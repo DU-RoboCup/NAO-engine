@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+# Directories
+
+.qi/
+build-linux64/
+build-cross-atom/
