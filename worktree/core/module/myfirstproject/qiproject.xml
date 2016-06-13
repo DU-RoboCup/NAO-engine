@@ -1,0 +1,3 @@
+<project name="myfirstproject">
+  <depends buildtime="true" runtime="true" names="libnaoqi" />
+</project>
