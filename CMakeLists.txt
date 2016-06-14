@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 project(NAO-engine)
 find_package(qibuild)
 
+# External Libraries
+ExternalProject_Add(luatables "lib/luatables")
+
+
+
 # Create a executable named n_a_o-engine
 # with the source file: main.cpp
 #qi_create_bin(NAO-engine "main.cpp")
