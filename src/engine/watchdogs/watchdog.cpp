@@ -25,14 +25,34 @@ VERSION HISTORY
 Put a description of your cpp file here. 
 */
 
-#ifdef PINEAPPLE_VERSION_0_0_1
-// Put version specific code here
-#endif
 
-#ifdef NAO_SDK_VERSION_2_1_4_13
-// Put Nao SDK version specific code here
-#endif
+// Includes
+#include "engine/watchdogs/watchdog.h"
 
-namespace SomeNamespace {
-	// Your code here ?
+void watchdog(int sig) {
+	std::cout << "The DOG DIED." << std::endl;
+	alarm(5);
+}
+
+int main(int argc, char**argv) {
+
+	// Version String information
+	std::cout << "Now running Pineapple, the University of Denver robocup NAO-Engine" << std::endl;	
+	#ifdef PINEAPPLE_VERSION_0_0_1
+		std::cout << "Current Pineapple version: 0.0.1" << std::endl;
+	#endif
+	#ifdef NAO_SDK_VERSION_2_1_4_13
+		std::cout << "Compiled NAO-SDK version: 2.1.4.13" << std::endl;
+	#endif
+
+	// Simple watchdog timer using sigalrm which dies after 5 seconds
+	signal(SIGALRM, watchdog);
+	alarm(5);
+	int i = 0;
+	while (true) {
+		sleep(i);
+		std::cout << "Petting the dog...." << std::endl;
+		alarm(5);
+		i++;
+	}
 }

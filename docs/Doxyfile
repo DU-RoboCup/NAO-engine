@@ -1,0 +1,24 @@
+PROJECT_NAME           = "Pineapple"
+PROJECT_NUMBER         = ..
+STRIP_FROM_PATH        = /home/vagrant/NAO/NAO-engine \
+                         /home/vagrant/NAO/NAO-engine/build-linux64
+INPUT                  =  \
+                         /home/vagrant/NAO/NAO-engine \
+                         /home/vagrant/NAO/NAO-engine/build-linux64
+FILE_PATTERNS          = *.h \
+                         *.cc \
+                         *.cpp \
+                         *.hpp \
+                         *.docs
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = */.qi/* \
+						 */.git/* \
+						 */code_templates/* \
+						 */build-linux64/* \
+						 */build-cross-atom/* \
+						 */lib/* \
+						 */examples/* \
+						
+						
+USE_MDFILE_AS_MAINPAGE = 
+EXTRACT_ALL = YES
