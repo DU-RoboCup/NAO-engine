@@ -47,4 +47,5 @@ else()
 	qi_use_lib(test_luatables luatables lua)
 endif()
 	
-
+#export compilation flags for YouCompleteMe
+set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
