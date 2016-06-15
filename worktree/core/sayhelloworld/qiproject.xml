@@ -1,3 +1,0 @@
-<project name="sayhelloworld">
-  <depends buildtime="true" runtime="true" names="libnaoqi" />
-</project>

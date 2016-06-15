@@ -1,3 +1,0 @@
-<project name="myfirstlocalmodule" >
-  <depends buildtime="true" runtime="true" names="libnaoqi" />
-</project>

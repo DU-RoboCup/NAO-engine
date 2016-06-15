@@ -1,3 +1,0 @@
-<project name="myfirstremotemodule">
-  <depends buildtime="true" runtime="true" names="libnaoqi" />
-</project>
