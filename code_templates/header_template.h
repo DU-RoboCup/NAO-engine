@@ -1,4 +1,4 @@
-/**
+/*
 Copyright (c) 2016 "University of Denver"
 
 This file is part of Pineapple.
@@ -21,37 +21,37 @@ VERSION HISTORY
 -- Modified by Mark Whalburg 7/14/18
 -- Modified by Hugh Jass 7/14/18
 
-/// FILE DESCRIPTION
+// FILE DESCRIPTION
 Put a description of your class/header file here. 
 */
 
-#ifndef __SOMEHEADERFILE.h__GUARD
-#define __SOMEHEADERFILE.h__GUARD
+#ifndef _SOMEHEADERFILE_h_GUARD
+#define _SOMEHEADERFILE_h_GUARD
 
-#ifdef PINEAPPLE_VERSION_0.0.1
+#ifdef PINEAPPLE_VERSION_0_0_1
 // Put version specific code here
 #endif
 
-#ifdef NAO_SDK_VERSION_2.1.4.13
+#ifdef NAO_SDK_VERSION_2_1_4_13
 // Put Nao SDK version specific code here
 #endif
 
-/// INCLUDES
+/ INCLUDES
 #include <algorithm>
 #include <someclass>
 
 
 namespace HeaderTemplateNamespace {
-	/***
+	/**
 	 * Doxygen style documentation for the class
 	 */
 	class MyClass : public AnotherClass {
 		public:
-			/*** Doxygen documentation for the function */
+			/** Doxygen documentation for the function */
 			void someFunction();
-			/*** Doxygen documentation for the function */
+			/** Doxygen documentation for the function */
 			someclass someOtherFunction(SomeParam c);
-			/*** Doxygen docs for another function */
+			/** Doxygen docs for another function */
 			void doSomething(int x) {
 				if (some condition) {
 					// code here
@@ -65,15 +65,15 @@ namespace HeaderTemplateNamespace {
 			}
 
 		private:
-			/*** Docs for the member variable */
+			/* Docs for the member variable */
 			int anInt = 0;
 	}
 
 }
 
-/**
+/*
  * Note - Please don't forget to use 'deprecated' labels if your
  * code is deprecated
  */
 
-#endif /*__SOMEHEADERFILE.h__GUARD
+#endif /*_SOMEHEADERFILE.h_GUARD
