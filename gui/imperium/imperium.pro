@@ -14,10 +14,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    Widgets/Network/connect.cpp
+    widgets/network/connect.cpp
 
 HEADERS  += mainwindow.h \
-    Widgets/Network/connect.h
+    widgets/network/connect.h
 
 FORMS    += mainwindow.ui \
-    Widgets/Network/connect.ui
+    widgets/network/connect.ui

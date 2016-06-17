@@ -8,9 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     //Create Qt elements here
-    QGridLayout *gridLayout = new QGridLayout;
-    QPushButton *addRobot = new QPushButton("Connect a Robot");
-
 
 }
 
