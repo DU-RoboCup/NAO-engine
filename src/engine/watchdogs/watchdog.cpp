@@ -28,10 +28,12 @@ Put a description of your cpp file here.
 
 // Includes
 #include "engine/watchdogs/watchdog.h"
+#include "debug/debug.h"
 
 void watchdog(int sig) {
 	std::cout << "The DOG DIED." << std::endl;
-	alarm(5);
+	LOG(fatal) << "The dog died. RIP.";
+    alarm(5);
 }
 
 int main(int argc, char**argv) {

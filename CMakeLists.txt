@@ -4,7 +4,7 @@ include(/usr/share/cmake-2.8/Modules/ExternalProject.cmake)
 
 # Include the qibuild system
 find_package(qibuild)
-
+# Include boost
 # Define the toolchain location
 set(CROSS_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/cross-atom/toolchain-cross-atom.cmake")
 set(SDK_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/linux64/toolchain-linux64.cmake")

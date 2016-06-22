@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QGridLayout>
+#include <QVBoxLayout>
+#include <widgets/network/connect.h>
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +20,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Connect *connect_window;
 };
 
 #endif // MAINWINDOW_H

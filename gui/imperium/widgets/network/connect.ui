@@ -91,9 +91,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="config_button">
         <property name="text">
-         <string>PushButton</string>
+         <string>Configure</string>
         </property>
        </widget>
       </item>
