@@ -28,7 +28,7 @@ Put a description of your cpp file here.
 
 // Includes
 #include "engine/watchdogs/watchdog.h"
-#include "debug/debug.h"
+#include "debug/debugging.h"
 
 void watchdog(int sig) {
 	std::cout << "The DOG DIED." << std::endl;

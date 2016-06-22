@@ -34,7 +34,7 @@ as well as easy to use unit tests. It makes extensive use of Boost.Log and Boost
 // Put Nao SDK version specific code here
 #endif
 
-#include "debug/debug.h"
+#include "debug/debugging.h"
 #include <iomanip>
 namespace bl		 = boost::log;
 namespace src		 = boost::log::sources;

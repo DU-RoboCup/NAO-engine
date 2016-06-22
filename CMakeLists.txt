@@ -5,6 +5,8 @@ include(/usr/share/cmake-2.8/Modules/ExternalProject.cmake)
 # Include the qibuild system
 find_package(qibuild)
 # Include boost
+find_package(Boost 1.43 COMPONENTS log REQUIRED)
+
 # Define the toolchain location
 set(CROSS_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/cross-atom/toolchain-cross-atom.cmake")
 set(SDK_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/linux64/toolchain-linux64.cmake")
@@ -20,7 +22,8 @@ endif()
 
 # Setup some additional import locations
 set(INC_DIRECTORIES "${CMAKE_SOURCE_DIR}/include")
-include_directories(${INC_DIRECTORIES})
+include_directories(${INC_DIRECTORIES} ${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIRS})
 
 # Set version information
 add_definitions(-DPINEAPPLE_VERSION_0_0_1 -DNAO_SDK_VERSION_2_1_4_13)
