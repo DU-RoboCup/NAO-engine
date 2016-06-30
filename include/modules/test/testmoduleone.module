@@ -1,0 +1,6 @@
+module = {
+	name = "Test Module One",
+	liblocation = "libtmoduleone.so",
+	rfps = 20,
+	mprio = 5
+}

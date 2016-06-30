@@ -32,7 +32,7 @@ if (${IS_CROSS} STREQUAL "TRUE")
 	message("Building with cross-atom compilation...")
 	
 	# Build the luatables library
-	qi_create_lib(luatables lib/luatables/luatables.h lib/luatables/luatables.cc)
+	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
 	qi_use_lib(luatables lua)
 	qi_stage_lib(luatables)
 
@@ -48,7 +48,7 @@ else()
 	message("Building with SDK compilation...")
 
 	# Build the luatables library
-	qi_create_lib(luatables lib/luatables/luatables.h lib/luatables/luatables.cc)
+	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
 	qi_use_lib(luatables lua)
 	qi_stage_lib(luatables)
 

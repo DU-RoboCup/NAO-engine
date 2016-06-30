@@ -28,9 +28,13 @@ Put a description of your cpp file here.
 
 // Includes
 #include "engine/watchdogs/watchdog.h"
+#include "engine/main/mloader.h"
+
+uint16_t id = 0;
 
 void watchdog(int sig) {
 	std::cout << "The DOG DIED." << std::endl;
+	ModuleLoader::Instance()->UnloadModule(id);
 	alarm(5);
 }
 
@@ -45,14 +49,24 @@ int main(int argc, char**argv) {
 		std::cout << "Compiled NAO-SDK version: 2.1.4.13" << std::endl;
 	#endif
 
+	// Load a module
+	id = ModuleLoader::Instance()->LoadModule("testmoduleone.module");
+	std::cout << "NAME: " << ModuleLoader::Instance()->GetModule(id)->GetName() << std::endl;
+	std::cout << "FPS:  " << ModuleLoader::Instance()->GetModule(id)->GetFPS() << std::endl;
+	std::cout << "PRIO: " << unsigned(ModuleLoader::Instance()->GetModule(id)->GetPriority()) << std::endl;
+	std::cout << "ID:   " << ModuleLoader::Instance()->GetModule(id)->GetID() << std::endl;
+
+
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
 	signal(SIGALRM, watchdog);
 	alarm(5);
-	int i = 0;
+	int i = 1;
 	while (true) {
 		sleep(i);
+		if (ModuleLoader::Instance()->GetModule(id))
+			ModuleLoader::Instance()->GetModule(id)->RunFrame();
 		std::cout << "Petting the dog...." << std::endl;
-		alarm(5);
 		i++;
+		alarm(5);
 	}
 }

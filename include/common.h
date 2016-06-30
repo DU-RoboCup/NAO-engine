@@ -27,7 +27,18 @@ This file contains a number of includes which are necessary for most of the proj
 #ifndef _COMMON_h_GUARD
 #define _COMMON_h_GUARD
 
+// Macros
 #include "util/branch_macros.h"
+
+// Constants
 #include "util/constants.h"
 
-#endif /*_COMMON_h_GUARD
+// Necessary headers for luatables
+#include "lib/luatables/luatables.h"
+#include <string>
+
+
+
+
+
+#endif /*_COMMON_h_GUARD */
