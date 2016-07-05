@@ -28,10 +28,14 @@ Put a description of your cpp file here.
 
 // Includes
 #include "engine/watchdogs/watchdog.h"
+#include "debug/debugging.h"
+
 
 void watchdog(int sig) {
 	std::cout << "The DOG DIED." << std::endl;
-	alarm(5);
+    BOOST_LOG_FUNCTION();
+    LOG_FATAL << "The dog is dead";
+    alarm(5);
 }
 
 int main(int argc, char**argv) {
@@ -45,14 +49,19 @@ int main(int argc, char**argv) {
 		std::cout << "Compiled NAO-SDK version: 2.1.4.13" << std::endl;
 	#endif
 
+    BOOST_LOG_FUNCTION();
+    LOG_DEBUG << "Starting watchdog...";
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
 	signal(SIGALRM, watchdog);
 	alarm(5);
 	int i = 0;
 	while (true) {
 		sleep(i);
+		LOG_DEBUG << "Petting the dog";
 		std::cout << "Petting the dog...." << std::endl;
 		alarm(5);
 		i++;
 	}
+  //  cleanup_logger();
+    return 0;
 }
