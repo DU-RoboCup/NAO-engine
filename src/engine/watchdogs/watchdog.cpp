@@ -33,6 +33,7 @@ Put a description of your cpp file here.
 
 void watchdog(int sig) {
 	std::cout << "The DOG DIED." << std::endl;
+    BOOST_LOG_FUNCTION();
     LOG_FATAL << "The dog is dead";
     alarm(5);
 }
@@ -48,12 +49,8 @@ int main(int argc, char**argv) {
 		std::cout << "Compiled NAO-SDK version: 2.1.4.13" << std::endl;
 	#endif
 
-    //initialize logger
-//    initialize_logger();
-//    LOG() << "Watchdog has started";
-//    LOG_ERROR() << "ERROR test";
-    
-
+    BOOST_LOG_FUNCTION();
+    LOG_DEBUG << "Starting watchdog...";
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
 	signal(SIGALRM, watchdog);
 	alarm(5);

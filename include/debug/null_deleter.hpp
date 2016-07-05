@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-namespace boost_future {
+namespace boost {
 
 //! A function object that does nothing and can be used as an empty deleter for \c shared_ptr
 struct null_deleter

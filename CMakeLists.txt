@@ -59,7 +59,8 @@ else()
     set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
     qi_create_bin(test_luatables "test/test_luatables.cpp")
     qi_use_lib(test_luatables luatables lua)
-
+    
+    
     add_subdirectory(src)
 
 endif()

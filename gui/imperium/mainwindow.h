@@ -3,8 +3,10 @@
 
 #include <QMainWindow>
 #include <QGridLayout>
-#include <QVBoxLayout>
-#include <widgets/network/connect.h>
+#include <QTextBrowser>
+#include <QLabel>
+#include <QPushButton>
+#include "widgets/robot_view/robot_status_widget.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,7 +22,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Connect *connect_window;
 };
 
 #endif // MAINWINDOW_H

@@ -1,3 +1,7 @@
+#ifndef _DEBUGGER_H_
+#define _DEBUGGER_H_
+
+#define BOOST_LOG_DYN_LINK 1 // necessary when linking the boost_log library dynamically
 /*
 Copyright (c) 2016 "University of Denver"
 
@@ -17,83 +21,87 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 VERSION HISTORY
--- Created by Paul Heinen 06/21/16
+-- Created by Paul Heinen 6/21/16
 
 // FILE DESCRIPTION
-Glorious Debug module to keep NAO safe
+    This is the global logger modules header file.
 */
 
-#ifndef _DEBUG_h_GUARD
-#define _DEBUG_h_GUARD
+// Includes
+#include <boost/shared_ptr.hpp>
+#include <boost/log/common.hpp>
+#include <boost/log/sinks.hpp>
+#include <boost/log/exceptions.hpp>
 
-#ifdef PINEAPPLE_VERSION_0_0_1
-// Put version specific code here
-#endif
-
-#ifdef NAO_SDK_VERSION_2_1_4_13
-// Put Nao SDK version specific code here
-#endif
-
-
-
-#define BOOST_LOG_DYN_LINK 1
+#include <boost/log/sources/logger.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/core/core.hpp>
+
 #include <boost/log/expressions/formatters/date_time.hpp>
 #include <boost/log/expressions.hpp>
-#include <boost/log/sinks/sync_frontend.hpp>
-#include <boost/log/sinks/text_ostream_backend.hpp>
-#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/attributes.hpp>
+
 #include <boost/log/support/date_time.hpp>
-#include <boost/log/trivial.hpp>
+
 #include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/exception_handler.hpp>
+#include <boost/log/utility/string_literal.hpp>
+
 #include <boost/log/attributes/mutable_constant.hpp>
 #include "null_deleter.hpp"
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-#include <fstream>
+#include <exception>
+#include <string>
 #include <ostream>
-
 
 // Boost.Log Namespaces
 namespace logging = boost::log;
+namespace keywords = boost::log::keywords;
 namespace src = boost::log::sources;
 namespace expr = boost::log::expressions;
 namespace sinks = boost::log::sinks;
 namespace attrs = boost::log::attributes;
 
 
-
-// Templated Attributes
-/*template<typename ValueType>
-ValueType set_get_attribute(const char* name, ValueType value)
+// Basic exception handler
+struct handler
 {
-    auto attribute =
-            logging::attribute_cast<attrs::mutable_constant<ValueType>>(logging::core::get()->get_global_attributes()[name]);
-    attribute.set(value);
-    return attribute.get();
-}*/
-
-//auto set_get_attribute("File", __FILE__);
+    void operator()(const logging::runtime_error &ex) const
+    {
+        std::cerr << "boost::log::runtime_error: " << ex.what() << ", congrats, you broke the logger.\n";
+    }
+    void operator()(const std::exception &ex) const
+    {
+        std::cerr << "std::exception: " << ex.what() << ", congrats, you broke the logger.\n";
+    }
+};
 
 // Logger Attributes
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
-//BOOST_LOG_ATTRIBUTE_KEYWORD(filename, "File", std::string)
 BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime)
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", logging::trivial::severity_level)
-
+BOOST_LOG_ATTRIBUTE_KEYWORD(scope, "Scope", attrs::named_scope)
+BOOST_LOG_ATTRIBUTE_KEYWORD(uptime, "Uptime", boost::posix_time::time_duration)
+BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
 
 
 // Functions
 std::string path_to_filename(std::string path);
-// the logs are also written to LOGFILE
-#define LOGFILE "logfile.log"
 
 // just log messages with severity >= SEVERITY_THRESHOLD are written
-#define SEVERITY_THRESHOLD logging::trivial::warning
+/* ========= ENTER SEVERITY THRESHOLD HERE =========
+ * Options are:
+ * 1. trace
+ * 2. info
+ * 3. debug
+ * 4. warning
+ * 5. error
+ * 6. fatal
+ */
 
+#define SEVERITY_THRESHOLD logging::trivial::debug
+// =================================================
 // register a global logger
 BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::log::trivial::severity_level>)
 
@@ -109,4 +117,5 @@ BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::l
 
 
 
-#endif 
+#endif
+
