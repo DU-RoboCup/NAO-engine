@@ -28,47 +28,61 @@ Module header file - presents the front interface for dynamic class loading
 #define _MODULE_h_GUARD
 
 #include "common.h"
-#include <string>
-#include <stdint>
+#include <string> 
+#include <stdint.h>
+
 
 
 class Module {
     public:
-        /** Called every time that the module gets frame time */
+        
+        /**
+         * Reconfigure a module
+         * @param   uint16_t    The ID of the module
+         * @param   uint16_t    The FPS of the module
+         * @param   uint8_t     The priority of the module
+         * @param   std::string The Name of the module
+         */
+        virtual void Reconfigure(uint16_t id, uint16_t fps, uint8_t priority, std::string name) = 0;
+
+        /**
+         * Run every time that a module is given frame time
+         * @return bool Whether or not there were errors
+         */
         virtual bool RunFrame() = 0;
 
-        /** Publish an API of calls to the bazzar, which will 
-         * allow us to throw errors if other modules try to 
-         * call something in it */
-        virtual std::vector<std::string> PublishRequestAPI() = 0;
-
-        /** Run when installing the module to the robot locally */
+        /**
+         * Run the first time that the module is installed
+         * @return bool If successful.
+         */
         virtual bool Install() = 0;
 
-        /** Run when uninstalling the module to the robot locally */
+        /**
+         * Run the when the module is uninstalled
+         * @return bool If successful.
+         */
         virtual bool Uninstall() = 0;
 
         /** Get the name of the module */
         const std::string GetName() const {return ModuleName;} 
 
         /** Get the ID of the module */
-        const uint32_t GetID() const {return ModuleID;}
+        const uint16_t GetID() const {return ModuleID;}
 
         /** Get the requested FPS for the module */
-        const uint32_t GetFPS() const {return ModuleFPS;}
+        const uint16_t GetFPS() const {return ModuleFPS;}
 
         /** Get the priority of the module */
         const uint8_t GetPriority() const {return ModulePriority;}
 
     protected:
-        const std::string ModuleName; /** The module's name */
-        const uint32_t ModuleID = 0x00000000; /** The module's unique ID number. See config for more info */
-        const uint32_t ModuleFPS = 100; /** The FPS that the module requests to run on the robot */
-        const uint8_t ModulePriority = 0; /** The priority that the module runs at. 8 is lowest. */
+        std::string ModuleName; /** The module's name */
+        uint16_t ModuleID; /** The module's unique ID number. See config for more info */
+        uint16_t ModuleFPS; /** The FPS that the module requests to run on the robot */
+        uint8_t ModulePriority; /** The priority that the module runs at. 8 is lowest. */
     private:
-        // Nothing here! Modules are pretty public people.
 
-}
+};
 
 
-#endif /*_MODULE_h_GUARD
+#endif /*_MODULE_h_GUARD */

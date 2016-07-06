@@ -6,7 +6,9 @@ include(/usr/share/cmake-2.8/Modules/ExternalProject.cmake)
 find_package(qibuild)
 # Include boost
 find_package(Boost 1.43 COMPONENTS log log_setup system thread date_time REQUIRED)
-
+if(Boost_FOUND)
+    message(STATUS "Boost found!")
+endif()
 # Define the toolchain location
 set(CROSS_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/cross-atom/toolchain-cross-atom.cmake")
 set(SDK_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/linux64/toolchain-linux64.cmake")
@@ -31,13 +33,13 @@ add_definitions(-DPINEAPPLE_VERSION_0_0_1 -DNAO_SDK_VERSION_2_1_4_13)
 
 # Main build system
 if (${IS_CROSS} STREQUAL "TRUE")
-    
-    message("Building with cross-atom compilation...")
-    
-    # Build the luatables library
-    qi_create_lib(luatables lib/luatables/luatables.h lib/luatables/luatables.cc)
-    qi_use_lib(luatables lua)
-    qi_stage_lib(luatables)
+
+	message("Building with cross-atom compilation...")
+	
+	# Build the luatables library
+	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
+	qi_use_lib(luatables lua)
+	qi_stage_lib(luatables)
 
     # Build the test for luatables
     set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
@@ -50,10 +52,10 @@ else()
 
     message("Building with SDK compilation...")
 
-    # Build the luatables library
-    qi_create_lib(luatables lib/luatables/luatables.h lib/luatables/luatables.cc)
-    qi_use_lib(luatables lua)
-    qi_stage_lib(luatables)
+	# Build the luatables library
+	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
+	qi_use_lib(luatables lua)
+	qi_stage_lib(luatables)
 
     # Built the test for luatables
     set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")

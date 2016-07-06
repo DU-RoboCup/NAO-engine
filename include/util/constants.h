@@ -31,4 +31,4 @@ Define some useful floating point macros
 #define PI         3.1415926
 #define PHI        2.6180339
 
-#endif /*_COMMON_h_GUARD
+#endif /*_CONSTANTS_h_GUARD */

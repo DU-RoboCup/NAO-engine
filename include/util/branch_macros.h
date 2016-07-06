@@ -30,4 +30,4 @@ Define a bunch of GCC specific macros
 #define LIKELY(x)        __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)      __builtin_expect(!!(x), 0)
 
-#endif /*_BRANCH_PRED_MACROS_h_GUARD
+#endif /*_BRANCH_PRED_MACROS_h_GUARD */

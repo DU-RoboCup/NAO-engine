@@ -34,7 +34,7 @@ and makes sure that they check in from time to time.
 #include <iostream>
 #include <signal.h>
 #include <unistd.h>
-
+#include <exception>
 /*! The main entry point for the entire NAO-Engine. This main method starts
  * the threads in the proper order, as well as generates the necessary watchdogs
  * to keep the thread alive

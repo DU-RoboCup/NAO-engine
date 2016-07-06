@@ -29,13 +29,16 @@ Put a description of your cpp file here.
 // Includes
 #include "engine/watchdogs/watchdog.h"
 #include "debug/debugging.h"
+#include "engine/main/mloader.h"
 
+uint16_t id = 0;
 
 void watchdog(int sig) {
-	std::cout << "The DOG DIED." << std::endl;
-    BOOST_LOG_FUNCTION();
+	BOOST_LOG_FUNCTION();
     LOG_FATAL << "The dog is dead";
-    alarm(5);
+    std::cout << "The DOG DIED." << std::endl;
+	ModuleLoader::Instance()->UnloadModule(id);
+	alarm(5);
 }
 
 int main(int argc, char**argv) {
@@ -51,16 +54,30 @@ int main(int argc, char**argv) {
 
     BOOST_LOG_FUNCTION();
     LOG_DEBUG << "Starting watchdog...";
+	// Load a module
+	try {
+        id = ModuleLoader::Instance()->LoadModule("testmoduleone.module");
+    } catch (std::exception &ex) {
+        LOG_FATAL << ex.what() << ", the dog is dead on arrival.";
+    }
+    std::cout << "NAME: " << ModuleLoader::Instance()->GetModule(id)->GetName() << std::endl;
+	std::cout << "FPS:  " << ModuleLoader::Instance()->GetModule(id)->GetFPS() << std::endl;
+	std::cout << "PRIO: " << unsigned(ModuleLoader::Instance()->GetModule(id)->GetPriority()) << std::endl;
+	std::cout << "ID:   " << ModuleLoader::Instance()->GetModule(id)->GetID() << std::endl;
+
+
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
 	signal(SIGALRM, watchdog);
 	alarm(5);
-	int i = 0;
+	int i = 1;
 	while (true) {
 		sleep(i);
 		LOG_DEBUG << "Petting the dog";
+		if (ModuleLoader::Instance()->GetModule(id))
+			ModuleLoader::Instance()->GetModule(id)->RunFrame();
 		std::cout << "Petting the dog...." << std::endl;
-		alarm(5);
 		i++;
+		alarm(5);
 	}
   //  cleanup_logger();
     return 0;
