@@ -4,11 +4,7 @@ include(/usr/share/cmake-2.8/Modules/ExternalProject.cmake)
 
 # Include the qibuild system
 find_package(qibuild)
-# Include boost
-find_package(Boost 1.43 COMPONENTS log log_setup system thread date_time REQUIRED)
-if(Boost_FOUND)
-    message(STATUS "Boost found!")
-endif()
+
 # Define the toolchain location
 set(CROSS_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/cross-atom/toolchain-cross-atom.cmake")
 set(SDK_QI_TOOLCHAIN "/home/vagrant/.local/share/qi/toolchains/linux64/toolchain-linux64.cmake")
@@ -24,18 +20,21 @@ endif()
 
 # Setup some additional import locations
 set(INC_DIRECTORIES "${CMAKE_SOURCE_DIR}/include")
-include_directories(${INC_DIRECTORIES} ${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
 
 # Set version information
 add_definitions(-DPINEAPPLE_VERSION_0_0_1 -DNAO_SDK_VERSION_2_1_4_13)
 
+# Add some common include directories
+include_directories(${INC_DIRECTORIES})
+
+# Enable C++0x support
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x" )
 
 # Main build system
 if (${IS_CROSS} STREQUAL "TRUE")
 
 	message("Building with cross-atom compilation...")
-	
+
 	# Build the luatables library
 	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
 	qi_use_lib(luatables lua)
@@ -49,8 +48,17 @@ if (${IS_CROSS} STREQUAL "TRUE")
     add_subdirectory(src)
 
 else()
-
+    
     message("Building with SDK compilation...")
+
+    # Include boost
+    find_package(Boost 1.43 COMPONENTS log log_setup system thread date_time REQUIRED)
+    if(Boost_FOUND)
+        message(STATUS "Boost found!")
+    endif()
+
+    include_directories(${Boost_INCLUDE_DIR})
+    link_directories(${Boost_LIBRARY_DIRS})
 
 	# Build the luatables library
 	qi_create_lib(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)

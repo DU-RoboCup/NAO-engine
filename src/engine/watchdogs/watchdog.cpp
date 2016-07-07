@@ -36,7 +36,6 @@ uint16_t id = 0;
 void watchdog(int sig) {
 	BOOST_LOG_FUNCTION();
     LOG_FATAL << "The dog is dead";
-    std::cout << "The DOG DIED." << std::endl;
 	ModuleLoader::Instance()->UnloadModule(id);
 	alarm(5);
 }
@@ -44,26 +43,34 @@ void watchdog(int sig) {
 int main(int argc, char**argv) {
 
 	// Version String information
-	std::cout << "Now running Pineapple, the University of Denver robocup NAO-Engine" << std::endl;	
+	LOG_DEBUG << "Now running Pineapple, the University of Denver robocup NAO-Engine";
 	#ifdef PINEAPPLE_VERSION_0_0_1
-		std::cout << "Current Pineapple version: 0.0.1" << std::endl;
+		LOG_DEBUG << "Current Pineapple version: 0.0.1";
 	#endif
 	#ifdef NAO_SDK_VERSION_2_1_4_13
-		std::cout << "Compiled NAO-SDK version: 2.1.4.13" << std::endl;
+		LOG_DEBUG << "Compiled NAO-SDK version: 2.1.4.13";
 	#endif
 
     BOOST_LOG_FUNCTION();
     LOG_DEBUG << "Starting watchdog...";
+	
 	// Load a module
 	try {
-        id = ModuleLoader::Instance()->LoadModule("testmoduleone.module");
+        id = ModuleLoader::Instance()->LoadModule("config/modules/testmoduleone.module");
     } catch (std::exception &ex) {
         LOG_FATAL << ex.what() << ", the dog is dead on arrival.";
     }
-    std::cout << "NAME: " << ModuleLoader::Instance()->GetModule(id)->GetName() << std::endl;
-	std::cout << "FPS:  " << ModuleLoader::Instance()->GetModule(id)->GetFPS() << std::endl;
-	std::cout << "PRIO: " << unsigned(ModuleLoader::Instance()->GetModule(id)->GetPriority()) << std::endl;
-	std::cout << "ID:   " << ModuleLoader::Instance()->GetModule(id)->GetID() << std::endl;
+    LOG_DEBUG << "NAME: " << ModuleLoader::Instance()->GetModule(id)->GetName();
+	LOG_DEBUG << "FPS:  " << ModuleLoader::Instance()->GetModule(id)->GetFPS();
+	LOG_DEBUG << "PRIO: " << unsigned(ModuleLoader::Instance()->GetModule(id)->GetPriority());
+	LOG_DEBUG << "ID:   " << ModuleLoader::Instance()->GetModule(id)->GetID();
+
+	// Show off the bazaar
+	std::string hw = "Hello World!";
+	boost::any* a = new boost::any(hw);
+	std::shared_ptr<boost::any> hello(a); 
+	Bazaar::Vend("HelloWorldKey", hello);
+	LOG_DEBUG <<  boost::any_cast<std::string>(*Bazaar::Get("HelloWorldKey"));
 
 
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
@@ -75,7 +82,6 @@ int main(int argc, char**argv) {
 		LOG_DEBUG << "Petting the dog";
 		if (ModuleLoader::Instance()->GetModule(id))
 			ModuleLoader::Instance()->GetModule(id)->RunFrame();
-		std::cout << "Petting the dog...." << std::endl;
 		i++;
 		alarm(5);
 	}

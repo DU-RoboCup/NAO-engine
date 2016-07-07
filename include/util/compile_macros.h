@@ -17,35 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 VERSION HISTORY
--- Created by David Chan 6/20/16
+-- Created by David Chan 7/7/16
 
 // FILE DESCRIPTION
 
-This file contains a number of includes which are necessary for most of the projects we are developing. It allows us to include with only one step.
+Define a bunch of GCC specific macros for compiling
 */
 
-#ifndef _COMMON_h_GUARD
-#define _COMMON_h_GUARD
+#ifndef _COMPILE_MACROS_h_GUARD
+#define _COMPILE_MACROS_h_GUARD
 
-// Macros
-#include "util/branch_macros.h"
-//#include "util/compile_macros.h"
+#include <ctime>
+#include // DEBUG
 
-// Constants
-#include "util/constants.h"
+// Warn if function call exceeds a certain time
+#define WARN_TIME(X, TIME)   {\
+								clock_t t = clock(); \
+								X \
+								t = clock() - t; \
+								if (((float)t)/CLOCKS_PER_SEC > TIME) \
+									LOG_WARNING << "Action " << #X << " Took longer than expected (Took " << ((float)t)/CLOCKS_PER_SEC << "s instead of" << #TIME << "s)" << std::endl; \
+							 }
 
-// Memory
-#include "memory/memory.h"
-
-// Debugging
-#include "debug/debugging.h"
-
-// Necessary headers for luatables
-#include "lib/luatables/luatables.h"
-#include <string>
-
-
-
-
-
-#endif /*_COMMON_h_GUARD */
+#endif /*_COMPILE_MACROS_h_GUARD */

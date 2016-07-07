@@ -1,7 +1,3 @@
-#ifndef _DEBUGGER_H_
-#define _DEBUGGER_H_
-
-#define BOOST_LOG_DYN_LINK 1 // necessary when linking the boost_log library dynamically
 /*
 Copyright (c) 2016 "University of Denver"
 
@@ -26,6 +22,12 @@ VERSION HISTORY
 // FILE DESCRIPTION
     This is the global logger modules header file.
 */
+
+#ifndef _DEBUGGER_H_
+#define _DEBUGGER_H_
+
+#define BOOST_LOG_DYN_LINK 1 // necessary when linking the boost_log library dynamically
+
 
 // Includes
 #include <boost/shared_ptr.hpp>
@@ -114,7 +116,6 @@ BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::l
 #define LOG_WARNING LOG(warning)
 #define LOG_ERROR   LOG(error)
 #define LOG_FATAL   LOG(fatal)
-
 
 
 #endif

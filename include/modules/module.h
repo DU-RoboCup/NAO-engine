@@ -28,6 +28,7 @@ Module header file - presents the front interface for dynamic class loading
 #define _MODULE_h_GUARD
 
 #include "common.h"
+#include "memory/intent.h"
 #include <string> 
 #include <stdint.h>
 
@@ -46,12 +47,6 @@ class Module {
         virtual void Reconfigure(uint16_t id, uint16_t fps, uint8_t priority, std::string name) = 0;
 
         /**
-         * Run every time that a module is given frame time
-         * @return bool Whether or not there were errors
-         */
-        virtual bool RunFrame() = 0;
-
-        /**
          * Run the first time that the module is installed
          * @return bool If successful.
          */
@@ -62,6 +57,24 @@ class Module {
          * @return bool If successful.
          */
         virtual bool Uninstall() = 0;
+
+
+        /**
+         * Run every time that a module is given frame time
+         * @return bool Whether or not there were errors
+         */
+        virtual bool RunFrame() = 0;
+
+
+        /**
+         * Called when an intent is submitted to a module. 
+         * This function should really not do more than save the 
+         * intent for later. If it is necessary to perform computation
+         * then it can be done, but a warning will be thrown
+         * @return bool If it was successful
+         */
+        virtual bool ProcessIntent(Intent &intent) = 0;
+
 
         /** Get the name of the module */
         const std::string GetName() const {return ModuleName;} 

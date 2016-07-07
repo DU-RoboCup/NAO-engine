@@ -17,35 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 VERSION HISTORY
--- Created by David Chan 6/20/16
+-- Created by David Chan 7/7/16
 
 // FILE DESCRIPTION
 
-This file contains a number of includes which are necessary for most of the projects we are developing. It allows us to include with only one step.
+This file deals with the inter-module communication, in what I think 
+is a relatively nice manner. It also holds a shared memory repository
+for other modules
+
 */
 
-#ifndef _COMMON_h_GUARD
-#define _COMMON_h_GUARD
+#ifndef _INTENT_h_GUARD_
+#define _INTENT_h_GUARD_
 
-// Macros
-#include "util/branch_macros.h"
-//#include "util/compile_macros.h"
-
-// Constants
-#include "util/constants.h"
-
-// Memory
-#include "memory/memory.h"
-
-// Debugging
-#include "debug/debugging.h"
-
-// Necessary headers for luatables
-#include "lib/luatables/luatables.h"
 #include <string>
 
 
+// Intents form the backbone of IMC, each intent is processed 
+// by the modules, and so - any module can willingly ignore the
+// pending intents. Each intent is string recognized and matched
+struct Intent {
+	Intent(std::string v) : value(v) {}
+	std::string value;
+};
 
 
-
-#endif /*_COMMON_h_GUARD */
+#endif /*_INTENT_h_GUARD_*/

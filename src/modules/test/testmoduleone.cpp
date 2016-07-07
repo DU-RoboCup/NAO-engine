@@ -27,16 +27,28 @@ void TestModuleOne::Reconfigure(uint16_t id, uint16_t fps, uint8_t priority, std
 }
 
 bool TestModuleOne::RunFrame() {
-	std::cout << ".";
+
+	LuaTable ltable = LuaTable::fromFile("config/modules/myfile.lua");
+	std::string name = ltable["name"].get<std::string>();
+	double height = ltable["height"].get<double>();
+	std::string country = ltable["address"]["country"].get<std::string> ();
+	
+	LOG_DEBUG << "Name: " << name << " Height: " << height << " Country: " << country; 
+
 	return true;
 }
 
+bool TestModuleOne::ProcessIntent(Intent &i)
+{
+	// Ignore it.
+}
+
 bool TestModuleOne::Install() {
-	std::cout << "Installed Test Module One" << std::endl;
+	LOG_DEBUG << "Installed Test Module One";
 	return true;
 }
 
 bool TestModuleOne::Uninstall() {
-	std::cout << "Uninstalled Test Module One" << std::endl;
+	LOG_DEBUG << "Uninstalled Test Module One";
 	return true;
 }
