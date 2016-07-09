@@ -2,12 +2,16 @@ SET(SOURCE_FILES 	watchdog.cpp
 					../main/mloader.cpp
 					../../debug/debug.cpp
 					../../memory/memory.cpp
+					../main/frame.cpp
+					../main/schedule.cpp
 )
 
 SET(CROSS_SOURCE_FILES 	watchdog.cpp
 						../main/mloader.cpp
 						../../debug/debug.cpp
 						../../memory/memory.cpp
+						../main/frame.cpp
+						../main/schedule.cpp
 )
 
 if (${IS_CROSS} STREQUAL "TRUE")

@@ -44,7 +44,7 @@ class Module {
          * @param   uint8_t     The priority of the module
          * @param   std::string The Name of the module
          */
-        virtual void Reconfigure(uint16_t id, uint16_t fps, uint8_t priority, std::string name) = 0;
+        virtual void Reconfigure(std::string config_file, uint16_t id) = 0;
 
         /**
          * Run the first time that the module is installed
@@ -88,11 +88,16 @@ class Module {
         /** Get the priority of the module */
         const uint8_t GetPriority() const {return ModulePriority;}
 
+        /** Get the thread of the module */
+        const uint8_t GetThread() const {return ModuleThread;}
+
+
     protected:
         std::string ModuleName; /** The module's name */
         uint16_t ModuleID; /** The module's unique ID number. See config for more info */
         uint16_t ModuleFPS; /** The FPS that the module requests to run on the robot */
         uint8_t ModulePriority; /** The priority that the module runs at. 8 is lowest. */
+        uint16_t ModuleThread; /** The thread that the module should run on (1-NUM_THREAD) */
     private:
 
 };

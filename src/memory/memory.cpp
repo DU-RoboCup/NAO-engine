@@ -116,7 +116,8 @@ bool Memory::updateKVPair(std::string key, std::shared_ptr<boost::any> data) {
 		LOG_WARNING << "When adding to memory at memory time " << this->memory_time << ", key " << key << " does not exist in the IMC map. Adding." ;
 		return this->addKVPair(key, data);
 	} else {
-		this->mem[key].data = data;
+		if (this->mem[key].data != data)
+			this->mem[key].data = data;
 		this->mem[key].last_updated = this->memory_time;
 		for (auto s = this->mem[key].subs.begin(); s != this->mem[key].subs.end(); s++) {
 			#ifdef DEBUG_LEVEL_7

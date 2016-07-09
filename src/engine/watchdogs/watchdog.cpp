@@ -29,18 +29,21 @@ Put a description of your cpp file here.
 // Includes
 #include "engine/watchdogs/watchdog.h"
 #include "debug/debugging.h"
-#include "engine/main/mloader.h"
+#include "engine/main/frame.h"
+
 
 uint16_t id = 0;
+bool timeout = false;
 
 void watchdog(int sig) {
 	BOOST_LOG_FUNCTION();
-    LOG_FATAL << "The dog is dead";
-	ModuleLoader::Instance()->UnloadModule(id);
-	alarm(5);
+    LOG_FATAL << "The main frame is not responding...";
+	LOG_FATAL << "We need to kill the frame...";
+	LOG_FATAL << "WE DON'T KNOW HOW TO DO THAT YET!!!!!!!!!";
+	LOG_FATAL << "AHHHHHHHHHHHHHHHHHHHH";
 }
 
-int main(int argc, char**argv) {
+int main(int argc, char** argv) {
 
 	// Version String information
 	LOG_DEBUG << "Now running Pineapple, the University of Denver robocup NAO-Engine";
@@ -51,9 +54,22 @@ int main(int argc, char**argv) {
 		LOG_DEBUG << "Compiled NAO-SDK version: 2.1.4.13";
 	#endif
 
+	// Setup the global clock
+	std::shared_ptr<boost::any> global_clock(new boost::any(clock_t()));
+	*global_clock = clock();
+	Bazaar::Vend("Global/Clock", global_clock);
+
     BOOST_LOG_FUNCTION();
     LOG_DEBUG << "Starting watchdog...";
+    signal(SIGALRM, watchdog);
+	alarm(30);
 	
+	LOG_DEBUG << "Running the frame...";
+	Frame f;
+	f.Run();
+
+
+	/*
 	// Load a module
 	try {
         id = ModuleLoader::Instance()->LoadModule("config/modules/testmoduleone.module");
@@ -74,8 +90,7 @@ int main(int argc, char**argv) {
 
 
 	// Simple watchdog timer using sigalrm which dies after 5 seconds
-	signal(SIGALRM, watchdog);
-	alarm(5);
+	
 	int i = 1;
 	while (true) {
 		sleep(i);
@@ -85,6 +100,7 @@ int main(int argc, char**argv) {
 		i++;
 		alarm(5);
 	}
+	*/
   //  cleanup_logger();
     return 0;
 }

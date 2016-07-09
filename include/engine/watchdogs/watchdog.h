@@ -31,10 +31,14 @@ and makes sure that they check in from time to time.
 #define _WATCHDOG_h_GUARD_
 
 // INCLUDES
+#include "engine/main/frame.h"
+
 #include <iostream>
 #include <signal.h>
 #include <unistd.h>
 #include <exception>
+#include <ctime>
+
 /*! The main entry point for the entire NAO-Engine. This main method starts
  * the threads in the proper order, as well as generates the necessary watchdogs
  * to keep the thread alive

@@ -51,8 +51,8 @@ uint16_t ModuleLoader::LoadModule(std::string module_file) {
 	void* hndl = dlopen(mconfig["liblocation"].get<std::string>().c_str(), RTLD_LAZY);
 	if (!hndl) {
 		// There's an error loading the module
-		std::cout << "Error Loading Module DLOpen Null..." << std::endl;
-		std::cout << dlerror() << std::endl;
+		LOG_WARNING << "Error Loading Module DLOpen Null..." << std::endl;
+		LOG_WARNING << dlerror() << std::endl;
 		return 0x0;
 	}
 	void* inst = dlsym(hndl, "mkrfn");
@@ -79,7 +79,7 @@ uint16_t ModuleLoader::LoadModule(std::string module_file) {
 	}
 
 	// Reconfigure the module
-	loaded_module->Reconfigure(id, (int)mconfig["rfps"].get<double>(),(int)mconfig["mprio"].get<double>(), mconfig["name"].get<std::string>());
+	loaded_module->Reconfigure(module_file, id);
 
 	// Keep the string map updated
 	name_map[loaded_module->GetName()] = 	id;

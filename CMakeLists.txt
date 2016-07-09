@@ -22,7 +22,7 @@ endif()
 set(INC_DIRECTORIES "${CMAKE_SOURCE_DIR}/include")
 
 # Set version information
-add_definitions(-DPINEAPPLE_VERSION_0_0_1 -DNAO_SDK_VERSION_2_1_4_13)
+add_definitions(-DPINEAPPLE_VERSION_0_0_1 -DNAO_SDK_VERSION_2_1_4_13 -D_GLIBCXX_USE_NANOSLEEP)
 
 # Add some common include directories
 include_directories(${INC_DIRECTORIES})

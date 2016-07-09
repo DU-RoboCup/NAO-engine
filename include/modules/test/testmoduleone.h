@@ -14,7 +14,7 @@ class TestModuleOne : public Module {
 	public:
 		static TestModuleOne* Instance();
 
-		void Reconfigure(uint16_t id, uint16_t fps, uint8_t priority, std::string name);
+		void Reconfigure(std::string config_file, uint16_t id);
 		
 		bool RunFrame();
 		bool ProcessIntent(Intent &i);
