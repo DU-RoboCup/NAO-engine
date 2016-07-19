@@ -1,4 +1,4 @@
-# DU Nao-Engine (version 0.0.1)
+# DU Nao-Engine (version 0.0.2)
 
 Check out our wiki [here](https://github.com/DU-RoboCup/NAO-engine/wiki) for information on compiling, installing, and other details.
 
