@@ -31,7 +31,7 @@ void TestModuleOne::Reconfigure(std::string config_file, uint16_t id) {
 
 bool TestModuleOne::RunFrame() {
 
-	LuaTable ltable = LuaTable::fromFile("config/modules/myfile.lua");
+	LuaTable ltable = LuaTable::fromFile("../config/modules/myfile.lua");
 	std::string name = ltable["name"].get<std::string>();
 	double height = ltable["height"].get<double>();
 	std::string country = ltable["address"]["country"].get<std::string> ();

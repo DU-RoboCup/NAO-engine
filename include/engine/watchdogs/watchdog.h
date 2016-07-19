@@ -31,7 +31,7 @@ and makes sure that they check in from time to time.
 #define _WATCHDOG_h_GUARD_
 
 // INCLUDES
-#include "engine/main/frame.h"
+#include "engine/main/context.h"
 
 #include <iostream>
 #include <signal.h>

@@ -22,13 +22,13 @@ VERSION HISTORY
 
 // FILE DESCRIPTION
 
-The main frame loop for the robot, deals with initialization, scheduling, and termination
+The main context loop for the robot, deals with initialization, scheduling, and termination
 
 */
 
 
-#ifndef _FRAME_h_GUARD_
-#define _FRAME_h_GUARD_
+#ifndef _CONTEXT_h_GUARD_
+#define _CONTEXT_h_GUARD_
 
 #include "common.h"
 #include "schedule.h"
@@ -45,7 +45,7 @@ The main frame loop for the robot, deals with initialization, scheduling, and te
 
 #define NUM_THREADS 2
 
-class Frame {
+class Context {
 	public:
 		void Run();
 		void Initialize();
@@ -58,7 +58,7 @@ class Frame {
 
 		RoundRobin* GetSchedule(uint8_t thread_id);
 
-		static void MainThreadLoop(Frame* myFrame, uint8_t id);
+		static void MainThreadLoop(Context* myFrame, uint8_t id);
 	private:
 		std::atomic<bool> is_dead;
 		std::vector<uint16_t> loaded_module_ids;

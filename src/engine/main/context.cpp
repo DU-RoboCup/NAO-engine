@@ -26,22 +26,22 @@ and termination
 
 */
 
-#include "engine/main/frame.h"
+#include "engine/main/context.h"
 
-void Frame::Run() {
+void Context::Run() {
 	this->Initialize();
 	this->Execute();
 	this->Cleanup();
 }
 
-void Frame::Initialize() {
-	LOG_DEBUG << "Initializing the main frame...";
+void Context::Initialize() {
+	LOG_DEBUG << "Initializing the main context...";
 
 	// We're no longer dead, so we run it
 	this->is_dead = false;
 
 	// Load the main conficuration
-	LuaTable mconfig = LuaTable::fromFile("config/main.config");
+	LuaTable mconfig = LuaTable::fromFile("../config/main.config");
 
 	// Figure out which modules that we need to load initially
 	int num_modules = (int) mconfig["len_init_modules"].get<double>();
@@ -54,7 +54,7 @@ void Frame::Initialize() {
 	for (auto i = init_modules.begin(); i != init_modules.end(); i++) {
 		std::string module = *i;
 		LOG_DEBUG << "Loading initial module " << module;
-		uint16_t module_id = ModuleLoader::Instance()->LoadModule("config/modules/" + module);
+		uint16_t module_id = ModuleLoader::Instance()->LoadModule("../config/modules/" + module);
 		if (UNLIKELY(module_id == 0)) {
 			// The module wasn't loaded properly
 			LOG_WARNING << "Failed to load module " << module;
@@ -92,12 +92,12 @@ void Frame::Initialize() {
 
 }
 
-void Frame::Execute() {
+void Context::Execute() {
 	// Create the threads that are a part of the thread pool
 	LOG_DEBUG << "Creating new threads in the frame...";
 
 	for (int i = 1; i <= NUM_THREADS; i++) {
-		threads[i] = new std::thread(Frame::MainThreadLoop, this, i);
+		threads[i] = new std::thread(Context::MainThreadLoop, this, i);
 	}
 
 	std::shared_ptr<boost::any> gc = Bazaar::Get("Global/Clock");
@@ -134,7 +134,7 @@ void Frame::Execute() {
 	LOG_DEBUG << "Finished joining threads...";	
 }
 
-void Frame::MainThreadLoop(Frame* myFrame, uint8_t thread_id) {
+void Context::MainThreadLoop(Context* myFrame, uint8_t thread_id) {
 	while (!myFrame->dead()) {
 		// Check in with the main frame
 		myFrame->checkin(thread_id);
@@ -143,17 +143,17 @@ void Frame::MainThreadLoop(Frame* myFrame, uint8_t thread_id) {
 	}
 }
 
-RoundRobin* Frame::GetSchedule(uint8_t thread_id) {
+RoundRobin* Context::GetSchedule(uint8_t thread_id) {
 	return schedules[thread_id];
 }
 
-void Frame::Cleanup() {
+void Context::Cleanup() {
 	LOG_DEBUG << "Frame Terminated... Cleaning up.";
 }
 
 
 /** It's possible to add some additional protection here */
-void Frame::Kill() {
+void Context::Kill() {
 	LOG_DEBUG << "Terminating thread....";
 	this->is_dead = true;
 }

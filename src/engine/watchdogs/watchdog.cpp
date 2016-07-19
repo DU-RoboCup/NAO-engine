@@ -28,8 +28,6 @@ Put a description of your cpp file here.
 
 // Includes
 #include "engine/watchdogs/watchdog.h"
-#include "debug/debugging.h"
-#include "engine/main/frame.h"
 
 
 uint16_t id = 0;
@@ -65,7 +63,7 @@ int main(int argc, char** argv) {
 	alarm(30);
 	
 	LOG_DEBUG << "Running the frame...";
-	Frame f;
+	Context f;
 	f.Run();
 
 

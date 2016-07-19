@@ -30,7 +30,6 @@
 
 # Directories
 
-.qi/
-build-linux64/
-build-cross-atom/
+build-local/
+build-cross/
 build/
