@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$0" == "local" ] || [ "$1" == "local" ] ; then
+if [ "$1" == "local" ] || [ "$2" == "local" ] ; then
     mkdir -p /home/vagrant/NAO/NAO-engine/build
     cd /home/vagrant/NAO/NAO-engine/build
     rm -rf *
@@ -8,7 +8,7 @@ if [ "$0" == "local" ] || [ "$1" == "local" ] ; then
     make
 fi
 
-if [  "$0" == "cross" ] || [ "$1" == "cross" ] ; then
+if [  "$1" == "cross" ] || [ "$2" == "cross" ] ; then
     mkdir -p /home/vagrant/NAO/NAO-engine/build
     cd /home/vagrant/NAO/NAO-engine/build
     rm -rf *

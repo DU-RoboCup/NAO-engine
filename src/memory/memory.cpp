@@ -159,6 +159,34 @@ uint32_t Memory::addSubscriber(std::string key, Subscriber s) {
 	return this->mem[key].sub_id;
 }
 
+bool Memory::touchKVPair(std::string key) {
+	this->memory_time += 1;
+	
+	#ifdef DEBUG_LEVEL_7
+		LOG_DEBUG << "Trying to touch memory key " << key << " at memory time " << this->memory_time ;
+	#endif
+
+	if (this->mem.find(key) == this->mem.end()) {
+		LOG_WARNING << "When adding to memory at memory time " << this->memory_time << ", key " << key << " does not exist in the IMC map." ;
+		return false;
+	} else {
+		this->mem[key].last_updated = this->memory_time;
+		for (auto s = this->mem[key].subs.begin(); s != this->mem[key].subs.end(); s++) {
+			#ifdef DEBUG_LEVEL_7
+				LOG_DEBUG << "Notifying Module " << s.module->GetName() << " that key " << key << " has been touched at memory time " << this->memory_time ;
+			#endif
+			Intent i((*s).second.intent);
+			(*s).second.module->ProcessIntent(i);
+		}
+	}
+
+	#ifdef DEBUG_LEVEL_7
+		LOG_DEBUG << "Touched memory key " << key << " with " << sizeof(d) << " bytes at memory time " << this->memory_time ;
+	#endif
+
+	return true;
+}
+
 
 bool Memory::removeSubscriber(std::string key, uint32_t id) {
 	this->memory_time += 1;
@@ -187,6 +215,10 @@ bool Memory::removeSubscriber(std::string key, uint32_t id) {
 
 bool Bazaar::Vend(std::string key, std::shared_ptr<boost::any> data) {
 	return Memory::Instance()->addKVPair(key, data);
+}
+
+bool Bazaar::Touch(std::string key) {
+	return Memory::Instance()->touchKVPair(key);
 }
 
 bool Bazaar::UpdateListing(std::string key, std::shared_ptr<boost::any> data) {

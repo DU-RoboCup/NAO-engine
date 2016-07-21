@@ -72,6 +72,7 @@ class Memory {
 		bool addKVPair(std::string key, std::shared_ptr<boost::any> data);
 		bool updateKVPair(std::string key, std::shared_ptr<boost::any> data);
 		bool removeKVPair(std::string key);
+		bool touchKVPair(std::string key);
 		
 		std::shared_ptr<boost::any> getKVPair(std::string key);
 
@@ -91,6 +92,7 @@ namespace Bazaar {
 
 	// Add a KV-pair, returns an ID which can be used to update this key.
 	bool Vend(std::string key, std::shared_ptr<boost::any> data);
+	bool Touch(std::string key);
 	bool UpdateListing(std::string key, std::shared_ptr<boost::any> data);
 	
 	// Get a KV-pair
