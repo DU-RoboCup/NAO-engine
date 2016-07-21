@@ -57,6 +57,16 @@ int main(int argc, char** argv) {
 	*global_clock = clock();
 	Bazaar::Vend("Global/Clock", global_clock);
 
+	// Setup the base priority
+	struct sched_param param;
+	param.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    if(sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        LOG_ERROR << "Setting the priority of the base thread failed. Are you running as root?";
+        LOG_DEBUG << "Finished running";
+ 		return 1;
+    }
+
+
     BOOST_LOG_FUNCTION();
     LOG_DEBUG << "Starting watchdog...";
     signal(SIGALRM, watchdog);

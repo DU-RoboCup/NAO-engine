@@ -36,7 +36,7 @@ bool TestModuleOne::RunFrame() {
 	double height = ltable["height"].get<double>();
 	std::string country = ltable["address"]["country"].get<std::string> ();
 	
-	LOG_DEBUG << "Name: " << name << " Height: " << height << " Country: " << country; 
+	//LOG_DEBUG << "Name: " << name << " Height: " << height << " Country: " << country; 
 
 	return true;
 }

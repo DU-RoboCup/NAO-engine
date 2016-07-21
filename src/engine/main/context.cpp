@@ -126,7 +126,7 @@ void Context::MainThreadLoop(Context* myFrame, ModuleRecord& m) {
 
 	// Declare as real time
 	struct sched_param param;
-	param.sched_priority = 49 - m.module_handle->GetPriority();
+	param.sched_priority = sched_get_priority_max(SCHED_FIFO) - m.module_handle->GetPriority();
     if(sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
         LOG_ERROR << "Setting the priority of module " << m.module_handle->GetName() << " failed. Are you running as root?";
         myFrame->Kill();
@@ -154,8 +154,8 @@ void Context::MainThreadLoop(Context* myFrame, ModuleRecord& m) {
 		std::chrono::duration<float> ft = ft_chrono - start_chrono;
 		m.avg_fps = ((m.avg_fps*m.num_runs) + 1.0/ft.count())/(m.num_runs+1);
 		m.num_runs += 1;
-		//if (m.num_runs % 100 == 0) 
-		//	LOG_DEBUG << "FPS of module " << m.module_handle->GetName() << " is " << m.avg_fps << ". Requested " << m.requested_fps;
+		if (m.num_runs % 100 == 0) 
+			LOG_DEBUG << "FPS of module " << m.module_handle->GetName() << " is " << m.avg_fps << ". Requested " << m.requested_fps << ".";
 	}
 }
 
