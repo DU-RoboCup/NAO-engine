@@ -53,5 +53,4 @@ int main(int argc, char** argv);
  */
 void watchdog(int sig);
 
-
 #endif /*_WATCHDOG_h_GUARD_*/

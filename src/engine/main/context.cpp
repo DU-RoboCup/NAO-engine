@@ -52,6 +52,8 @@ void Context::Initialize() {
 
 	// Load the Modules
 	for (auto i = init_modules.begin(); i != init_modules.end(); i++) {
+
+		// Load and configure the module
 		std::string module = *i;
 		LOG_DEBUG << "Loading initial module " << module;
 		uint16_t module_id = ModuleLoader::Instance()->LoadModule("../config/modules/" + module);
@@ -60,48 +62,36 @@ void Context::Initialize() {
 			LOG_WARNING << "Failed to load module " << module;
 			continue;
 		}
-		this->loaded_module_ids.push_back(module_id);
+		
+		// Create and push back a module record
+		loaded_modules.push_back(ModuleRecord(0, 
+											  ModuleLoader::Instance()->GetModule(module_id), 
+											  module_id,  
+											  static_cast<float>(ModuleLoader::Instance()->GetModule(module_id)->GetFPS())
+											  )
+								);
+
+
 	}
-
-	// Initialize the schedules
-	for (int i = 1; i <= NUM_THREADS; i++) {
-		schedules[i] = new RoundRobin();
-	}
-
-	// Schedule the modules
-	for (int i = 0; i < loaded_module_ids.size(); i++) {
-		// Get which schedule we should add the module to
-		uint16_t which_thread = ModuleLoader::Instance()->GetModule(loaded_module_ids[i])->GetThread();
-		if (which_thread > NUM_THREADS || which_thread < 1){
-			LOG_WARNING << "Invalid thread " << which_thread << " when scheduling module " << ModuleLoader::Instance()->GetModule(loaded_module_ids[i])->GetName();
-			LOG_WARNING << "Scheduling " << ModuleLoader::Instance()->GetModule(loaded_module_ids[i])->GetName() << " on thread " << NUM_THREADS;
-			which_thread = NUM_THREADS;
-		}
-
-		// Add the module to the schedule
-		uint16_t fps = ModuleLoader::Instance()->GetModule(loaded_module_ids[i])->GetFPS();
-		std::function<bool()> f_act = std::bind(&Module::RunFrame, ModuleLoader::Instance()->GetModule(loaded_module_ids[i]));
-		schedules[which_thread]->ScheduleAction(f_act);
-	}
-
 
 	// Setup the checkin variables
-	for (int i = 1; i <= NUM_THREADS; i++) {
-		m_check[i] = false;
+	for (ModuleRecord& m : loaded_modules) {
+		m_check[m.module_id] = false;
 	}
 
 }
 
 void Context::Execute() {
-	// Create the threads that are a part of the thread pool
 	LOG_DEBUG << "Creating new threads in the frame...";
-
-	for (int i = 1; i <= NUM_THREADS; i++) {
-		threads[i] = new std::thread(Context::MainThreadLoop, this, i);
+	for (ModuleRecord& m : loaded_modules) {
+		// Create a new thread running this module
+		m.thread_handle = new std::thread(MainThreadLoop, this, std::ref(m));
+		LOG_DEBUG << "Started module: " << m.module_handle->GetName();
 	}
 
+
 	std::shared_ptr<boost::any> gc = Bazaar::Get("Global/Clock");
-	LOG_DEBUG << "UPDATED CLOCK TO: " << boost::any_cast<clock_t>(*gc);
+	LOG_DEBUG << "Created main reference clock: " << boost::any_cast<clock_t>(*gc);
 
 	while (!this->is_dead) {
 		// Check that all threads have both checked in and if they have, then schedule the alarm
@@ -113,7 +103,7 @@ void Context::Execute() {
 			}
 		}
 
-		if (!check) {
+		if (check) {
 			alarm(10);
 			for (auto x = m_check.begin(); x != m_check.end(); x++) {
 				(*x).second = false;
@@ -124,31 +114,65 @@ void Context::Execute() {
 		(*gc) = clock();
 		Bazaar::UpdateListing("Global/Clock", gc);
 	}
-
-
-	// Join the threads
-	LOG_DEBUG << "Started joining threads...";
-	for (auto i = threads.begin(); i != threads.end(); i++) {
-		(*i).second->join();
-	}
-	LOG_DEBUG << "Finished joining threads...";	
+	// Set the alarm for some more time to deal with the cleanup
+	alarm(30);
 }
 
-void Context::MainThreadLoop(Context* myFrame, uint8_t thread_id) {
+void Context::MainThreadLoop(Context* myFrame, ModuleRecord& m) {
+	
+	// Figure out the scheduling window (that is, what length chunks should we use)
+	auto sched_window = std::chrono::nanoseconds(static_cast<uint64_t>((1.0/m.requested_fps)*1000000000));
+	LOG_DEBUG << "Scheduling window is " << sched_window.count() << "ns for module: " << m.module_handle->GetName();
+
+	// Declare as real time
+	struct sched_param param;
+	param.sched_priority = 49 - m.module_handle->GetPriority();
+    if(sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        LOG_ERROR << "Setting the priority of module " << m.module_handle->GetName() << " failed. Are you running as root?";
+        myFrame->Kill();
+ 		return;
+    }
+
+    /* There's no readon here to prefault the stack, or to lock the memory, as 
+    	we're not a true realtime task. However, this could be added in later
+    	versions in order to retain ns timing */
+
+	// Start the internal thread clock
 	while (!myFrame->dead()) {
+		auto start_chrono = std::chrono::high_resolution_clock::now();
 		// Check in with the main frame
-		myFrame->checkin(thread_id);
-		// Run the next object from the scheduler
-		myFrame->GetSchedule(thread_id)->GetNextAction()();
-	}
-}
+		myFrame->checkin(m.module_id);
+		// Run the module
+		m.module_handle->RunFrame();
+		// Figure out sleep time
+		auto end_chrono = std::chrono::high_resolution_clock::now();
+		if (LIKELY((end_chrono-start_chrono) < sched_window))
+			std::this_thread::sleep_for(sched_window - (end_chrono-start_chrono));
 
-RoundRobin* Context::GetSchedule(uint8_t thread_id) {
-	return schedules[thread_id];
+		// Do FPS calculations
+		auto ft_chrono = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> ft = ft_chrono - start_chrono;
+		m.avg_fps = ((m.avg_fps*m.num_runs) + 1.0/ft.count())/(m.num_runs+1);
+		m.num_runs += 1;
+		//if (m.num_runs % 100 == 0) 
+		//	LOG_DEBUG << "FPS of module " << m.module_handle->GetName() << " is " << m.avg_fps << ". Requested " << m.requested_fps;
+	}
 }
 
 void Context::Cleanup() {
 	LOG_DEBUG << "Frame Terminated... Cleaning up.";
+	LOG_DEBUG << "Attempting to gracefully join module threads...";
+	for (ModuleRecord& m : loaded_modules) {
+		m.thread_handle->join();
+		LOG_DEBUG << "Joined module: " << m.module_handle->GetName();
+	}
+	LOG_DEBUG << "Finished joining module threads...";	
+	LOG_DEBUG << "Unloading modules...";
+	for (ModuleRecord& m : loaded_modules) {
+		ModuleLoader::Instance()->UnloadModule(m.module_id);
+	}
+	LOG_DEBUG << "Finished unloading modules...";
+	LOG_DEBUG << "Finished cleanup...";
 }
 
 

@@ -33,23 +33,23 @@ Put a description of your cpp file here.
 uint16_t id = 0;
 bool timeout = false;
 
+Context* myContext;
+
 void watchdog(int sig) {
 	BOOST_LOG_FUNCTION();
-    LOG_FATAL << "The main frame is not responding...";
-	LOG_FATAL << "We need to kill the frame...";
-	LOG_FATAL << "WE DON'T KNOW HOW TO DO THAT YET!!!!!!!!!";
-	LOG_FATAL << "AHHHHHHHHHHHHHHHHHHHH";
+    LOG_FATAL << "The main context is not responding...";
+	myContext->Kill();
 }
 
 int main(int argc, char** argv) {
 
 	// Version String information
-	LOG_DEBUG << "Now running Pineapple, the University of Denver robocup NAO-Engine";
+	LOG_INFO << "Now running Pineapple, the University of Denver robocup NAO-Engine";
 	#ifdef PINEAPPLE_VERSION_0_0_1
-		LOG_DEBUG << "Current Pineapple version: 0.0.1";
+		LOG_INFO << "Current Pineapple version: 0.0.2";
 	#endif
 	#ifdef NAO_SDK_VERSION_2_1_4_13
-		LOG_DEBUG << "Compiled NAO-SDK version: 2.1.4.13";
+		LOG_INFO << "Compiled NAO-SDK version: 2.1.4.13";
 	#endif
 
 	// Setup the global clock
@@ -63,42 +63,10 @@ int main(int argc, char** argv) {
 	alarm(30);
 	
 	LOG_DEBUG << "Running the frame...";
-	Context f;
-	f.Run();
+	myContext = new Context();
+	myContext->Run();
+	delete myContext;
 
-
-	/*
-	// Load a module
-	try {
-        id = ModuleLoader::Instance()->LoadModule("config/modules/testmoduleone.module");
-    } catch (std::exception &ex) {
-        LOG_FATAL << ex.what() << ", the dog is dead on arrival.";
-    }
-    LOG_DEBUG << "NAME: " << ModuleLoader::Instance()->GetModule(id)->GetName();
-	LOG_DEBUG << "FPS:  " << ModuleLoader::Instance()->GetModule(id)->GetFPS();
-	LOG_DEBUG << "PRIO: " << unsigned(ModuleLoader::Instance()->GetModule(id)->GetPriority());
-	LOG_DEBUG << "ID:   " << ModuleLoader::Instance()->GetModule(id)->GetID();
-
-	// Show off the bazaar
-	std::string hw = "Hello World!";
-	boost::any* a = new boost::any(hw);
-	std::shared_ptr<boost::any> hello(a); 
-	Bazaar::Vend("HelloWorldKey", hello);
-	LOG_DEBUG <<  boost::any_cast<std::string>(*Bazaar::Get("HelloWorldKey"));
-
-
-	// Simple watchdog timer using sigalrm which dies after 5 seconds
-	
-	int i = 1;
-	while (true) {
-		sleep(i);
-		LOG_DEBUG << "Petting the dog";
-		if (ModuleLoader::Instance()->GetModule(id))
-			ModuleLoader::Instance()->GetModule(id)->RunFrame();
-		i++;
-		alarm(5);
-	}
-	*/
-  //  cleanup_logger();
+    //cleanup_logger();
     return 0;
 }

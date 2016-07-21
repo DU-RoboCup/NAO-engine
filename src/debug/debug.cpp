@@ -69,7 +69,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(logger, src::severity_logger_mt) {
     }
     // log message format
     logging::formatter formatter = expr::stream
-            << expr::attr < unsigned int > ("LineID")
+            << "\033[0m" << expr::attr < unsigned int > ("LineID")
             << " [" << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%d.%m.%Y %H:%M:%S.%f")
             << "] [" << expr::attr<logging::trivial::severity_level>("Severity") //boost::log::trivial::severity
             << "] [" << expr::attr<boost::posix_time::time_duration>("Uptime")

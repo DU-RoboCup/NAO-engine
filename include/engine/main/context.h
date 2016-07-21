@@ -31,8 +31,13 @@ The main context loop for the robot, deals with initialization, scheduling, and 
 #define _CONTEXT_h_GUARD_
 
 #include "common.h"
-#include "schedule.h"
-#include "mloader.h"
+#include "engine/main/mloader.h"
+
+// Real Time
+#include <time.h>
+#include <sched.h>
+#include <sys/mman.h>
+#include <signal.h>
 
 
 #include <thread>
@@ -43,7 +48,24 @@ The main context loop for the robot, deals with initialization, scheduling, and 
 #include <map>
 #include <memory>
 
+
 #define NUM_THREADS 2
+
+struct ModuleRecord {
+	
+	ModuleRecord(Module* m, uint16_t id) : thread_handle(0), module_handle(m), module_id(id) {}
+	ModuleRecord(std::thread* t, Module* m, uint16_t id) : thread_handle(t), module_handle(m), module_id(id) {}
+	ModuleRecord(std::thread* t, Module* m, uint16_t id, float rfps) : thread_handle(t), module_handle(m), module_id(id), requested_fps(rfps) {}
+	
+	std::thread* thread_handle;
+	Module* module_handle;
+	uint16_t module_id;
+
+	float avg_frame_runtime = 0;
+	float avg_fps = 0;
+	uint64_t num_runs = 1;
+	float requested_fps = 0;
+};
 
 class Context {
 	public:
@@ -56,16 +78,11 @@ class Context {
 		bool dead() {return is_dead;}
 		void checkin(uint8_t thread_id) {m_check[thread_id] = true;}
 
-		RoundRobin* GetSchedule(uint8_t thread_id);
-
-		static void MainThreadLoop(Context* myFrame, uint8_t id);
+		static void MainThreadLoop(Context* myFrame, ModuleRecord& m);
 	private:
 		std::atomic<bool> is_dead;
-		std::vector<uint16_t> loaded_module_ids;
-
-		std::map<uint8_t, std::thread*> threads;
-		std::map<uint8_t, bool> m_check;
-		std::map<uint8_t, RoundRobin*> schedules;
+		std::vector<ModuleRecord> loaded_modules;
+		std::map<uint8_t, std::atomic<bool>> m_check;
 };
 
 #endif /*_FRAME_h_GUARD_*/

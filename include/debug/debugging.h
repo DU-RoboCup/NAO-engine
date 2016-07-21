@@ -110,12 +110,13 @@ BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::l
 #define LOG(severity) BOOST_LOG_SEV(logger::get(), boost::log::trivial::severity)
 
 // ===== log macros =====
-#define LOG_TRACE   LOG(trace)
-#define LOG_DEBUG   LOG(debug)
-#define LOG_INFO    LOG(info)
-#define LOG_WARNING LOG(warning)
-#define LOG_ERROR   LOG(error)
-#define LOG_FATAL   LOG(fatal)
+#define LOG_TRACE   LOG(trace) << "\033[0m"
+#define LOG_DEBUG   LOG(debug) << "\033[0m"
+#define LOG_INFO    LOG(info) << "\033[36m"
+#define LOG_WARNING LOG(warning) << "\033[35m"
+#define LOG_ERROR   LOG(error) << "\033[31m"
+#define LOG_FATAL   LOG(fatal) << "\033[31m"
+
 
 
 #endif
