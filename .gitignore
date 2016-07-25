@@ -33,3 +33,6 @@
 build-local/
 build-cross/
 build/
+
+# Qt stuff
+CMakeLists.txt.user

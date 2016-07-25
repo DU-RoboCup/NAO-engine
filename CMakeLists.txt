@@ -2,6 +2,15 @@ Cmake_minimum_required(VERSION 2.8)
 
 # Define the toolchain location
 option(USE_CROSS "Whether or not to build using the cross-toolchain" "ON")
+option(USE_QT_CREATOR "Let's Qt creator find all the header files correctly" "OFF")
+
+# Let QtCreator find all project header files
+if(USE_QT_CREATOR)
+	FILE(GLOB_RECURSE LibFiles "include/*.h")
+       FILE(GLOB_RECURSE AlLibFiles "../devtools/naoqi-sdk-2.1.4.13-linux64/include/*.h")
+        add_custom_target(headers SOURCES ${LibFiles})
+endif()
+
 
 # Define different compilation routes if cross-atom toolchain
 if(USE_CROSS)
@@ -29,6 +38,12 @@ set(CROSS_SYS_INC_PATH "/var/persistent/cross-atom/i686-nptl-linux-gnu/include/"
 set(CROSS_LIB_LOCATION "/var/persistent/cross-atom/lib")
 set(CROSS_SYS_LIB_LOCATION "/var/persistent/cross-atom/i686-nptl-linux-gnu/lib")
 
+# Add the Aldebaran libraries
+set(CROSS_AL_LIB_PATH "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib")
+set(CROSS_AL_INCLUDE_PATH "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include")
+set(LOCAL_AL_LIB_PATH "/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib")
+set(LOCAL_AL_INCLUDE_PATH "/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include")
+
 # Add header location for main project
 set(INC_DIRECTORIES "${CMAKE_SOURCE_DIR}/include")
 include_directories(${INC_DIRECTORIES})
@@ -40,20 +55,20 @@ add_definitions(-DPINEAPPLE_VERSION_0_0_2 -DNAO_SDK_VERSION_2_1_4_13 -D_GLIBCXX_
 # Main build system
 if (${IS_CROSS} STREQUAL "TRUE")
 
-	message("Building with cross-atom compilation...")
+    message("Building with cross-atom compilation...")
 
     message("Configuring compiler flags...")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -g -march=atom -mtune=atom -Wl,-rpath=${CROSS_RPATH_LOCATION} -Wl,-dynamic-linker=${CROSS_DYN_LINKER_LOCATION} -Wl,-L${CROSS_LIB_LOCATION} -Wno-deprecated-declarations")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -march=atom -mtune=atom -Wl,-rpath=${CROSS_RPATH_LOCATION} -Wl,-dynamic-linker=${CROSS_DYN_LINKER_LOCATION} -Wl,-L${CROSS_LIB_LOCATION}")
 
     message("Configuring cmake options...")
-    set(CMAKE_LIBRARY_PATH "${CROSS_SYS_LIB_LOCATION}:${CROSS_LIB_LOCATION}:${CMAKE_LIBRARY_PATH}")
+    set(CMAKE_LIBRARY_PATH "${CROSS_SYS_LIB_LOCATION}:${CROSS_LIB_LOCATION}:${CMAKE_LIBRARY_PATH}:${CROSS_AL_LIB_PATH}")
 
     message("Adding header folders...")
-    include_directories(${CROSS_INC_PATH} ${CROSS_SYS_INC_PATH})
+    include_directories(${CROSS_INC_PATH} ${CROSS_SYS_INC_PATH} ${CROSS_AL_INCLUDE_PATH})
 
     message("Adding library folders...")
-    link_directories(${CROSS_LIB_LOCATION})
+    link_directories(${CROSS_LIB_LOCATION} ${CROSS_AL_LIB_PATH})
 
     message("Creating install location...")
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build-cross/bin" CACHE INTERNAL "exoutpath" FORCE)
@@ -90,6 +105,7 @@ else()
         message(STATUS "Lua found!")
     endif()
 
+
     include_directories(${LUA_INCLUDE_DIR})
     link_directories(${LUA_LIBRARIES})
 
@@ -97,11 +113,16 @@ else()
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build-local/bin" CACHE INTERNAL "exoutpath" FORCE)
     set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build-local/lib" CACHE INTERNAL "liboutpath" FORCE)
 
-	# Build the luatables library
-	add_library(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
+    # Build the luatables library
+    add_library(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
     target_link_libraries(luatables lua5.1)
     
     add_subdirectory(src)  
+
+    # Aldebaran linux 64 bit libraries (this may break something)
+    set(CMAKE_LIBRARY_PATH "${LOCAL_AL_LIB_PATH}")
+    include_directories(${LOCAL_AL_INCLUDE_PATH})
+    link_directories(${LOCAL_AL_LIB_PATH})
 
     # Install configuration files
     file( COPY ${CMAKE_SOURCE_DIR}/config DESTINATION ${CMAKE_SOURCE_DIR}/build-local)  
