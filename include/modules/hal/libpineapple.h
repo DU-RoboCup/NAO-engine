@@ -21,7 +21,7 @@ VERSION HISTORY
 
 // FILE DESCRIPTION
 
-LibPineapple directly interfaces with the DCM and the HAL
+LibPineapple interfaces with libNao via shared memory
 to read from as well as write to the sensors and actuators
 on the NAO robot. This allows more control and effeciency
 then what some of the Aldebaran API's potentially offer.
@@ -30,8 +30,8 @@ Parts of this code are borrowed from the B-Human 2015 Release.
 
 */
 
-#ifndef LIBPINEAPPLE_H
-#define LIBPINEAPPLE_H
+#ifndef PINEAPPLE_H
+#define PINEAPPLE_H
 
 /// Includes
 #include "include/common.h"
@@ -41,10 +41,10 @@ using namespace boost::interprocess;
 
 
 
-class LibPineapple : public Module, public AL::Module {
+class Pineapple : public Module {
 public:
 
-    static LibPineapple* Instance();
+    static Pineapple* Instance();
     void Reconfigure(std::string config_file, uint16_t id);
     bool RunFrame();
     bool ProcessIntent(Intent &i);
@@ -54,12 +54,14 @@ public:
 
 private:
 
-    LibPineapple();
-    static LibPineapple* instance;
+    Pineapple();
+    static Pineapple* instance;
 
+    managed_shared_memory shm;
 
+    LPData_Buffer *pineappleJuice;
 
-    float *sensorPtrs[lpNumOfSensorIds];
+    /*float *sensorPtrs[lpNumOfSensorIds];
     int dcmTime;
     float requestedActuators[lpNumOfActuatorIds];
     int lastReadingActuators;
@@ -69,21 +71,15 @@ private:
     int ledIndex;
     int rightEarLEDsChangedTime;
     float startAngles[lpNumOfPositionActuatorIds];
-    float startStiffness[lpNumOfPositionActuatorIds];
+    float startStiffness[lpNumOfPositionActuatorIds];*/
 
-    static const int allowedFrameDrops = 6; //Frame drops allowed before NAO goes into emergency sitting mode
+    //static const int allowedFrameDrops = 6; //Frame drops allowed before NAO goes into emergency sitting mode
 
-    void shutdown();
-    void setEyeLEDS(float *actuators);
-    void setBatteryStatusLEDS(float *actuators);
-    void copyServoData(const float *srcActuators, float *destActuators);
-    void resetSonarMeasurements();
-    float *state_handler(float *actuators);
-    void setActuators();
 
-    enum State {sitting, standingUp, standing, sittingDown, preShutDown, preSittingShutDown, shuttingDown} state;
+
+    //enum State {sitting, standingUp, standing, sittingDown, preShutDown, preSittingShutDown, shuttingDown} state;
 
 };
 
 
-#endif // LIBPINEAPPLE_H
+#endif // PINEAPPLE_H
