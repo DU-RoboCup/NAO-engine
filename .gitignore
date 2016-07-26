@@ -35,4 +35,4 @@ build-cross/
 build/
 
 # Qt stuff
-CMakeLists.txt.user
+*.user
