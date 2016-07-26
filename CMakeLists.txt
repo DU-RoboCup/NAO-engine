@@ -43,7 +43,6 @@ set(CROSS_AL_LIB_PATH "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libn
 set(CROSS_AL_INCLUDE_PATH "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include")
 set(LOCAL_AL_LIB_PATH "/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib")
 set(LOCAL_AL_INCLUDE_PATH "/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include")
-
 # Add header location for main project
 set(INC_DIRECTORIES "${CMAKE_SOURCE_DIR}/include")
 include_directories(${INC_DIRECTORIES})
@@ -58,7 +57,7 @@ if (${IS_CROSS} STREQUAL "TRUE")
     message("Building with cross-atom compilation...")
 
     message("Configuring compiler flags...")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -g -march=atom -mtune=atom -Wl,-rpath=${CROSS_RPATH_LOCATION} -Wl,-dynamic-linker=${CROSS_DYN_LINKER_LOCATION} -Wl,-L${CROSS_LIB_LOCATION} -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14 -O3 -g -march=atom -mtune=atom -Wl,-rpath=${CROSS_RPATH_LOCATION} -Wl,-dynamic-linker=${CROSS_DYN_LINKER_LOCATION} -Wl,-L${CROSS_LIB_LOCATION} -Wno-deprecated-declarations")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -march=atom -mtune=atom -Wl,-rpath=${CROSS_RPATH_LOCATION} -Wl,-dynamic-linker=${CROSS_DYN_LINKER_LOCATION} -Wl,-L${CROSS_LIB_LOCATION}")
 
     message("Configuring cmake options...")
@@ -88,7 +87,7 @@ else()
     message("Building with SDK compilation...")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -march=native -Wno-deprecated-declarations")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -g -march=native -Wno-deprecated-declarations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gnu=c++11 -O3 -g -march=native -Wno-deprecated-declarations")
 
     # Include boost
     find_package(Boost 1.43 COMPONENTS log log_setup system thread date_time REQUIRED)

@@ -31,7 +31,16 @@ Parts of this code are borrowed from the B-Human 2015 Release.
 */
 
 // Includes
-#include "include/modules/hal/libnao.h";
+#include "include/modules/hal/libnao.h"
+
+// Naoqi module stuff
+Nao *Nao::instance = 0;
+extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
+{
+  AL::ALModule::createModule<Nao>(pBroker);
+  return 0;
+}
+
 
 using namespace boost::interprocess;
 
@@ -371,8 +380,8 @@ static const float sitDownAngles[25] =
 };
 
 
-Nao::Nao(boost::shared_ptr<AL::Broker> pBroker) :
-    AL::Module(pBroker, "Pineapple"),
+Nao::Nao(boost::shared_ptr<AL::ALBroker> pBroker) :
+    ALModule(pBroker, "Pineapple"),
     shm(open_or_create, "Fridge", 65536),
     proxy(0), memory(0), dcmTime(0),
     lastReadingActuators(-1),
@@ -397,7 +406,7 @@ Nao::Nao(boost::shared_ptr<AL::Broker> pBroker) :
 
     //Create shared memory
     LOG_DEBUG << "All tests passed. Creating shared memory block 'PineappleJuice'";
-    LPData_Buffer *pineappleJuice = shm.construct<LPData_Buffer>("PineappleJuice")();
+    pineappleJuice = shm.construct<LPData_Buffer>("PineappleJuice")();
 
     LOG_DEBUG << "Shared memory block PineappleJuice was created.";
     LOG_DEBUG << "Attempting to negotiate with naoqi...";
@@ -469,7 +478,7 @@ Nao::Nao(boost::shared_ptr<AL::Broker> pBroker) :
           stiffnessRequest[5][i].arraySetSize(1);
 
         LOG_INFO << "Preparing usRequest";
-        // prepare usRequest
+        // prepare sonar Request
         usRequest.arraySetSize(6);
         usRequest[0] = std::string("usRequest");
         usRequest[1] = std::string("Merge"); // doesn't work with "ClearAll"
@@ -491,7 +500,7 @@ Nao::Nao(boost::shared_ptr<AL::Broker> pBroker) :
         // prepare sensor pointers
         for(int i = 0; i < lpNumOfSensorIds; ++i)
           sensorPtrs[i] = (float*) memory->getDataPtr(sensorNames[i]);
-        resetUsMeasurements();
+        resetSonar();
 
         LOG_INFO << "Initializing requested actuators";
         // initialize requested actuators
@@ -604,7 +613,7 @@ float* Nao::state_handler(float *actuators)
             for(int i = 0; i < lpNumOfActuatorIds; ++i)
                 startAngles[i] = *sensorPtrs[i * 3];
 
-        standing:
+        standingUp:
             state = standingUp;
             phase = 0.f;
         case standingUp:
@@ -625,18 +634,18 @@ float* Nao::state_handler(float *actuators)
 
         case standing: if(frameDrops <= allowedFrameDrops) return actuators;
 
-        case preShutDown:
+        case preShuttingDown:
             for(int i = 0; i < lpNumOfPositionActuatorIds; ++i)
             {
                 startAngles[i] = positionRequest[5][i][0];
-                if(actuators[lHipPitchStiffnessAcutator] = 0.f && actuators[rHipPitchStiffnessActuator] == 0.f)
-                    startingStiffness[i] = 0.f;
+                if(actuators[lHipPitchStiffnessActuator] = 0.f && actuators[rHipPitchStiffnessActuator] == 0.f)
+                    startStiffness[i] = 0.f;
                 else if(i >= lShoulderPitchPositionActuator && i <= rElbowRollPositionActuator)
                     startStiffness[i] = 0.4f;
                 else
                     startStiffness[i] = std::min<float>(stiffnessRequest[5][i][0], 0.3f);
             }
-            state = state == preShutDown ? shuttingDown : sittingDown;
+            state = state == preShuttingDown ? shuttingDown : sittingDown;
             phase = 0.f;
 
         case shuttingDown:
@@ -658,7 +667,7 @@ float* Nao::state_handler(float *actuators)
                 } else {
                     goto sitting;
                 }
-        case preSittingShutDown:
+        case preShuttingDownWhileSitting:
             for(int i = 0; i < lpNumOfPositionActuatorIds; ++i)
                 startStiffness[i] = 0.f;
             state = shuttingDown;
@@ -702,7 +711,7 @@ void Nao::setActuators()
         }
 
         lastReadingActuators = pineappleJuice->readingActuators;
-        float *readingActuators = pineappleJuice->readingActuators;
+        float *readingActuators = pineappleJuice->actuators[pineappleJuice->readingActuators];
         float *actuators = state_handler(readingActuators);
 
 
@@ -738,7 +747,7 @@ void Nao::setActuators()
 
         //set Sonar actuator
         bool requestedSonar = false;
-        if(requestedActuators[usActuator] != actuators[usActuators])
+        if(requestedActuators[usActuator] != actuators[usActuator])
         {
             requestedActuators[usActuator] = actuators[usActuator];
             if(actuators[usActuator] >= 0.f)
@@ -773,7 +782,7 @@ void Nao::setActuators()
         if(pineappleJuice->pineappleStartTime != lastPineappleStartTime)
         {
             for(int i = 0; i < lpNumOfTeamInfoIds; ++i)
-                memory->instertData(teamInfoNames[i], pineappleJuice->teamInfo[j]);
+                memory->insertData(teamInfoNames[i], pineappleJuice->teamInfo[i]);
 
             lastPineappleStartTime = pineappleJuice->pineappleStartTime;
         }
@@ -792,7 +801,7 @@ void Nao::readSensors()
         if((writerCounter == pineappleJuice->readingSensors) && (++writerCounter == pineappleJuice->newestSensors)) ++writerCounter;
 
         //Tests
-        assert(writerCounter != pineappleJuice->sensors[writerCounter]);
+        assert(writerCounter != pineappleJuice->newestSensors);
         assert(writerCounter != pineappleJuice->readingSensors);
 
         float *sensors = pineappleJuice->sensors[writerCounter];
@@ -826,23 +835,16 @@ void Nao::readSensors()
 
 
 // This gets called by NaoQi before communication with the chest board
-static void onPreProcess()
+void Nao::onPreProcess()
 {
     instance->setActuators();
 }
 
 // called immedietly after communication with chest board to get sensor values.
-static void onPostProcess()
+void Nao::onPostProcess()
 {
     instance->readSensors();
 }
 
 
 
-// Naoqi module stuff
-Nao *Nao::instance = 0;
-extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
-{
-  AL::ALModule::createModule<Nao>(pBroker);
-  return 0;
-}

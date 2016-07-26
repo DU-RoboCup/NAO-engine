@@ -36,3 +36,5 @@ build/
 
 # Qt stuff
 *.user
+*.txt.user
+*.text.user.*

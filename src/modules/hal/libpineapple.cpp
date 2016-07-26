@@ -46,7 +46,7 @@ bool Pineapple::Install()
 {
     LOG_DEBUG << "Installing the 'Pineapple' Module. Trying to open shared memory 'PineappleJuice'";
     try {
-         pineappleJuice = shm.find<LPData_Buffer>("PineappleJuice");
+         pineappleJuice = shm.find_or_construct<LPData_Buffer>("PineappleJuice")();
          LOG_DEBUG << "Shared Memory 'PineappleJuice' was successfully opened";
     } catch(interprocess_exception &ex) {
         LOG_FATAL << "Could not find the shared memory block PineappleJuice because: " << ex.what();

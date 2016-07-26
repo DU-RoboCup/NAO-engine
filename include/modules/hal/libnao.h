@@ -41,10 +41,10 @@ Parts of this code are borrowed from the B-Human 2015 Release.
 
 using namespace boost::interprocess;
 
-class Nao : public AL::Module
+class Nao : public AL::ALModule
 {
 public:
-    Nao(boost::shared_ptr<AL::Broker> pBroker);
+    Nao(boost::shared_ptr<AL::ALBroker> pBroker);
 
     ~Nao();
 
@@ -52,8 +52,9 @@ private:
     static Nao *instance;
 
     managed_shared_memory shm;
+    LPData_Buffer *pineappleJuice; // Shared memory struct
 
-    AL::DCMProxy *dcmproxy;
+    AL::DCMProxy *proxy;
     AL::ALMemoryProxy *memory;
     AL::ALValue positionRequest;
     AL::ALValue stiffnessRequest;
@@ -87,10 +88,12 @@ private:
     void setEyeLEDS(float *actuators);
     void setBatteryStatusLEDS(float *actuators);
     void copyServoData(const float *srcActuators, float *destActuators);
-    void resetSonarMeasurements();
+    void resetSonar();
     float *state_handler(float *actuators);
     void setActuators();
+    void readSensors();
     void readActuators();
+    void copyNonServos(const float *srcActuators, float *destActuators);
     static void onPreProcess();
     static void onPostProcess();
     
