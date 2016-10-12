@@ -1,18 +1,10 @@
 
 #include "include/modules/test/testmoduleone.h"
 
-
+// Registers the module with the dynamic loader
 REGISTER_MODULE(TestModuleOne)
-/*
-extern "C"
-{
-	Module* mkrfn() {
-		return TestModuleOne::Instance();
-	}
-}
-*/
-TestModuleOne* TestModuleOne::instance;
 
+TestModuleOne* TestModuleOne::instance;
 TestModuleOne* TestModuleOne::Instance() {
 	if (UNLIKELY(TestModuleOne::instance == 0))
 	{
