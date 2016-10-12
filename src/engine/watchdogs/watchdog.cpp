@@ -41,6 +41,14 @@ void watchdog(int sig) {
 	myContext->Kill();
 }
 
+void terminate_context(int dummy) {
+    BOOST_LOG_FUNCTION();
+    LOG_WARNING << "SIGINT Caught. Terminating Frame.";
+    myContext->Kill();
+    LOG_DEBUG << "Context Terminated. Ending Program.";
+    exit(dummy);
+}
+
 int main(int argc, char** argv) {
 
 	// Version String information
@@ -71,12 +79,20 @@ int main(int argc, char** argv) {
     LOG_DEBUG << "Starting watchdog...";
     signal(SIGALRM, watchdog);
 	alarm(30);
+
+    // Capture CTRL-C
+    signal(SIGINT, terminate_context);
 	
 	LOG_DEBUG << "Running the frame...";
-	myContext = new Context();
-	myContext->Run();
-	delete myContext;
-
+	try {
+        myContext = new Context();
+	    myContext->Run();
+	    delete myContext;
+    } catch (int e) {
+        // Disable the watchdog
+        LOG_ERROR << "An error occurred while running the main context: " << e;
+        LOG_ERROR << "Exiting...";
+    }
     //cleanup_logger();
     return 0;
 }
