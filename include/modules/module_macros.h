@@ -17,36 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 VERSION HISTORY
--- Created by David Chan 6/20/16
+-- Created by David Chan 10/12/16
 
 // FILE DESCRIPTION
 
-This file contains a number of includes which are necessary for most of the projects we are developing. It allows us to include with only one step.
+Macros for registering modules
 */
 
-#ifndef _COMMON_h_GUARD
-#define _COMMON_h_GUARD
+#ifndef _MODULE_MACRO_h_GUARD
+#define _MODULE_MACRO_h_GUARD
 
-// Macros
-#include "util/branch_macros.h"
-#include "modules/module_macros.h"
-//#include "util/compile_macros.h"
+#define REGISTER_MODULE(module_name) extern "C" { Module* mkrfn() { return module_name::Instance(); }}
 
-// Constants
-#include "util/constants.h"
-
-// Memory
-#include "memory/memory.h"
-
-// Debugging
-#include "debug/debugging.h"
-
-// Necessary headers for luatables
-#include "lib/luatables/luatables.h"
-#include <string>
-
-
-
-
-
-#endif /*_COMMON_h_GUARD */
+#endif /*_MODULE_MACRO_h_GUARD */

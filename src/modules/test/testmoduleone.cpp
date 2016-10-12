@@ -2,13 +2,15 @@
 #include "include/modules/test/testmoduleone.h"
 
 
+REGISTER_MODULE(TestModuleOne)
+/*
 extern "C"
 {
 	Module* mkrfn() {
 		return TestModuleOne::Instance();
 	}
 }
-
+*/
 TestModuleOne* TestModuleOne::instance;
 
 TestModuleOne* TestModuleOne::Instance() {
