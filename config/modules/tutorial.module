@@ -1,0 +1,8 @@
+module = {
+    name = "Tutorial Module",
+    liblocation = "../lib/libtutmodule.so",
+    rfpt = 20,
+    mprio = 4,
+    mthr = 1
+}
+return module
