@@ -1,7 +1,7 @@
 module = {
     name = "Tutorial Module",
     liblocation = "../lib/libtutmodule.so",
-    rfpt = 20,
+    rfps = 20,
     mprio = 4,
     mthr = 1
 }

@@ -7,7 +7,7 @@ using std::string;
 
 TutorialModule *TutorialModule::instance;
 TutorialModule *TutorialModule::Instance() {
-    if(UNLIKELY(TutorialModule::instance = 0)) {
+    if(UNLIKELY(TutorialModule::instance == 0)) {
         TutorialModule::instance = new TutorialModule();
     }
     return TutorialModule::instance;
