@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 "University of Denver"
+Copyright (c) 2017 "University of Denver"
 
 This file is part of Pineapple.
 
@@ -50,8 +50,6 @@ hal_access::hal_access(std::shared_ptr<AL::ALBroker> broker_ptr, const &broker_n
         body_version = (std::string) nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0);
         head_version = (std::string) nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0);
 
-
-    
     }
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 "University of Denver"
+Copyright (c) 2017 "University of Denver"
 
 This file is part of Project Pineapple.
 
@@ -40,6 +40,7 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 #include <alcommon/albroker.h>
 #include <alcommon/almodule.h>
 #include <vector>
+#include <string>
 
 class hal_access : AL::ALModule
 {
@@ -55,6 +56,8 @@ public:
     virtual ~hal_access;
 
 private:
+    //instance
+    static hal_access *instance;
 
     //Initializes the link to the DCM and ALMemory
     void init_link();
