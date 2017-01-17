@@ -42,6 +42,15 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 #include <vector>
 #include <string>
 
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/interprocess/sync/interprocess_condition.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+
+
+using namespace boost::interprocess;
+
 class hal_access : AL::ALModule
 {
 public: 
@@ -100,13 +109,12 @@ private:
     std::vector<float *> current_ptrs;
     int *battery_status_ptr;
 
-
+    //Boost Interprocess Shared Memory
+    managed_shared_memory shm;
+    named_semaphore semaphore;
+    hal_data *pineappleJuice; //Struct to be passed around in shared memory
 
     //Read the current sensor/actuator values
-
-
-
-
 
 }
 
