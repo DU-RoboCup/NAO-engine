@@ -24,6 +24,9 @@ VERSION HISTORY
 Joint Data container which stores  joint angle and stiffness information.
 */
 
+#ifndef _JOINT_DATA_H
+#define _JOINT_DATA_H
+
 #include "hardware_data.h" 
 
 struct joint_data {
@@ -54,3 +57,4 @@ struct joint_data {
 
 }
 
+#endif

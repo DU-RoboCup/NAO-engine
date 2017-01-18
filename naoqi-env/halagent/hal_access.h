@@ -44,11 +44,12 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 #include <iostream>
 #include "hal_data.h"
 
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/sync/interprocess_semaphore.hpp>
-#include <boost/interprocess/sync/interprocess_condition.hpp>
-#include <boost/interprocess/allocators/allocator.hpp>
+// #include <boost/interprocess/managed_shared_memory.hpp>
+// #include <boost/interprocess/mapped_region.hpp>
+// #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+// #include <boost/interprocess/sync/interprocess_condition.hpp>
+// #include <boost/interprocess/allocators/allocator.hpp>
+// #include <boost/interprocess/sync/named_semaphore.hpp
 
 
 using namespace boost::interprocess;
@@ -57,6 +58,7 @@ class hal_access : AL::ALModule
 {
 public: 
     //Input a broker for communication with other NaoQi modules: see http://doc.aldebaran.com/2-1/dev/naoqi/index.html#broker
+    
     hal_access(boost::shared_ptr<AL::ALBroker> broker_ptr, const std::string &broker_name_ptr);
 
     //DCM loop accessor functions
@@ -112,9 +114,9 @@ private:
     int *battery_status_ptr;
 
     //Boost Interprocess Shared Memory
-    managed_shared_memory shm;
-    named_semaphore semaphore;
-    hal_data *pineappleJuice; //Struct to be passed around in shared memory
+   // managed_shared_memory shm;
+   // named_semaphore semaphore;
+     hal_data *pineappleJuice; //Struct to be passed around in shared memory
 
     //Read the current sensor/actuator values
 

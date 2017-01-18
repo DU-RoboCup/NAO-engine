@@ -35,9 +35,9 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 #include "hal_access.h"
 
 hal_access::hal_access(boost::shared_ptr<AL::ALBroker> broker_ptr, const std::string &broker_name_ptr) :
-    ALModule(broker_ptr, "Pineapple"),
-    shm(open_or_create, "PineappleJuice", sizeof(pineappleJuice)),
-    semaphore(open_or_create, "HAL_SEMAPHORE", 0, 0600) 
+    ALModule(broker_ptr, "Pineapple")
+    //shm(open_or_create, "PineappleJuice", sizeof(pineappleJuice)),
+    //semaphore(open_or_create, "HAL_SEMAPHORE", 0, 0600) 
 {
 	setModuleDescription("Communicates between the Naoqi process and our Pineapple");
     try {
@@ -55,7 +55,7 @@ hal_access::hal_access(boost::shared_ptr<AL::ALBroker> broker_ptr, const std::st
 
         //This worked when I tried it this summer (I think). The hope is, is that
         //Boost will properly map this struct into shared memory. 
-        pineappleJuice = shm.construct<pineappleJuice>("PineappleJuice")();
+       // pineappleJuice = shm.construct<pineappleJuice>("PineappleJuice")();
         
     } catch(AL::ALError &error) {
         std::cout << "it broke. shit." << std::endl;
