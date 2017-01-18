@@ -1,3 +1,4 @@
+
 /*
 Copyright (c) 2017 "University of Denver"
 
@@ -20,25 +21,31 @@ VERSION HISTORY
 -- Created by Paul Heinen 1/16/17
 
 // FILE DESCRIPTION
-
-Sensor Data container which stores the returned sensor values, which includes
-joint values, IMU values, FSR values, buttons. Currently excludes sonar data.
+Container for all hal data on the NAO. This container will be inserted into shared
+memory for interprocess communication.
 */
 
-#pragma once //Only needs to be included once
+#include "data_types/joint_data.h"
+#include "data_types/sensor_data.h"
 
-#include "hardware_data.h"
-#include "joint_data.h"
+struct hal_data {
+    volatile uint8_t sensors_read;
+    volatile uint8_t sensors_current_read; //value of the latest reading
+    volatile uint8_t actuators_read;
+    volatile uint8_t actuators_current_read;
 
-struct sensor_data {
-    sensor_data() {
-        for(int i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i) sensors[i] = NAN;
+    joint_data joints[3];
+
+    char text_to_speak[3][35]; //Text to have the NAO say
+
+    volatile bool standing;
+    void init()
+    {
+        sensors_read = 0;
+        sensors_current_read = 0;
+        actuators_read = 0;
+        actuators_current_read = 0;
     }
-    sensor_data(bool reset) {
-        joints = joint_data(true); //sets all joint values to 0
-        for(int i = 0; i < Sensors::NUMBER_OF_SENSORS; ++i) sensors[i] = 0;
-    }
-    joint_data joints;
-    float[Sensors::NUMBER_OF_SENSORS];
+    for(int i = 0; i < 3; ++i) text_to_speak[i][0] = 0;
 };
 

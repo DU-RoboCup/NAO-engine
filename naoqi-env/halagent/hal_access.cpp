@@ -34,15 +34,15 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 
 #include "hal_access.h"
 
-hal_access::hal_access(std::shared_ptr<AL::ALBroker> broker_ptr, const &broker_name_ptr) :
+hal_access::hal_access(boost::shared_ptr<AL::ALBroker> broker_ptr, const std::string &broker_name_ptr) :
     ALModule(broker_ptr, "Pineapple"),
     shm(open_or_create, "PineappleJuice", sizeof(pineappleJuice)),
     semaphore(open_or_create, "HAL_SEMAPHORE", 0, 0600) 
 {
-    setModuleDescription("Communicates between the Naoqi process and our Pineapple");
+	setModuleDescription("Communicates between the Naoqi process and our Pineapple");
     try {
         //Initialize DCM and memory proxy
-        dcm_proxy = new DCMProxy(broker_ptr);
+        dcm_proxy = new AL::DCMProxy(broker_ptr);
         if(dcm_proxy == NULL) throw AL::ALError(name, "constructor", "dcm_proxy == NULL");
         
         nao_memory_proxy = new AL::ALMemoryProxy(broker_ptr);
@@ -56,12 +56,18 @@ hal_access::hal_access(std::shared_ptr<AL::ALBroker> broker_ptr, const &broker_n
         //This worked when I tried it this summer (I think). The hope is, is that
         //Boost will properly map this struct into shared memory. 
         pineappleJuice = shm.construct<pineappleJuice>("PineappleJuice")();
-
+        
+    } catch(AL::ALError &error) {
+        std::cout << "it broke. shit." << std::endl;
     }
+}
+hal_access::~hal_access()
+{
+    std::cout << "hal_access destroyed" << std::endl;
 }
 
 //Module info for NaoQi
-extern "C" int _createModule(std::shared_ptr<AL::ALBroker> broker_ptr)
+extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> broker_ptr)
 {
     AL::ALModule::createModule<Pineapple>(broker_ptr);
     return 0;
