@@ -14,7 +14,9 @@ SET(CMAKE_TARGET_LINKED_INFO_FILES
 
 # The include file search paths:
 SET(CMAKE_C_TARGET_INCLUDE_PATH
-  "/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include"
+  "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include"
+  "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55"
+  "/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/include"
   )
 SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
 SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})

@@ -53,15 +53,15 @@ CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o: CMakeFiles/hal_experimen
 CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o: ../hal_experimental.cpp
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/build-linux64/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o -c /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp
+	/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o -c /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp
 
 CMakeFiles/hal_experimental.dir/hal_experimental.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/hal_experimental.dir/hal_experimental.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp > CMakeFiles/hal_experimental.dir/hal_experimental.cpp.i
+	/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp > CMakeFiles/hal_experimental.dir/hal_experimental.cpp.i
 
 CMakeFiles/hal_experimental.dir/hal_experimental.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/hal_experimental.dir/hal_experimental.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp -o CMakeFiles/hal_experimental.dir/hal_experimental.cpp.s
+	/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/vagrant/NAO/NAO-engine/naoqi-env/halagent/hal_experimental.cpp -o CMakeFiles/hal_experimental.dir/hal_experimental.cpp.s
 
 CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o.requires:
 .PHONY : CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o.requires
@@ -81,25 +81,26 @@ hal_experimental_EXTERNAL_OBJECTS =
 
 sdk/bin/hal_experimental: CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o
 sdk/bin/hal_experimental: CMakeFiles/hal_experimental.dir/build.make
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalproxies.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalcommon.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_signals.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/librttools.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalvalue.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalerror.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqimessaging.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqitype.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqi.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_chrono.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_filesystem.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_program_options.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_regex.so
-sdk/bin/hal_experimental: /usr/lib/x86_64-linux-gnu/libdl.so
-sdk/bin/hal_experimental: /usr/lib/x86_64-linux-gnu/librt.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_date_time.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_system.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_locale.so
-sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_thread.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalproxies.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalcommon.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_signals-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/librttools.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalvalue.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalerror.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqimessaging.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqitype.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqi.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_chrono-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_filesystem-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_program_options-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_regex-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/libdl.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/librt.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_date_time-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_system-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_locale-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_thread-mt-1_55.so
+sdk/bin/hal_experimental: /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/libpthread.so
 sdk/bin/hal_experimental: CMakeFiles/hal_experimental.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable sdk/bin/hal_experimental"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hal_experimental.dir/link.txt --verbose=$(VERBOSE)
@@ -107,42 +108,6 @@ sdk/bin/hal_experimental: CMakeFiles/hal_experimental.dir/link.txt
 # Rule to build all files generated by this target.
 CMakeFiles/hal_experimental.dir/build: sdk/bin/hal_experimental
 .PHONY : CMakeFiles/hal_experimental.dir/build
-
-# Object files for target hal_experimental
-hal_experimental_OBJECTS = \
-"CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o"
-
-# External object files for target hal_experimental
-hal_experimental_EXTERNAL_OBJECTS =
-
-CMakeFiles/CMakeRelink.dir/hal_experimental: CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o
-CMakeFiles/CMakeRelink.dir/hal_experimental: CMakeFiles/hal_experimental.dir/build.make
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalproxies.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalcommon.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_signals.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/librttools.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalvalue.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalerror.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqimessaging.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqitype.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqi.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_chrono.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_filesystem.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_program_options.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_regex.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /usr/lib/x86_64-linux-gnu/libdl.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /usr/lib/x86_64-linux-gnu/librt.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_date_time.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_system.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_locale.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: /home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_thread.so
-CMakeFiles/CMakeRelink.dir/hal_experimental: CMakeFiles/hal_experimental.dir/relink.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable CMakeFiles/CMakeRelink.dir/hal_experimental"
-	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hal_experimental.dir/relink.txt --verbose=$(VERBOSE)
-
-# Rule to relink during preinstall.
-CMakeFiles/hal_experimental.dir/preinstall: CMakeFiles/CMakeRelink.dir/hal_experimental
-.PHONY : CMakeFiles/hal_experimental.dir/preinstall
 
 CMakeFiles/hal_experimental.dir/requires: CMakeFiles/hal_experimental.dir/hal_experimental.cpp.o.requires
 .PHONY : CMakeFiles/hal_experimental.dir/requires

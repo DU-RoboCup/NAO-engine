@@ -78,15 +78,6 @@ CMakeFiles/hal_experimental.dir/rule: cmake_check_build_system
 hal_experimental: CMakeFiles/hal_experimental.dir/rule
 .PHONY : hal_experimental
 
-# Pre-install relink rule for target.
-CMakeFiles/hal_experimental.dir/preinstall:
-	$(MAKE) -f CMakeFiles/hal_experimental.dir/build.make CMakeFiles/hal_experimental.dir/preinstall
-.PHONY : CMakeFiles/hal_experimental.dir/preinstall
-
-# Prepare target for install.
-preinstall: CMakeFiles/hal_experimental.dir/preinstall
-.PHONY : preinstall
-
 # clean rule for target.
 CMakeFiles/hal_experimental.dir/clean:
 	$(MAKE) -f CMakeFiles/hal_experimental.dir/build.make CMakeFiles/hal_experimental.dir/clean

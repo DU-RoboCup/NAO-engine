@@ -18,75 +18,80 @@
 ALCOMMON_DEBUG_LIBRARY:FILEPATH=ALCOMMON_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for ALCOMMON.
-ALCOMMON_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/alcommon
+ALCOMMON_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/alcommon
 
-ALCOMMON_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+ALCOMMON_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-ALCOMMON_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalcommon.so
+ALCOMMON_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalcommon.so
 
 //Path to a library.
 ALERROR_DEBUG_LIBRARY:FILEPATH=ALERROR_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for ALERROR.
-ALERROR_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/alerror
+ALERROR_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/alerror
 
-ALERROR_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+ALERROR_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-ALERROR_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalerror.so
+ALERROR_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalerror.so
 
 //Path to a library.
 ALPROXIES_DEBUG_LIBRARY:FILEPATH=ALPROXIES_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for ALPROXIES.
-ALPROXIES_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/alproxies
+ALPROXIES_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/alproxies
 
-ALPROXIES_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+ALPROXIES_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-ALPROXIES_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalproxies.so
+ALPROXIES_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalproxies.so
 
 //Path to a library.
 ALVALUE_DEBUG_LIBRARY:FILEPATH=ALVALUE_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for ALVALUE.
-ALVALUE_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/alvalue
+ALVALUE_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/alvalue
 
-ALVALUE_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+ALVALUE_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-ALVALUE_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalvalue.so
+ALVALUE_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalvalue.so
 
 //The directory containing a CMake configuration file for BOOST_CHRONO.
-BOOST_CHRONO_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_chrono
+BOOST_CHRONO_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_chrono
 
 //The directory containing a CMake configuration file for BOOST_DATE_TIME.
-BOOST_DATE_TIME_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_date_time
+BOOST_DATE_TIME_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_date_time
 
 //The directory containing a CMake configuration file for BOOST.
-BOOST_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost
+BOOST_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost
 
 //The directory containing a CMake configuration file for BOOST_FILESYSTEM.
-BOOST_FILESYSTEM_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_filesystem
+BOOST_FILESYSTEM_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_filesystem
 
 //The directory containing a CMake configuration file for BOOST_LOCALE.
-BOOST_LOCALE_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_locale
+BOOST_LOCALE_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_locale
 
 //The directory containing a CMake configuration file for BOOST_PROGRAM_OPTIONS.
-BOOST_PROGRAM_OPTIONS_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_program_options
+BOOST_PROGRAM_OPTIONS_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_program_options
 
 //The directory containing a CMake configuration file for BOOST_REGEX.
-BOOST_REGEX_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_regex
+BOOST_REGEX_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_regex
 
 //The directory containing a CMake configuration file for BOOST_SIGNALS.
-BOOST_SIGNALS_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_signals
+BOOST_SIGNALS_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_signals
 
 //The directory containing a CMake configuration file for BOOST_SYSTEM.
-BOOST_SYSTEM_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_system
+BOOST_SYSTEM_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_system
 
 //The directory containing a CMake configuration file for BOOST_THREAD.
-BOOST_THREAD_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/boost_thread
+BOOST_THREAD_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/share/cmake/boost_thread
+
+//Path to a program.
+CCACHE:FILEPATH=CCACHE-NOTFOUND
+
+CMAKE_AR:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-ar
 
 //Choose the type of build, options are: None(CMAKE_CXX_FLAGS or
 // CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.
@@ -96,10 +101,7 @@ CMAKE_BUILD_TYPE:STRING=Debug
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
 //CXX compiler.
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
-
-//Flags used by the compiler during all build types.
-CMAKE_CXX_FLAGS:STRING=
+CMAKE_CXX_COMPILER:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-g++
 
 //Flags used by the compiler during debug builds.
 CMAKE_CXX_FLAGS_DEBUG:STRING=-g
@@ -116,10 +118,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //C compiler.
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/cc
-
-//Flags used by the compiler during all build types.
-CMAKE_C_FLAGS:STRING=
+CMAKE_C_COMPILER:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-gcc
 
 //Flags used by the compiler during debug builds.
 CMAKE_C_FLAGS_DEBUG:STRING=-g
@@ -134,9 +133,6 @@ CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 
 //Flags used by the compiler during Release with Debug Info builds.
 CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
-
-//Flags used by the linker.
-CMAKE_EXE_LINKER_FLAGS:STRING=' '
 
 //Flags used by the linker during debug builds.
 CMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=
@@ -153,11 +149,10 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //Enable/Disable output of compile commands during generation.
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=OFF
 
+CMAKE_LINKER:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-ld
+
 //Path to a program.
 CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/make
-
-//Flags used by the linker during the creation of modules.
-CMAKE_MODULE_LINKER_FLAGS:STRING=' '
 
 //Flags used by the linker during debug builds.
 CMAKE_MODULE_LINKER_FLAGS_DEBUG:STRING=
@@ -171,11 +166,16 @@ CMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=
 //Flags used by the linker during Release with Debug Info builds.
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
+CMAKE_NM:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-nm
+
+CMAKE_OBJCOPY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-objcopy
+
+CMAKE_OBJDUMP:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-objdump
+
 //Value Computed by CMake
 CMAKE_PROJECT_NAME:STATIC=hal_agent
 
-//Flags used by the linker during the creation of dll's.
-CMAKE_SHARED_LINKER_FLAGS:STRING=' '
+CMAKE_RANLIB:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-ranlib
 
 //Flags used by the linker during debug builds.
 CMAKE_SHARED_LINKER_FLAGS_DEBUG:STRING=
@@ -211,6 +211,8 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=
 //Flags used by the linker during Release with Debug Info builds.
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
+CMAKE_STRIP:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-strip
+
 //No help, variable specified on the command line.
 CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=/home/vagrant/.local/share/qi/toolchains/linux64/toolchain-linux64.cmake
 
@@ -223,36 +225,22 @@ CMAKE_USE_RELATIVE_PATHS:BOOL=OFF
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
-//Cleared.
-DL_DEFINITIONS:STRING=
-
 //The directory containing a CMake configuration file for DL.
-DL_DIR:PATH=/home/vagrant/.local/share/cmake/qibuild/modules
-
-//Cleared.
-DL_EXECUTABLE:STRING=
-
-//Cleared.
-DL_EXECUTABLE_DEBUG:STRING=
+DL_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/dl/share/cmake/dl
 
 HAL_EXPERIMENTAL_DEPENDS:STRING=ALPROXIES;ALCOMMON;BOOST_SIGNALS;RTTOOLS;ALVALUE;ALERROR;QIMESSAGING;QITYPE;QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;DL;RT;BOOST_DATE_TIME;BOOST_SYSTEM;BOOST_LOCALE;BOOST_THREAD;PTHREAD;BOOST
 
-//Cleared.
-PTHREAD_DEFINITIONS:STRING=
+//this is always defined when we target a robot (either ATOM or
+// GEODE)
+I_AM_A_ROBOT:BOOL=ON
 
 //The directory containing a CMake configuration file for PTHREAD.
-PTHREAD_DIR:PATH=/home/vagrant/.local/share/cmake/qibuild/modules
-
-//Cleared.
-PTHREAD_EXECUTABLE:STRING=
-
-//Cleared.
-PTHREAD_EXECUTABLE_DEBUG:STRING=
+PTHREAD_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/pthread
 
 //Path to a program.
 PYTHON2_EXECUTABLE:FILEPATH=/usr/bin/python2
 
-QIBUILD_PYTHON_PATH:STRING=/home/vagrant/.local/lib/python2.7/site-packages
+QIBUILD_PYTHON_PATH:STRING=/usr/local/lib/python2.7/dist-packages
 
 //qibuild version
 QIBUILD_VERSION:STRING=3.11.6
@@ -261,37 +249,37 @@ QIBUILD_VERSION:STRING=3.11.6
 QIMESSAGING_DEBUG_LIBRARY:FILEPATH=QIMESSAGING_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for QIMESSAGING.
-QIMESSAGING_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/qimessaging
+QIMESSAGING_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/qimessaging
 
-QIMESSAGING_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+QIMESSAGING_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-QIMESSAGING_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqimessaging.so
+QIMESSAGING_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqimessaging.so
 
 //Path to a library.
 QITYPE_DEBUG_LIBRARY:FILEPATH=QITYPE_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for QITYPE.
-QITYPE_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/qitype
+QITYPE_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/qitype
 
-QITYPE_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+QITYPE_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-QITYPE_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqitype.so
+QITYPE_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqitype.so
 
 //Path to a library.
 QI_DEBUG_LIBRARY:FILEPATH=QI_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for QI.
-QI_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/qi
+QI_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/qi
 
 //Force 32bits build even when on 64bits
 QI_FORCE_32_BITS:BOOL=OFF
 
-QI_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+QI_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-QI_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqi.so
+QI_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqi.so
 
 //Enable code coverage
 QI_WITH_COVERAGE:BOOL=OFF
@@ -313,45 +301,21 @@ QI_WITH_TESTS:BOOL=ON
 RTTOOLS_DEBUG_LIBRARY:FILEPATH=RTTOOLS_DEBUG_LIBRARY-NOTFOUND
 
 //The directory containing a CMake configuration file for RTTOOLS.
-RTTOOLS_DIR:PATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/share/cmake/rttools
+RTTOOLS_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/share/cmake/rttools
 
-RTTOOLS_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include;
+RTTOOLS_INCLUDE_DIRS:STRING=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/include;
 
 //Path to a library.
-RTTOOLS_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/librttools.so
-
-//Cleared.
-RT_DEFINITIONS:STRING=
+RTTOOLS_LIBRARY:FILEPATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/librttools.so
 
 //The directory containing a CMake configuration file for RT.
-RT_DIR:PATH=/home/vagrant/.local/share/cmake/qibuild/modules
-
-//Cleared.
-RT_EXECUTABLE:STRING=
-
-//Cleared.
-RT_EXECUTABLE_DEBUG:STRING=
-
-//Cleared.
-dl_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libdl.so
-
-//Cleared.
-dlfcn.h_INCLUDE:PATH=/usr/include
+RT_DIR:PATH=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/rt/share/cmake/rt
 
 //Value Computed by CMake
 hal_agent_BINARY_DIR:STATIC=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent/build-linux64
 
 //Value Computed by CMake
 hal_agent_SOURCE_DIR:STATIC=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent
-
-//Cleared.
-pthread.h_INCLUDE:PATH=/usr/include
-
-//Cleared.
-rt_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/librt.so
-
-//Cleared.
-time.h_INCLUDE:PATH=/usr/include
 
 
 ########################
@@ -361,65 +325,65 @@ time.h_INCLUDE:PATH=/usr/include
 ALCOMMON_DEPENDS:INTERNAL=ALVALUE;ALERROR;QIMESSAGING;QITYPE;BOOST;BOOST_DATE_TIME;BOOST_SIGNALS;RTTOOLS;QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_SYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;BOOST_LOCALE;BOOST_THREAD;PTHREAD;RT;DL
 //ADVANCED property for variable: ALCOMMON_INCLUDE_DIRS
 ALCOMMON_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-ALCOMMON_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalcommon.so
+ALCOMMON_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalcommon.so
 ALCOMMON_PACKAGE_FOUND:INTERNAL=TRUE
 ALERROR_DEPENDS:INTERNAL=QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_SYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;BOOST_LOCALE;BOOST_THREAD;PTHREAD;DL;RT
 //ADVANCED property for variable: ALERROR_INCLUDE_DIRS
 ALERROR_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-ALERROR_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalerror.so
+ALERROR_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalerror.so
 ALERROR_PACKAGE_FOUND:INTERNAL=TRUE
 ALPROXIES_DEPENDS:INTERNAL=ALCOMMON;BOOST_SIGNALS;RTTOOLS;ALVALUE;ALERROR;QIMESSAGING;QITYPE;QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;DL;RT;BOOST;BOOST_DATE_TIME;BOOST_SYSTEM;BOOST_LOCALE;BOOST_THREAD;PTHREAD
 //ADVANCED property for variable: ALPROXIES_INCLUDE_DIRS
 ALPROXIES_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-ALPROXIES_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalproxies.so
+ALPROXIES_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalproxies.so
 ALPROXIES_PACKAGE_FOUND:INTERNAL=TRUE
 ALVALUE_DEPENDS:INTERNAL=ALERROR;QIMESSAGING;QITYPE;QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;DL;RT;BOOST;BOOST_DATE_TIME;BOOST_SYSTEM;BOOST_LOCALE;BOOST_THREAD;PTHREAD
 //ADVANCED property for variable: ALVALUE_INCLUDE_DIRS
 ALVALUE_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-ALVALUE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libalvalue.so
+ALVALUE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libalvalue.so
 ALVALUE_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_CHRONO_DEPENDS:INTERNAL=BOOST_SYSTEM
-BOOST_CHRONO_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_CHRONO_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_chrono.so
+BOOST_CHRONO_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_CHRONO_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_chrono-mt-1_55.so
 BOOST_CHRONO_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_CHRONO_SEARCHED:INTERNAL=TRUE
 BOOST_DATE_TIME_DEPENDS:INTERNAL=BOOST_SYSTEM
-BOOST_DATE_TIME_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_DATE_TIME_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_date_time.so
+BOOST_DATE_TIME_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_DATE_TIME_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_date_time-mt-1_55.so
 BOOST_DATE_TIME_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_DATE_TIME_SEARCHED:INTERNAL=TRUE
 BOOST_FILESYSTEM_DEPENDS:INTERNAL=BOOST_SYSTEM
-BOOST_FILESYSTEM_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_FILESYSTEM_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_filesystem.so
+BOOST_FILESYSTEM_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_FILESYSTEM_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_filesystem-mt-1_55.so
 BOOST_FILESYSTEM_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_FILESYSTEM_SEARCHED:INTERNAL=TRUE
-BOOST_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
+BOOST_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
 BOOST_LOCALE_DEPENDS:INTERNAL=BOOST_THREAD;PTHREAD
-BOOST_LOCALE_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_LOCALE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_locale.so
+BOOST_LOCALE_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_LOCALE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_locale-mt-1_55.so
 BOOST_LOCALE_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_LOCALE_SEARCHED:INTERNAL=TRUE
 BOOST_PACKAGE_FOUND:INTERNAL=TRUE
-BOOST_PROGRAM_OPTIONS_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_PROGRAM_OPTIONS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_program_options.so
+BOOST_PROGRAM_OPTIONS_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_PROGRAM_OPTIONS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_program_options-mt-1_55.so
 BOOST_PROGRAM_OPTIONS_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_PROGRAM_OPTIONS_SEARCHED:INTERNAL=TRUE
-BOOST_REGEX_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_REGEX_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_regex.so
+BOOST_REGEX_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_REGEX_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_regex-mt-1_55.so
 BOOST_REGEX_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_REGEX_SEARCHED:INTERNAL=TRUE
 BOOST_SEARCHED:INTERNAL=TRUE
-BOOST_SIGNALS_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_SIGNALS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_signals.so
+BOOST_SIGNALS_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_SIGNALS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_signals-mt-1_55.so
 BOOST_SIGNALS_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_SIGNALS_SEARCHED:INTERNAL=TRUE
-BOOST_SYSTEM_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_SYSTEM_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_system.so
+BOOST_SYSTEM_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_SYSTEM_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_system-mt-1_55.so
 BOOST_SYSTEM_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_SYSTEM_SEARCHED:INTERNAL=TRUE
 BOOST_THREAD_DEPENDS:INTERNAL=PTHREAD
-BOOST_THREAD_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/include
-BOOST_THREAD_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libboost_thread.so
+BOOST_THREAD_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/include/boost-1_55
+BOOST_THREAD_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost/lib/libboost_thread-mt-1_55.so
 BOOST_THREAD_PACKAGE_FOUND:INTERNAL=TRUE
 BOOST_THREAD_SEARCHED:INTERNAL=TRUE
 BUILD_PERF_TESTS:INTERNAL=OFF
@@ -446,6 +410,7 @@ CMAKE_CPACK_COMMAND:INTERNAL=/usr/bin/cpack
 CMAKE_CTEST_COMMAND:INTERNAL=/usr/bin/ctest
 //ADVANCED property for variable: CMAKE_CXX_FLAGS
 CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1
+CMAKE_CXX_FLAGS:INTERNAL=   -DI_AM_A_ROBOT --sysroot /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/ -pipe -fomit-frame-pointer -fno-align-jumps -fno-align-functions -fno-align-labels -fno-align-loops -m32 -mtune=generic
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_DEBUG
 CMAKE_CXX_FLAGS_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_MINSIZEREL
@@ -456,6 +421,7 @@ CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS
 CMAKE_C_FLAGS-ADVANCED:INTERNAL=1
+CMAKE_C_FLAGS:INTERNAL=   -DI_AM_A_ROBOT --sysroot /home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/ -pipe -fomit-frame-pointer -fno-align-jumps -fno-align-functions -fno-align-labels -fno-align-loops -m32 -mtune=generic
 //ADVANCED property for variable: CMAKE_C_FLAGS_DEBUG
 CMAKE_C_FLAGS_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS_MINSIZEREL
@@ -466,6 +432,7 @@ CMAKE_C_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_C_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS
 CMAKE_EXE_LINKER_FLAGS-ADVANCED:INTERNAL=1
+CMAKE_EXE_LINKER_FLAGS:INTERNAL=-Wl,--as-needed,--sysroot,/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_DEBUG
 CMAKE_EXE_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_MINSIZEREL
@@ -476,19 +443,12 @@ CMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS
 CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
+CMAKE_FIND_ROOT_PATH:INTERNAL=/home/vagrant/NAO/devtools
 CMAKE_FRAMEWORK_PATH:INTERNAL=
 //Name of generator.
 CMAKE_GENERATOR:INTERNAL=Unix Makefiles
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
-//Have symbol pthread_create
-CMAKE_HAVE_LIBC_CREATE:INTERNAL=
-//Have library pthreads
-CMAKE_HAVE_PTHREADS_CREATE:INTERNAL=
-//Have library pthread
-CMAKE_HAVE_PTHREAD_CREATE:INTERNAL=1
-//Have include pthread.h
-CMAKE_HAVE_PTHREAD_H:INTERNAL=1
 //Start directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent
@@ -499,6 +459,7 @@ CMAKE_INSTALL_SO_NO_EXE:INTERNAL=1
 CMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS
 CMAKE_MODULE_LINKER_FLAGS-ADVANCED:INTERNAL=1
+CMAKE_MODULE_LINKER_FLAGS:INTERNAL=-Wl,--as-needed,--sysroot,/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_DEBUG
 CMAKE_MODULE_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL
@@ -507,14 +468,15 @@ CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_MODULE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
-CMAKE_MODULE_PATH:INTERNAL=/home/vagrant/.local/share/cmake;/home/vagrant/.local/share/cmake/qibuild/..
+CMAKE_MODULE_PATH:INTERNAL=/usr/local/share/cmake;/usr/local/share/cmake/qibuild/..
 //number of local generators
 CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=1
-CMAKE_PREFIX_PATH:INTERNAL=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent/build-linux64/sdk;/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64;/home/vagrant/.local/share/cmake/qibuild/modules/
+CMAKE_PREFIX_PATH:INTERNAL=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent/build-linux64/sdk;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/acl;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/alsa;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/archive;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/attr;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/avahi;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/boost;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/bzip2;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/c_ares;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/curl;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/dbus;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/dbus-glib;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/dl;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/eigen3;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/ffi;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/ffmpeg;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/flac;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/fuse-2.8.6;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/glib2;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/gstreamer;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/gstreamer-farsight;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/iconv;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/jpeg;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libevent;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libftdi1;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/liblttng_ust;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/liburcu;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/lircclient;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/lttng_tools;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/octomap;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/ogg;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/opencv;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/openni2;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/openssl;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/pam;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/png;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/pthread;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/pulseaudio;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/python;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/qt;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/rt;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/samplerate;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/sndfile;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/soundtouch;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/tbb;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/telepathy-farsight;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/telepathy-glib;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/tiff;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/udev;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/urg;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/usb;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/usb_1;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/v4l;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/vorbis;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/xml2;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/xz_utils;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/zbar;/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/zlib;/usr/local/share/cmake/qibuild/modules/
 //Path to CMake installation.
 CMAKE_ROOT:INTERNAL=/usr/share/cmake-2.8
 //ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS
 CMAKE_SHARED_LINKER_FLAGS-ADVANCED:INTERNAL=1
+CMAKE_SHARED_LINKER_FLAGS:INTERNAL=-Wl,--as-needed,--sysroot,/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/
 //ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_DEBUG
 CMAKE_SHARED_LINKER_FLAGS_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL
@@ -541,50 +503,31 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_USE_RELATIVE_PATHS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DL_DEFINITIONS
-DL_DEFINITIONS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DL_EXECUTABLE
-DL_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DL_EXECUTABLE_DEBUG
-DL_EXECUTABLE_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DL_INCLUDE_DIRS
-DL_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-DL_INCLUDE_DIRS:INTERNAL=/usr/include
-//ADVANCED property for variable: DL_LIBRARIES
-DL_LIBRARIES-ADVANCED:INTERNAL=1
-DL_LIBRARIES:INTERNAL=general;/usr/lib/x86_64-linux-gnu/libdl.so
+DL_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/include
+DL_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/libdl.so
 DL_PACKAGE_FOUND:INTERNAL=TRUE
 DL_SEARCHED:INTERNAL=TRUE
 //ADVANCED property for variable: HAL_EXPERIMENTAL_DEPENDS
 HAL_EXPERIMENTAL_DEPENDS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: PTHREAD_DEFINITIONS
-PTHREAD_DEFINITIONS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: PTHREAD_EXECUTABLE
-PTHREAD_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: PTHREAD_EXECUTABLE_DEBUG
-PTHREAD_EXECUTABLE_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: PTHREAD_INCLUDE_DIRS
-PTHREAD_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-PTHREAD_INCLUDE_DIRS:INTERNAL=/usr/include
-//ADVANCED property for variable: PTHREAD_LIBRARIES
-PTHREAD_LIBRARIES-ADVANCED:INTERNAL=1
-PTHREAD_LIBRARIES:INTERNAL=-lpthread
+PKG_CONFIG_EXECUTABLE:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/pkg-config
+PTHREAD_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/include
+PTHREAD_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/libpthread.so
 PTHREAD_PACKAGE_FOUND:INTERNAL=TRUE
 PTHREAD_SEARCHED:INTERNAL=TRUE
 QIMESSAGING_DEPENDS:INTERNAL=QITYPE;QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;DL;RT;BOOST;BOOST_DATE_TIME;BOOST_SYSTEM;BOOST_LOCALE;BOOST_THREAD;PTHREAD
 //ADVANCED property for variable: QIMESSAGING_INCLUDE_DIRS
 QIMESSAGING_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-QIMESSAGING_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqimessaging.so
+QIMESSAGING_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqimessaging.so
 QIMESSAGING_PACKAGE_FOUND:INTERNAL=TRUE
 QITYPE_DEPENDS:INTERNAL=QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;DL;RT;BOOST;BOOST_DATE_TIME;BOOST_SYSTEM;BOOST_LOCALE;BOOST_THREAD;PTHREAD
 //ADVANCED property for variable: QITYPE_INCLUDE_DIRS
 QITYPE_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-QITYPE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqitype.so
+QITYPE_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqitype.so
 QITYPE_PACKAGE_FOUND:INTERNAL=TRUE
 QI_DEPENDS:INTERNAL=BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_SYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;BOOST_LOCALE;BOOST_THREAD;PTHREAD;DL;RT
 //ADVANCED property for variable: QI_INCLUDE_DIRS
 QI_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-QI_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/libqi.so
+QI_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/libqi.so
 QI_NIGHTLY_TESTS:INTERNAL=OFF
 QI_PACKAGE_FOUND:INTERNAL=TRUE
 //ADVANCED property for variable: QI_SDK_BIN
@@ -613,34 +556,23 @@ QI_SDK_LIB:INTERNAL=lib
 //ADVANCED property for variable: QI_SDK_SHARE
 QI_SDK_SHARE-ADVANCED:INTERNAL=1
 QI_SDK_SHARE:INTERNAL=share
-QI_VIRTUALENV_PATH:INTERNAL=/home/vagrant/NAO/NAO-engine/naoqi-env/.qi/venvs/py-linux64
+QI_VIRTUALENV_PATH:INTERNAL=/home/vagrant/NAO/NAO-engine/naoqi-env/halagent/.qi/venvs/py-linux64
+QT_MOC_EXECUTABLE:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-moc
+QT_QMAKE_EXECUTABLE:INTERNAL=QT_QMAKE_EXECUTABLE-NOTFOUND
+QT_RCC_EXECUTABLE:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-rcc
+QT_UIC_EXECUTABLE:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/bin/i686-aldebaran-linux-gnu-uic
+QT_USE_QMAKE:INTERNAL=FALSE
 RTTOOLS_DEPENDS:INTERNAL=QI;BOOST_CHRONO;BOOST_FILESYSTEM;BOOST_SYSTEM;BOOST_PROGRAM_OPTIONS;BOOST_REGEX;BOOST_LOCALE;BOOST_THREAD;PTHREAD;DL;RT
 //ADVANCED property for variable: RTTOOLS_INCLUDE_DIRS
 RTTOOLS_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-RTTOOLS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/naoqi-sdk-2.1.4.13-linux64/lib/librttools.so
+RTTOOLS_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/libnaoqi/lib/librttools.so
 RTTOOLS_PACKAGE_FOUND:INTERNAL=TRUE
-//ADVANCED property for variable: RT_DEFINITIONS
-RT_DEFINITIONS-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: RT_EXECUTABLE
-RT_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: RT_EXECUTABLE_DEBUG
-RT_EXECUTABLE_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: RT_INCLUDE_DIRS
-RT_INCLUDE_DIRS-ADVANCED:INTERNAL=1
-RT_INCLUDE_DIRS:INTERNAL=/usr/include
-//ADVANCED property for variable: RT_LIBRARIES
-RT_LIBRARIES-ADVANCED:INTERNAL=1
-RT_LIBRARIES:INTERNAL=general;/usr/lib/x86_64-linux-gnu/librt.so
+RT_INCLUDE_DIRS:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/include
+RT_LIBRARIES:INTERNAL=/home/vagrant/NAO/devtools/ctc-linux64-atom-2.1.4.13/cross/i686-aldebaran-linux-gnu/sysroot/usr/lib/librt.so
 RT_PACKAGE_FOUND:INTERNAL=TRUE
 RT_SEARCHED:INTERNAL=TRUE
 _dpkg_architecture:INTERNAL=/usr/bin/dpkg-architecture
-//ADVANCED property for variable: dlfcn.h_INCLUDE
-dlfcn.h_INCLUDE-ADVANCED:INTERNAL=1
 hal_experimental_NO_INSTALL:INTERNAL=FALSE
 hal_experimental_SUBFOLDER:INTERNAL=
-//ADVANCED property for variable: pthread.h_INCLUDE
-pthread.h_INCLUDE-ADVANCED:INTERNAL=1
-qibuild_DIR:INTERNAL=/home/vagrant/.local/share/cmake/qibuild
-//ADVANCED property for variable: time.h_INCLUDE
-time.h_INCLUDE-ADVANCED:INTERNAL=1
+qibuild_DIR:INTERNAL=/usr/local/share/cmake/qibuild
 
