@@ -27,8 +27,8 @@ memory for interprocess communication.
 #ifndef _HAL_DATA_H
 #define _HAL_DATA_H
 
-#include "data_types/joint_data.h"
-#include "data_types/sensor_data.h"
+//#include "data_types/joint_data.h"
+//#include "data_types/sensor_data.h"
 
 struct hal_data {
     volatile uint8_t sensors_read;
@@ -36,7 +36,7 @@ struct hal_data {
     volatile uint8_t actuators_read;
     volatile uint8_t actuators_current_read;
 
-    joint_data joints[3];
+    //joint_data joints[3];
 
     char text_to_speak[3][35]; //Text to have the NAO say
 
@@ -47,8 +47,9 @@ struct hal_data {
         sensors_current_read = 0;
         actuators_read = 0;
         actuators_current_read = 0;
+        for(int i = 0; i < 3; ++i) text_to_speak[i][0] = 0;
     }
-    for(int i = 0; i < 3; ++i) text_to_speak[i][0] = 0;
+    
 };
 
 #endif

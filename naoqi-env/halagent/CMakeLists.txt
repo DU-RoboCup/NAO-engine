@@ -4,9 +4,10 @@ project(hal_agent)
 find_package(qibuild)
 # Create a executable named hal_agent
 # with the source file: main.cpp
-qi_create_bin(hal_agent "hal_access.cpp")
-
-qi_use_lib(hal_agent ALCOMMON ALPROXIES BOOST)
+# qi_create_bin(hal_agent "hal_access.cpp")
+# qi_use_lib(hal_agent ALCOMMON ALPROXIES BOOST)
+qi_create_bin(hal_experimental "hal_experimental.cpp" "hal_experimental.h")
+qi_use_lib(hal_experimental ALCOMMON ALPROXIES BOOST)
 
 # Add a simple test:
 #qi_create_test(test_hal_agent "test.cpp")

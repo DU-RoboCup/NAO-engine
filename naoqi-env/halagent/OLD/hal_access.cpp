@@ -33,7 +33,7 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 */
 
 #include "hal_access.h"
-
+const std::string hal_access::name("Bender");
 hal_access::hal_access(boost::shared_ptr<AL::ALBroker> broker_ptr, const std::string &broker_name_ptr) :
     ALModule(broker_ptr, "Pineapple")
     //shm(open_or_create, "PineappleJuice", sizeof(pineappleJuice)),
@@ -69,6 +69,6 @@ hal_access::~hal_access()
 //Module info for NaoQi
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> broker_ptr)
 {
-    AL::ALModule::createModule<Pineapple>(broker_ptr);
+    AL::ALModule::createModule<hal_access>(broker_ptr, "hal_access");
     return 0;
 }

@@ -31,7 +31,7 @@ Joint Data container which stores  joint angle and stiffness information.
 
 struct joint_data {
     joint_data() {
-        for(int i = 0; i < Joints::NUMBER_OF_JOINTS; ++i)
+        for(int i = 0; i < Joints2::NUMBER_OF_JOINTS; ++i)
         {
             angles[i] = NAN;
             stiffness[i] = NAN;
@@ -42,7 +42,7 @@ struct joint_data {
     //Reset all joint values to zero
     joint_data(bool reset_code)
     {
-        for(int i = 0; i < Joints::NUMBER_OF_JOINTS; ++i)
+        for(int i = 0; i < Joints2::NUMBER_OF_JOINTS; ++i)
         {
             angles[i] = 0;
             stiffness[i] = 0;
@@ -50,10 +50,10 @@ struct joint_data {
             currents[i] = 0; 
         }
     }
-    float angles[Joints::NUMBER_OF_JOINTS];
-    float stiffness[Joints::NUMBER_OF_JOINTS];
-    float temperatures[Joints::NUMBER_OF_JOINTS];
-    float currents[Joints::NUMBER_OF_JOINTS];
+    float angles[Joints2::NUMBER_OF_JOINTS];
+    float stiffness[Joints2::NUMBER_OF_JOINTS];
+    float temperatures[Joints2::NUMBER_OF_JOINTS];
+    float currents[Joints2::NUMBER_OF_JOINTS];
 
 }
 

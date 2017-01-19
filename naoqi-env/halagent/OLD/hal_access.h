@@ -52,7 +52,7 @@ A more detailed explanation can be found here: http://doc.aldebaran.com/2-1/naoq
 // #include <boost/interprocess/sync/named_semaphore.hpp
 
 
-using namespace boost::interprocess;
+//using namespace boost::interprocess;
 
 class hal_access : AL::ALModule
 {
@@ -64,7 +64,7 @@ public:
     //DCM loop accessor functions
     void start_loop();
     void stop_loop();
-    const static std::string name = "Bender"; //Temporary til this gets implemented later
+    const static std::string name; //Temporary til this gets implemented later
 
     virtual ~hal_access();
 

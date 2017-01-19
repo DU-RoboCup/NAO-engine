@@ -31,7 +31,7 @@ Values are from the NaoQi docs.
 #include <string>
 
 
-namespace Joints {
+namespace Joints2 {
 
     typedef enum JointNames {
         HeadYaw = 0,
