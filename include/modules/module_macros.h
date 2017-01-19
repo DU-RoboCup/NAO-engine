@@ -28,5 +28,6 @@ Macros for registering modules
 #define _MODULE_MACRO_h_GUARD
 
 #define REGISTER_MODULE(module_name) extern "C" { Module* mkrfn() { return module_name::Instance(); }}
+#define INITIALIZE_SINGLETON_MODULE(module_name) module_name* module_name::instance; module_name* module_name::Instance() {if (UNLIKELY(module_name::instance == 0)){ module_name::instance = new module_name();} return module_name::instance;}
 
 #endif /*_MODULE_MACRO_h_GUARD */
