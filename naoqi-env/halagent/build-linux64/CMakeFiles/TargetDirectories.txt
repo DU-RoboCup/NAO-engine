@@ -1,0 +1,1 @@
+/home/vagrant/NAO/NAO-engine/naoqi-env/halagent/build-linux64/CMakeFiles/hal_experimental.dir

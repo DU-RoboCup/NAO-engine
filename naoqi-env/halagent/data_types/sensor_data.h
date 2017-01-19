@@ -25,7 +25,11 @@ Sensor Data container which stores the returned sensor values, which includes
 joint values, IMU values, FSR values, buttons. Currently excludes sonar data.
 */
 
+#ifndef _SENSOR_DATA_H
+#define _SENSOR_DATA_H
+
 #pragma once //Only needs to be included once
+
 
 #include "hardware_data.h"
 #include "joint_data.h"
@@ -42,3 +46,4 @@ struct sensor_data {
     float[Sensors::NUMBER_OF_SENSORS];
 };
 
+#endif
