@@ -1,4 +1,4 @@
 <qibuild version="1">
   <defaults config="linux64" />
-  <build />
+  <build prefix="build-linux64" />
 </qibuild>
