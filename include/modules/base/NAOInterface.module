@@ -1,0 +1,6 @@
+module = {
+	name = "NAOInterface",
+	liblocation = "libnaointerface.so",
+	rfps = 40,
+	mprio = 2
+}

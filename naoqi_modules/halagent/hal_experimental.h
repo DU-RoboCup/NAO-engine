@@ -1,5 +1,6 @@
 #ifndef _HAL_EXPERIMENTAL_H
 #define _HAL_EXPERIMENTAL_H
+
 #define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <boost/shared_ptr.hpp>
 #include "alcommon/albroker.h"
@@ -30,10 +31,12 @@ public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
     virtual ~hal_experimental();
     static const std::string name;
-    void preCallBack();
-    void postCallBack();
-
+    // static void preCallBack();
+    // static void postCallBack();
+    void setActuators();
+    //void readSensors();
 private:
+    //static hal_experimental *theInstance;
     AL::DCMProxy *dcm;
     AL::ALMemoryProxy *nao_memory_proxy;
 
@@ -46,5 +49,6 @@ private:
     boost::interprocess::managed_shared_memory shm;
     //named_semaphore semaphore;
     hal_data *pineappleJuice;
+
 };
 #endif
