@@ -47,6 +47,7 @@ uint16_t ModuleLoader::LoadModule(std::string module_file) {
 	// Load the module file
 	LuaTable mconfig = LuaTable::fromFile(module_file.c_str());
 
+	LOG_DEBUG << "opening dll: " + mconfig["liblocation"].get<std::string>();
 	// Construct the module
 	void* hndl = dlopen(mconfig["liblocation"].get<std::string>().c_str(), RTLD_LAZY);
 	if (!hndl) {

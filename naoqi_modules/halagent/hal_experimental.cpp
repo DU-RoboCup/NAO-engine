@@ -81,10 +81,10 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         std::cout << "hal_data created in shared memory" << std::cout;
     } catch(boost::interprocess::interprocess_exception &e) {std::cout << "Interprocess error: " << e.what() << std::endl;}
     //set up the callbacks for ALBroker
-    // dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
-    // dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
-    // dcm->getGenericProxy()->getModule()->atPostProcess(&hal_experimental::onPreCallBack);
-    // dcm->getGenericProxy()->getModule()->atPreProcess(&hal_experimental::onPostCallBack);
+    dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
+    dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
+    dcm->getGenericProxy()->getModule()->atPostProcess(&hal_experimental::onPreCallBack);
+    dcm->getGenericProxy()->getModule()->atPreProcess(&hal_experimental::onPostCallBack);
 
     // theInstance = NULL;
 }
@@ -96,14 +96,14 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 // {
 //     theInstance->setActuators();
 // }
-//     /**
-//     * The method is called by NaoQi immediately after it communicated with the chest board.
-//     * It reads all sensors.
-//     */
-// static void hal_experimental::postCallBack()
-// {
-//     theInstance->readSensors();
-// }
+/**
+* The method is called by NaoQi immediately after it communicates with the chest board.
+* It reads all sensors.
+*/
+//static void hal_experimental::postCallBack()
+//{
+//    theInstance->readSensors();
+//}
 hal_experimental::~hal_experimental()
 {
     std::cout << "Destructing hal_experimental" << std::endl;
@@ -126,9 +126,26 @@ hal_experimental::~hal_experimental()
 // {
 //     std::cout << "postCallBack called." << std::endl;
 // }
-void setActuators()
+void set_actuators()
 {
     std::cout << "Setting actuators" << std::endl;
+
+	try
+	{
+		dcm_time = dcm->getTime(0); ///< Get's current time on NAO
+		hal_data->actuators_newest_update = hal_data->actuators_currently_being_read;
+		if (hal_data->actuators_newest_update = last_reading_actuator)
+		{
+			std::cout << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << std::endl;
+			actuator_update_fails++;
+		}
+		else actuator_update_fails = 0;
+
+		last_reading_update = hal_data->actuators_newest_update;
+
+		boost::unique_ptr<float> read_actuators = boost::make_unique<float>(hal_data->actuators[hal_data->last_reading_actuators]);
+
+	}
 }
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
 {

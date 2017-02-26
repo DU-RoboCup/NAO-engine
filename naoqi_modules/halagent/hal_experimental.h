@@ -31,9 +31,10 @@ public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
     virtual ~hal_experimental();
     static const std::string name;
+	void set_actuators();
     // static void preCallBack();
     // static void postCallBack();
-    void setActuators();
+    //void setActuators();
     //void readSensors();
 private:
     //static hal_experimental *theInstance;
@@ -45,7 +46,10 @@ private:
     std::string body_version;
     std::string head_ID; 
     std::string head_version;
-
+	
+	uint8_t last_reading_actuator = 254;
+	size_t actuator_update_fails = 0;
+	float dcm_time;
     boost::interprocess::managed_shared_memory shm;
     //named_semaphore semaphore;
     hal_data *pineappleJuice;

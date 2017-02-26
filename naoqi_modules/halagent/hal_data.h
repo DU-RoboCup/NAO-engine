@@ -29,27 +29,22 @@ memory for interprocess communication.
 
 //#include "data_types/joint_data.h"
 //#include "data_types/sensor_data.h"
+#include "data_types\more_hardware_data.h"
+#include <cstdint>
 
 struct hal_data {
-    volatile uint8_t sensors_read;
-    volatile uint8_t sensors_current_read; //value of the latest reading
-    volatile uint8_t actuators_read;
-    volatile uint8_t actuators_current_read;
+    uint8_t sensors_newest_update; ///< Index of the sensor with the most recently updated value 
+    uint8_t sensors_currently_being_read; ///< Index from the list of the current sensor being read
+    uint8_t actuators_new_read; ///< Index of the actuator with the most recently updated value
+    uint8_t actuators_current_read; ///< Index from the actuator of the current sensor being read
 
     //joint_data joints[3];
 
     char text_to_speak[3][35]; //Text to have the NAO say
-
-    volatile bool standing;
-    void init()
-    {
-        sensors_read = 0;
-        sensors_current_read = 0;
-        actuators_read = 0;
-        actuators_current_read = 0;
-        for(int i = 0; i < 3; ++i) text_to_speak[i][0] = 0;
-    }
+    bool standing;
     
+	float sensors[3][NumOfSensorIds];
+	float actuators[3][NumOfActuatorIds];
 };
 
 #endif

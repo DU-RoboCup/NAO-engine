@@ -29,9 +29,10 @@
 *.app
 
 # Directories
-
 build-local/
 build-cross/
 build/
 examples/
 naoqi_modules/halagent/build-crosscompiler/
+.vs/
+

@@ -59,7 +59,7 @@ public:
 	/*
 	* hardware_datatypes - boost::variant datatype that can be set to a variety of different datatypes.
 	**/
-	typedef boost::variant < std::pair<double, double>, double, std::string, std::unordered_map<std::string, Head::EyeLED> > hardware_datatypes;
+	typedef boost::variant < std::pair<float, float>, float, std::string, std::unordered_map<std::string, Head::EyeLED> > hardware_datatypes;
 	void parse_intent(const std::string &input);
 	void initialize_hardware_map(); ///< Initially sets all of the values of our absurd hashmap.
 	void initialize_function_map(); ///< Initializes a map for calling functions.
@@ -71,8 +71,8 @@ public:
 	void print_hardware_map(); ///< Will probably be deprecated
 
 
-	double generate_random_bound_val(double min, double max); ///< Generates a random number between a lower and upper limit
-	double generate_random_bound_val(std::pair<double, double> bounds); ///< Generates a random value given a actuators bounds (in radians, don't use degrees).
+	float generate_random_bound_val(float min, float max); ///< Generates a random number between a lower and upper limit
+	float generate_random_bound_val(std::pair<float, float> bounds); ///< Generates a random value given a actuators bounds (in radians, don't use degrees).
 	std::vector<std::string> command_list; ///< Stores the commands. 
 	/**
 	  * @brief Writes a new value to a hardware component.
@@ -85,7 +85,7 @@ public:
 	  * After all values have been written to the local map of values, we send that data
 	  * to the Shared Memory Map using the synch_pineapple() method.
 	  */
-	bool set_hardware_value(const std::string &hardware_component, double  value); 
+	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	/**
 	  * @brief Reads requested hardware map values and returns the requested value.]
 	  * @param request_module - Name of the the module that requested the values
@@ -135,8 +135,8 @@ private:
 
 protected: 
 	std::unordered_map<std::string, hardware_datatypes> joint_and_sensor_data; ///< Clusterf*** of a hashmap containing all of the hardware values. Subject to change...
-	std::unordered_map<std::string, std::function<void(double)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
-	std::unordered_map<std::string, std::function<double(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers
+	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
+	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers
 };
 
 #endif //NAOInterface_H

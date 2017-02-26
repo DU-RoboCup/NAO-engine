@@ -1,7 +1,4 @@
-#include "include/base/Head.h"
-
-
-
+#include "include/modules/base/Head.h"
 
 Head::Head()
 {
@@ -11,7 +8,7 @@ Head::Head()
 
 	//Set map of occurences where Pitch range is limited to Yaw according to http://doc.aldebaran.com/2-1/family/robots/joints_robot.html#robot-joints-v4-head-joints
 	//Key = yaw_value
-	//Value = std::pair<double,double> limited_pitch_value
+	//Value = std::pair<float,float> limited_pitch_value
 	pitch_limits_map = {
 		{ -2.086017, { -0.449073, 0.330041 }},
 		{ -1.526988, { -0.330041, 0.200015 }},
@@ -45,12 +42,12 @@ Head::~Head()
 {
 }
 
-bool Head::checkBounds(std::pair<double, double> bounds, double val)
+bool Head::checkBounds(std::pair<float, float> bounds, float val)
 {
 	return true ? (val > bounds.first && val < bounds.second) : false;
 }
 
-void Head::set_head_actuators(double yaw, double pitch)
+void Head::set_head_actuators(float yaw, float pitch)
 {
 	//First check that the pitch and yaw are within the actuator bounds
 	if (checkBounds(YawRange, yaw) && checkBounds(PitchRange, pitch))
@@ -81,23 +78,23 @@ void Head::set_head_actuators(double yaw, double pitch)
 
 }
 
-void Head::set_yaw(double yaw)
+void Head::set_yaw(float yaw)
 {
 	set_head_actuators(yaw, head_pitch); ///< Lazy way to not repeat bounds check code
 }
-void Head::set_pitch(double pitch)
+void Head::set_pitch(float pitch)
 {
 	set_head_actuators(head_yaw, pitch); ///< Lazy way to not repeat bounds check code
 }
-std::pair<double, double> Head::get_actuators()
+std::pair<float, float> Head::get_actuators()
 {
-	return std::pair<double, double>(head_yaw, head_pitch);
+	return std::pair<float, float>(head_yaw, head_pitch);
 }
-double Head::get_head_yaw()
+float Head::get_head_yaw()
 {
 	return head_yaw;
 }
-double Head::get_head_pitch()
+float Head::get_head_pitch()
 {
 	return head_pitch;
 }
@@ -114,9 +111,4 @@ Head::EyeLED Head::get_Eye_LEDS(std::string & eye_and_LED_number)
 	catch (const std::exception &e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
-}
-std::string Head::get_current_thought()
-{
-	//TODO: idk lol
-	return std::string("I don't think much. I'm not even real.");
 }

@@ -16,71 +16,71 @@ VERSION HISTORY
 // FILE DESCRIPTION
 Abstract/Interface class for arms
 */
-#include "include/base/Arm.h"
+#include "include/modules/base/Arm.h"
 
 void Arm::current_actuator_vals()
 {
 	std::cout << "Actuator Values: Shouder[" << ShoulderRoll << ", " << ShoulderPitch << "]; Elbow[" << ElbowRoll << ", " << ElbowYaw << "]; Wrist[" << WristYaw << "]" << std::endl;
 }
 
-void Arm::set_shoulder_roll(double roll)
+void Arm::set_shoulder_roll(float roll)
 {
 	set_shoulder(roll, ShoulderPitch);
 }
 
-void Arm::set_shoulder_pitch(double  pitch)
+void Arm::set_shoulder_pitch(float  pitch)
 {
 	set_shoulder(ShoulderRoll, pitch);
 }
 
-void Arm::set_elbow_roll(double  roll)
+void Arm::set_elbow_roll(float  roll)
 {
 	set_elbow(roll, ElbowRoll);
 }
 
-void Arm::set_elbow_yaw(double  yaw)
+void Arm::set_elbow_yaw(float  yaw)
 {
 	set_elbow(ElbowRoll, yaw);
 }
 
-void Arm::set_wrist_yaw(double  yaw)
+void Arm::set_wrist_yaw(float  yaw)
 {
 	set_wrist(yaw);
 }
 
-double Arm::get_shoulder_roll()
+float Arm::get_shoulder_roll()
 {
 	return ShoulderRoll;
 }
 
-double Arm::get_shoulder_pitch()
+float Arm::get_shoulder_pitch()
 {
 	return ShoulderPitch;
 }
 
-double Arm::get_elbow_roll()
+float Arm::get_elbow_roll()
 {
 	return ElbowRoll;
 }
 
-double Arm::get_elbow_yaw()
+float Arm::get_elbow_yaw()
 {
 	return ElbowYaw;
 }
 
-double Arm::get_wrist_yaw()
+float Arm::get_wrist_yaw()
 {
 	return WristYaw;
 }
 
 
 
-std::vector<double> Arm::get_sensors()
+std::vector<float> Arm::get_sensors()
 {
-	return std::vector<double>() = {ShoulderRollSensor, ShoulderPitchSensor, ElbowRollSensor, ElbowPitchSensor};
+	return std::vector<float>() = {ShoulderRollSensor, ShoulderPitchSensor, ElbowRollSensor, ElbowPitchSensor};
 }
 
-bool Arm::checkBounds(std::pair<double, double> actuator, double value)
+bool Arm::checkBounds(std::pair<float, float> actuator, float value)
 {
 	return true ? (value > actuator.first && value < actuator.second) : false;
 }

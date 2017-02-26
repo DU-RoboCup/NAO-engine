@@ -31,17 +31,17 @@ public:
 
 	Head();
 	~Head();
-	typedef struct EyeLED { double RED = 0.0; double GREEN = 1.0; double BLUE = 0.0; }; //% of each LED, 0 being off, 1 being full brightness
+	typedef struct EyeLED { float RED = 0.0; float GREEN = 1.0; float BLUE = 0.0; }; //% of each LED, 0 being off, 1 being full brightness
 	
 	std::string get_current_thought();
-	std::unordered_map<double, std::pair<double, double>> pitch_limits_map;
-	void set_head_actuators(double yaw, double pitch);
-	void set_yaw(double yaw);
-	void set_pitch(double pitch);
-	bool checkBounds(std::pair<double, double> bounds, double val);
-	std::pair<double, double> get_actuators();
-	double get_head_yaw();
-	double get_head_pitch();
+	std::unordered_map<float, std::pair<float, float>> pitch_limits_map;
+	void set_head_actuators(float yaw, float pitch);
+	void set_yaw(float yaw);
+	void set_pitch(float pitch);
+	bool checkBounds(std::pair<float, float> bounds, float val);
+	std::pair<float, float> get_actuators();
+	float get_head_yaw();
+	float get_head_pitch();
 	std::unordered_map<std::string, EyeLED> get_Eye_LEDS();
 	EyeLED get_Eye_LEDS(std::string &eye_and_LED_number);
 
@@ -49,7 +49,7 @@ public:
 private:
 	std::unordered_map<std::string, EyeLED> eye_led_map;
 	//NOTE: Pitch value is limited to the Yaw value to prevent collision with plastic. http://doc.aldebaran.com/2-1/family/robots/joints_robot.html#robot-joints-v4-head-joints
-	double head_yaw, head_pitch;
-	std::pair<double, double> YawRange;
-	std::pair<double, double> PitchRange;
+	float head_yaw, head_pitch;
+	std::pair<float, float> YawRange;
+	std::pair<float, float> PitchRange;
 };

@@ -30,48 +30,48 @@ public:
 	/**
 	  * Interface methods. Need to be implemented in each body part due to actuator limit checking.
 	  */
-	virtual void set_shoulder(double roll, double pitch) = 0;
-	virtual void set_elbow(double roll, double yaw) = 0;
-	virtual void set_wrist(double yaw) = 0;
+	virtual void set_shoulder(float roll, float pitch) = 0;
+	virtual void set_elbow(float roll, float yaw) = 0;
+	virtual void set_wrist(float yaw) = 0;
 	//Thank you abstraction!
-	void set_shoulder_roll(double roll);
-	void set_shoulder_pitch(double pitch);
-	void set_elbow_roll(double roll);
-	void set_elbow_yaw(double yaw);
-	void set_wrist_yaw(double yaw);
+	void set_shoulder_roll(float roll);
+	void set_shoulder_pitch(float pitch);
+	void set_elbow_roll(float roll);
+	void set_elbow_yaw(float yaw);
+	void set_wrist_yaw(float yaw);
 
 	//<R,L>ARM::ACTUATORS::<shoulder, elbow, wrist> getters
-	double get_shoulder_roll();
-	double get_shoulder_pitch();
-	double get_elbow_roll();
-	double get_elbow_yaw();
-	double get_wrist_yaw();
+	float get_shoulder_roll();
+	float get_shoulder_pitch();
+	float get_elbow_roll();
+	float get_elbow_yaw();
+	float get_wrist_yaw();
 	void current_actuator_vals();
 
-	//void set_stiffness_vals(double shoulder_roll, double shoulder_pitch, double elbow_roll, double elbow_yaw, double wrist_yaw, double hand);
-	std::vector<double> get_sensors();
-	bool checkBounds(std::pair<double, double> actuator, double value);
+	//void set_stiffness_vals(float shoulder_roll, float shoulder_pitch, float elbow_roll, float elbow_yaw, float wrist_yaw, float hand);
+	std::vector<float> get_sensors();
+	bool checkBounds(std::pair<float, float> actuator, float value);
 
 	//There's probably a much better way to do this
-	std::pair<double, double> wrist_bounds;
-	std::pair<double, double> shoulder_roll_bounds;
-	std::pair<double, double> shoulder_pitch_bounds;
-	std::pair<double, double> elbow_roll_bounds;
-	std::pair<double, double> elbow_yaw_bounds;
-	std::pair<double, double> hand_position_bounds = std::make_pair<double, double>(0, 1);
+	std::pair<float, float> wrist_bounds;
+	std::pair<float, float> shoulder_roll_bounds;
+	std::pair<float, float> shoulder_pitch_bounds;
+	std::pair<float, float> elbow_roll_bounds;
+	std::pair<float, float> elbow_yaw_bounds;
+	std::pair<float, float> hand_position_bounds = std::make_pair<float, float>(0, 1);
 
 	//Debug functions
 	std::string print_arm_status();
 protected:
 	//Actuators
-	double ShoulderRoll, ShoulderPitch;
-	double ElbowRoll, ElbowYaw;
-	double WristYaw;
+	float ShoulderRoll, ShoulderPitch;
+	float ElbowRoll, ElbowYaw;
+	float WristYaw;
 	//Sensors
-	double ShoulderRollSensor, ShoulderPitchSensor;
-	double ElbowRollSensor, ElbowPitchSensor;
+	float ShoulderRollSensor, ShoulderPitchSensor;
+	float ElbowRollSensor, ElbowPitchSensor;
 	struct stiffness_vals {
-		double shoulder_roll, shoulder_pitch, elbow_roll, elbow_yaw, wrist_yaw, hand = 0.0;
+		float shoulder_roll, shoulder_pitch, elbow_roll, elbow_yaw, wrist_yaw, hand = 0.0;
 	};
 
 

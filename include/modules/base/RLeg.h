@@ -26,13 +26,10 @@ class RLeg :
 public:
 	RLeg();
 	~RLeg();
-	void set_hip(double roll, double yaw, double pitch);
-	void set_knee(double pitch);
-	void set_ankle(double roll, double pitch);
-	BoundList get_actuator_bounds();
+	void set_hip(float roll, float yaw, float pitch);
+	void set_knee(float pitch);
+	void set_ankle(float roll, float pitch);
 private:
-	std::unique_ptr<Hip> RHip;
-	std::unique_ptr<Knee> RKnee;
-	std::unique_ptr<Ankle> RAnkle;
+	std::pair<float, float> HipRollBounds, HipPitchBounds, HipYawBounds, KneePitchBounds, AnklePitchBounds, AnkleRollBounds = {0,0};
 };
 

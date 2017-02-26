@@ -26,8 +26,8 @@ class LArm :
 public:
 	LArm();
 	~LArm();
-	void set_shoulder(double roll, double pitch);
-	void set_elbow(double roll, double yaw);
-	void set_wrist(double yaw);
+	void set_shoulder(float roll, float pitch);
+	void set_elbow(float roll, float yaw);
+	void set_wrist(float yaw);
 };
 

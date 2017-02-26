@@ -5,7 +5,7 @@ if [ "$1" == "local" ] || [ "$2" == "local" ] ; then
     cd /home/vagrant/NAO/NAO-engine/build
     rm -rf *
     cmake ../ -DUSE_CROSS=NO
-    make
+    make -j2
 fi
 
 if [  "$1" == "cross" ] || [ "$2" == "cross" ] ; then
@@ -13,7 +13,7 @@ if [  "$1" == "cross" ] || [ "$2" == "cross" ] ; then
     cd /home/vagrant/NAO/NAO-engine/build
     rm -rf *
     cmake ../ -DUSE_CROSS=YES
-    make
+    make -j2
     cd /home/vagrant/NAO/NAO-engine/naoqi_modules/halagent/
     qibuild configure -c cross-compiler
     qibuild make -c cross-compiler

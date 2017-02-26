@@ -38,9 +38,9 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 	this->ModuleID = id;
 	LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
 	this->ModuleName = mconfig["name"].get<std::string>();
-	this->ModuleFPS = (int)mconfig["rfps"].get<double>();
-	this->ModulePriority = (int)mconfig["mprio"].get<double>();
-	this->ModuleThread = (int)mconfig["mthr"].get<double>();
+	this->ModuleFPS = (int)mconfig["rfps"].get<float>();
+	this->ModulePriority = (int)mconfig["mprio"].get<float>();
+	this->ModuleThread = (int)mconfig["mthr"].get<float>();
 }
 bool NAOInterface::RunFrame()
 {
@@ -50,7 +50,7 @@ bool NAOInterface::RunFrame()
     //     ParsedIntent pi = Intent::Parse(pendingIntents.pop_front());
     //     if (pi[1] = "execute_intent_write")
     //     {
-    //         execute_intent_write(pi[2], (pi.size() != 3) ? std::vector<double>{pi[3], pi.end()} : std::vector<double>{ pi[3] });
+    //         execute_intent_write(pi[2], (pi.size() != 3) ? std::vector<float>{pi[3], pi.end()} : std::vector<float>{ pi[3] });
     //     }
     //         else if (pi[1] = "execute_intent_read")
     //     {
@@ -63,6 +63,14 @@ bool NAOInterface::RunFrame()
     //     //pi is now an array of split strings...Function calls for getting/setting can go here
 	//     return true;
 	// }
+	if(!pendingIntents.empty()) 
+	{
+		//Do intent stuff
+		//auto pi = Intent::Parse(pendingIntents.pop_front())
+		sanity_test("0.o");
+		LOG_DEBUG << "Doing stuff with intents";
+	}
+	return true;
 }
 bool NAOInterface::ProcessIntent(Intent &i)
 {
@@ -127,24 +135,24 @@ void NAOInterface::print_commands_list()
 	}
 }
 
-double NAOInterface::generate_random_bound_val(double min, double max)
+float NAOInterface::generate_random_bound_val(float min, float max)
 {
 	assert(max > min);
-	double rand = ((double)std::rand()) / (double) RAND_MAX;
-	double r = rand * (max - min);
+	float rand = ((float)std::rand()) / (float) RAND_MAX;
+	float r = rand * (max - min);
 	return min + r;
 }
-double NAOInterface::generate_random_bound_val(std::pair<double, double> bounds)
+float NAOInterface::generate_random_bound_val(std::pair<float, float> bounds)
 {
 	auto min = bounds.first;
 	auto max = bounds.second;
 	assert(max > min);
-	double rand = ((double)std::rand()) / (double)RAND_MAX;
-	double r = rand * (max - min);
+	float rand = ((float)std::rand()) / (float)RAND_MAX;
+	float r = rand * (max - min);
 	return min + r;
 }
 
-bool NAOInterface::set_hardware_value(const std::string & hardware_component, double  value)
+bool NAOInterface::set_hardware_value(const std::string & hardware_component, float  value)
 {
 	if (hardware_set_functions.find(hardware_component) == hardware_set_functions.end())
 	{
@@ -173,15 +181,15 @@ bool NAOInterface::execute_intent_read(std::string & request_module, std::string
 		{
 		case 0:
 		{
-			/// typeID = std::pair<double,double>
-			std::pair<double, double> val = boost::get<std::pair<double, double>>(joint_and_sensor_data[hardware_component]);
+			/// typeID = std::pair<float,float>
+			std::pair<float, float> val = boost::get<std::pair<float, float>>(joint_and_sensor_data[hardware_component]);
 			return_values = "(" + std::to_string(val.first) + ", " + std::to_string(val.second) + ")";
 			break;
 		}
 		case 1:
 		{
-			/// typeID = double
-			return_values = std::to_string(boost::get<double>(joint_and_sensor_data[hardware_component]));
+			/// typeID = float
+			return_values = std::to_string(boost::get<float>(joint_and_sensor_data[hardware_component]));
 			break;
 		}
 		case 2:
@@ -268,7 +276,7 @@ void NAOInterface::initialize_hardware_map()
 		std::cout << "fail test passed. awesome" << std::endl;
 	else std::cout << "Fail test failed" << std::endl;
 
-	std::cout << "Hardware Map/Database/Cancer has been spawned. It's so easy to call values like this-> " << boost::get<std::pair<double, double>>(test_val).first << " " << boost::get<std::pair<double, double>>(test_val).second << std::endl;
+	std::cout << "Hardware Map/Database/Cancer has been spawned. It's so easy to call values like this-> " << boost::get<std::pair<float, float>>(test_val).first << " " << boost::get<std::pair<float, float>>(test_val).second << std::endl;
 	std::cout << "Another Test: " << boost::get<std::string>(joint_and_sensor_data["POTATO"]) << std::endl;
 }
 
@@ -301,7 +309,7 @@ void NAOInterface::initialize_function_map()
 		{"RLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&RLeg::set_hip_yaw_stiffness, RightLeg, _1) },
 
 		{"RLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::set_hip_pitch, RightLeg, _1)},
-		{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_hip_pitch_stiffness, RightLeg, _1) },
+		//{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_hip_pitch_stiffness, RightLeg, _1) },
 
 		{"RLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::set_knee_pitch, RightLeg, _1) },
 		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_knee_pitch_stiffness, RightLeg, _1) },
@@ -319,7 +327,7 @@ void NAOInterface::initialize_function_map()
 		{ "LLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&LLeg::set_hip_yaw_stiffness, LeftLeg, _1) },
 
 		{ "LLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::set_hip_pitch, LeftLeg, _1) },
-		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_hip_pitch_stiffness, LeftLeg, _1) },
+//		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_hip_pitch_stiffness, LeftLeg, _1) },
 
 		{ "LLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::set_knee_pitch, LeftLeg, _1) },
 		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_knee_pitch_stiffness, LeftLeg, _1) },
@@ -336,66 +344,66 @@ void NAOInterface::initialize_function_map()
 		{ "HEAD::ACTUATORS::PITCH", std::bind(&Head::get_head_pitch, head) },
 		//TODO: EyeLEDS, Stiffness, Body
 		//RArm
-		{ "RARM::SHOULDER::ACTUATORS::ROLL", std::bind(&RArm::get_shoulder_roll, RightArm) },
-		{ "RARM::SHOULDER::ACTUATORS::PITCH", std::bind(&RArm::get_shoulder_pitch, RightArm) },
-		{ "RARM::ELBOW::ACTUATORS::ROLL", std::bind(&RArm::get_elbow_roll, RightArm) },
-		{ "RARM::ELBOW::ACTUATORS::YAW", std::bind(&RArm::get_elbow_yaw, RightArm) },
-		{ "RARM::WRIST::ACTUATORS::YAW", std::bind(&RArm::get_wrist_yaw, RightArm) },
+		{ "RARM::SHOULDER::ACTUATORS::ROLL", std::bind(&Arm::get_shoulder_roll, RightArm) },
+		{ "RARM::SHOULDER::ACTUATORS::PITCH", std::bind(&Arm::get_shoulder_pitch, RightArm) },
+		{ "RARM::ELBOW::ACTUATORS::ROLL", std::bind(&Arm::get_elbow_roll, RightArm) },
+		{ "RARM::ELBOW::ACTUATORS::YAW", std::bind(&Arm::get_elbow_yaw, RightArm) },
+		{ "RARM::WRIST::ACTUATORS::YAW", std::bind(&Arm::get_wrist_yaw, RightArm) },
 		//LArm
-		{ "LARM::SHOULDER::ACTUATORS::ROLL", std::bind(&LArm::get_shoulder_roll, LeftArm) },
-		{ "LARM::SHOULDER::ACTUATORS::PITCH", std::bind(&LArm::get_shoulder_pitch, LeftArm) },
-		{ "LARM::ELBOW::ACTUATORS::ROLL", std::bind(&LArm::get_elbow_roll, LeftArm) },
-		{ "LARM::ELBOW::ACTUATORS::YAW", std::bind(&LArm::get_elbow_yaw, LeftArm) },
-		{ "LARM::WRIST::ACTUATORS::YAW", std::bind(&LArm::get_wrist_yaw, LeftArm) },
+		{ "LARM::SHOULDER::ACTUATORS::ROLL", std::bind(&Arm::get_shoulder_roll, LeftArm) },
+		{ "LARM::SHOULDER::ACTUATORS::PITCH", std::bind(&Arm::get_shoulder_pitch, LeftArm) },
+		{ "LARM::ELBOW::ACTUATORS::ROLL", std::bind(&Arm::get_elbow_roll, LeftArm) },
+		{ "LARM::ELBOW::ACTUATORS::YAW", std::bind(&Arm::get_elbow_yaw, LeftArm) },
+		{ "LARM::WRIST::ACTUATORS::YAW", std::bind(&Arm::get_wrist_yaw, LeftArm) },
 		//RLeg
-		{ "RLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&RLeg::get_hip_roll, RightLeg) },
+		{ "RLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_hip_roll, RightLeg) },
 //		{ "RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::get_hip_roll_stiffness },
 
-		{ "RLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&RLeg::get_hip_yaw, RightLeg) },
+		{ "RLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&Leg::get_hip_yaw, RightLeg) },
 //		{ "RLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&RLeg::get_hip_yaw_stiffness },
 
-		{ "RLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::get_hip_pitch, RightLeg) },
+		{ "RLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_hip_pitch, RightLeg) },
 //		{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_hip_pitch_stiffness },
 
-		{ "RLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::get_knee_pitch, RightLeg) },
+		{ "RLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_knee_pitch, RightLeg) },
 //		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_knee_pitch_stiffness },
 
-		{ "RLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&RLeg::get_ankle_roll, RightLeg) },
+		{ "RLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_ankle_roll, RightLeg) },
 //		{ "RLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::get_ankle_roll_stiffness },
 
-		{ "RLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::get_ankle_pitch, RightLeg) },
+		{ "RLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, RightLeg) },
 //		{ "RLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_ankle_pitch_stiffness },
 		//LLeg
-		{ "LLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&LLeg::get_hip_roll, LeftLeg) },
+		{ "LLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_hip_roll, LeftLeg) },
 //		{ "LLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::get_hip_roll_stiffness },
 
-		{ "LLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&LLeg::get_hip_yaw, LeftLeg) },
+		{ "LLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&Leg::get_hip_yaw, LeftLeg) },
 //		{ "LLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&LLeg::get_hip_yaw_stiffness },
 
-		{ "LLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::get_hip_pitch, LeftLeg) },
+		{ "LLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_hip_pitch, LeftLeg) },
 //		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_hip_pitch_stiffness },
 
-		{ "LLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::get_knee_pitch, LeftLeg) },
+		{ "LLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_knee_pitch, LeftLeg) },
 //		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_knee_pitch_stiffness },
 
-		{ "LLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&LLeg::get_ankle_roll, LeftLeg) },
+		{ "LLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_ankle_roll, LeftLeg) },
 //		{ "LLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::get_ankle_roll_stiffness },
 
-		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::get_ankle_pitch, LeftLeg) },
+		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, LeftLeg) }
 //		{ "LLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_ankle_pitch_stiffness },
 	};
 
 	/// The Results of lots of Trial and Error
-	//std::function<double(Head::*)> f = std::bind(&Head::get_head_pitch, head);
+	//std::function<float(Head::*)> f = std::bind(&Head::get_head_pitch, head);
 	//auto f = &Head::get_head_pitch;
-	//double (Head::*fun_ptr)() = &Head::get_head_pitch;
+	//float (Head::*fun_ptr)() = &Head::get_head_pitch;
 	//hardware_set_functions["HEAD::ACTUATORS::PITCH"](0.51);
-	//std::function<double(void)> f = std::bind(&Head::get_head_pitch, head);
+	//std::function<float(void)> f = std::bind(&Head::get_head_pitch, head);
 	//float test_d = static_cast<float>(f());
 	//unsigned int *bit_test = reinterpret_cast<unsigned int *>(&test_d);
 	////*bit_test &= (1 << 3);
 	//std::cout << "TEST FUNCTION: " << std::to_string(f()) << " Casted: " << *bit_test<<  std::endl;
-	//try{ std::cout << "test of f: " << std::to_string(boost::any_cast<double>(f)) << std::endl;  }
+	//try{ std::cout << "test of f: " << std::to_string(boost::any_cast<float>(f)) << std::endl;  }
 	//catch (boost::bad_any_cast &e) { std::cout << "Cast error: " << e.what() << std::endl; }
 	//auto test_fn = std::bind(&NAOInterface::sanity_test, this, std::placeholders::_1);
 	//function_ptr_set_map.insert(std::make_pair("TEST_FN", test_fn));
