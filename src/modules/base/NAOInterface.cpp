@@ -158,12 +158,26 @@ bool NAOInterface::set_hardware_value(const std::string & hardware_component, fl
 	{
 		std::cout << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names" << std::endl;
 	}
-	else {
+	else 
+	{
 		hardware_set_functions[hardware_component](value);
 		std::cout << hardware_component << " Updated!" << std::endl;
 		return true;
 	}
 	
+}
+bool NAOInterface::get_hardware_value(const std::string &hardware_component)
+{
+	if(hardware_get_map.find(hardware_component) == hardware_get_map.end())
+	{
+		std::cout << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names" << std::endl;
+	}
+	else
+	{
+		//Todo: Implement Return Intent with requested value
+		auto val = hardware_get_map[hardware_component]();
+		std::cout << hardware_component << ": " << val << std::endl;
+	}
 }
 
 // Currently a half-assed solution.
@@ -214,6 +228,7 @@ bool NAOInterface::execute_intent_read(std::string & request_module, std::string
 
 bool NAOInterface::sync_pineapple()
 {
+	//ToDo: Post a semaphore and read value in shared memory using Boost.Interprocess
 	return true;
 }
 
@@ -263,21 +278,21 @@ void NAOInterface::initialize_hardware_map()
 	* NOTE: This is probably going to be migrated to using luatables...or a database
 	* This will (probably TM) work but it kind of sucks.
 	**/
-	std::cout << "Initializing joint and sensor map. Test: " << head->get_actuators().first << " " << head->get_actuators().second << std::endl;
-	joint_and_sensor_data = {
-		{ "HEAD::ACTUATORS::POSITION", head->get_actuators() },
-		{ "HEAD::ACTUATORS::YAW", head->get_head_yaw()},
-		{ "HEAD::ACTUATORS::PITCH", head->get_head_pitch()},
-		{ "HEAD::LEDS", head->get_Eye_LEDS() },
-		{ "POTATO", "HEY! I am a pineapple"},
-	};
-	auto test_val = joint_and_sensor_data["HEAD::ACTUATORS::POSITION"];
-	if (joint_and_sensor_data.find("test_FAIL") == joint_and_sensor_data.end())
-		std::cout << "fail test passed. awesome" << std::endl;
-	else std::cout << "Fail test failed" << std::endl;
+	// std::cout << "Initializing joint and sensor map. Test: " << head->get_actuators().first << " " << head->get_actuators().second << std::endl;
+	// joint_and_sensor_data = {
+	// 	{ "HEAD::ACTUATORS::POSITION", head->get_actuators() },
+	// 	{ "HEAD::ACTUATORS::YAW", head->get_head_yaw()},
+	// 	{ "HEAD::ACTUATORS::PITCH", head->get_head_pitch()},
+	// 	{ "HEAD::LEDS", head->get_Eye_LEDS() },
+	// 	{ "POTATO", "HEY! I am a pineapple"},
+	// };
+	// auto test_val = joint_and_sensor_data["HEAD::ACTUATORS::POSITION"];
+	// if (joint_and_sensor_data.find("test_FAIL") == joint_and_sensor_data.end())
+	// 	std::cout << "fail test passed. awesome" << std::endl;
+	// else std::cout << "Fail test failed" << std::endl;
 
-	std::cout << "Hardware Map/Database/Cancer has been spawned. It's so easy to call values like this-> " << boost::get<std::pair<float, float>>(test_val).first << " " << boost::get<std::pair<float, float>>(test_val).second << std::endl;
-	std::cout << "Another Test: " << boost::get<std::string>(joint_and_sensor_data["POTATO"]) << std::endl;
+	// std::cout << "Hardware Map/Database/Cancer has been spawned. It's so easy to call values like this-> " << boost::get<std::pair<float, float>>(test_val).first << " " << boost::get<std::pair<float, float>>(test_val).second << std::endl;
+	// std::cout << "Another Test: " << boost::get<std::string>(joint_and_sensor_data["POTATO"]) << std::endl;
 }
 
 void NAOInterface::initialize_function_map()
@@ -357,74 +372,42 @@ void NAOInterface::initialize_function_map()
 		{ "LARM::WRIST::ACTUATORS::YAW", std::bind(&Arm::get_wrist_yaw, LeftArm) },
 		//RLeg
 		{ "RLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_hip_roll, RightLeg) },
-//		{ "RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::get_hip_roll_stiffness },
+		{ "RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&Leg::get_hip_roll_stiffness, RightLeg) },
 
 		{ "RLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&Leg::get_hip_yaw, RightLeg) },
-//		{ "RLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&RLeg::get_hip_yaw_stiffness },
+		{ "RLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&Leg::get_hip_yaw_stiffness, RightLeg) },
 
 		{ "RLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_hip_pitch, RightLeg) },
-//		{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_hip_pitch_stiffness },
+		{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_hip_pitch_stiffness, RightLeg) },
 
 		{ "RLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_knee_pitch, RightLeg) },
-//		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_knee_pitch_stiffness },
+		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_knee_pitch_stiffness, RightLeg)},
 
 		{ "RLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_ankle_roll, RightLeg) },
-//		{ "RLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::get_ankle_roll_stiffness },
+		{ "RLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&Leg::get_ankle_roll_stiffness, RightLeg) },
 
 		{ "RLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, RightLeg) },
-//		{ "RLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::get_ankle_pitch_stiffness },
+		{ "RLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_ankle_pitch_stiffness, RightLeg) },
+
 		//LLeg
 		{ "LLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_hip_roll, LeftLeg) },
-//		{ "LLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::get_hip_roll_stiffness },
+		{ "LLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&Leg::get_hip_roll_stiffness, LeftLeg) },
 
 		{ "LLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&Leg::get_hip_yaw, LeftLeg) },
-//		{ "LLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&LLeg::get_hip_yaw_stiffness },
+		{ "LLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&Leg::get_hip_yaw_stiffness, LeftLeg) },
 
 		{ "LLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_hip_pitch, LeftLeg) },
-//		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_hip_pitch_stiffness },
+		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_hip_pitch_stiffness, LeftLeg) },
 
 		{ "LLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_knee_pitch, LeftLeg) },
-//		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_knee_pitch_stiffness },
+		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_knee_pitch_stiffness, LeftLeg) },
 
 		{ "LLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_ankle_roll, LeftLeg) },
-//		{ "LLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::get_ankle_roll_stiffness },
+		{ "LLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&Leg::get_ankle_roll_stiffness, LeftLeg) },
 
-		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, LeftLeg) }
-//		{ "LLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::get_ankle_pitch_stiffness },
+		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, LeftLeg) },
+		{ "LLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_ankle_pitch_stiffness, LeftLeg) },
 	};
-
-	/// The Results of lots of Trial and Error
-	//std::function<float(Head::*)> f = std::bind(&Head::get_head_pitch, head);
-	//auto f = &Head::get_head_pitch;
-	//float (Head::*fun_ptr)() = &Head::get_head_pitch;
-	//hardware_set_functions["HEAD::ACTUATORS::PITCH"](0.51);
-	//std::function<float(void)> f = std::bind(&Head::get_head_pitch, head);
-	//float test_d = static_cast<float>(f());
-	//unsigned int *bit_test = reinterpret_cast<unsigned int *>(&test_d);
-	////*bit_test &= (1 << 3);
-	//std::cout << "TEST FUNCTION: " << std::to_string(f()) << " Casted: " << *bit_test<<  std::endl;
-	//try{ std::cout << "test of f: " << std::to_string(boost::any_cast<float>(f)) << std::endl;  }
-	//catch (boost::bad_any_cast &e) { std::cout << "Cast error: " << e.what() << std::endl; }
-	//auto test_fn = std::bind(&NAOInterface::sanity_test, this, std::placeholders::_1);
-	//function_ptr_set_map.insert(std::make_pair("TEST_FN", test_fn));
-
-	//auto test_fn = boost::bind(&NAOInterface::sanity_test_any, this, boost::placeholders::_1);
-	//function_ptr_set_map.insert(std::make_pair("TEST_FN", test_fn));
-
-	//std::shared_ptr<Head> potater = std::make_shared<Head>();
-	//auto advanced_test_fn = std::bind(&Head::silly_test, THead, std::placeholders::_1);
-	//function_ptr_set_map.insert(std::make_pair("TEST_FN2", advanced_test_fn));
-
-	////auto test_fn3 = std::bind(&NAOInterface::sanity_test, this, std::placeholders::_1);
-	//function_ptr_set_map.insert(std::make_pair("TEST_FN3", test_fn));
-
-	//auto t = function_ptr_set_map["TEST_FN"];
-	//t("Simple Test test_fn");
-
-	//auto t2 = function_ptr_set_map["TEST_FN2"];
-	//t2("Advanced Test test_fn2");
-	//auto t3 = function_ptr_set_map["TEST_FN3"];
-	//t3("Test_FN3");
 }
 
 void NAOInterface::sanity_test(const std::string &foo)
@@ -433,6 +416,6 @@ void NAOInterface::sanity_test(const std::string &foo)
 	//auto t = hardware_set_functions[fooL];
 	//t(1.21);
 	set_hardware_value(fooL, 1.21);
-
+	std::cout << "HEAD::ACTUATORS::YAW Value is now: " << get_hardware_value(fooL) << std::endl;
 }
 

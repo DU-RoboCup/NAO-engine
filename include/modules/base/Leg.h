@@ -59,12 +59,19 @@ public:
 	float get_knee_pitch();
 	float get_ankle_roll();
 	float get_ankle_pitch();
+
+	float get_hip_roll_stiffness();
+	float get_hip_yaw_stiffness();
+	float get_hip_pitch_stiffness();
+	float get_knee_pitch_stiffness();
+	float get_ankle_roll_stiffness();
+	float get_ankle_pitch_stiffness();
+
 	// BoundList get_actuator_bounds();
 
 	bool checkBounds(std::pair<float, float> bounds, float val);
 
 private:
+	float HipRoll_Stiffness, HipYaw_Stiffness, HipPitch_Stiffness, KneePitch_Stiffness, AnkleRoll_Stiffness, AnklePitch_Stiffness = 0; ///< Actuator Stiffness Values
 	float HipRoll_A, HipYaw_A, HipPitch_A, KneePitch_A, AnkleRoll_A, AnklePitch_A;///<Actuator Positions Values
-	float HipRoll_Stiffness, HipYaw_Stiffness, HipPitch_Stiffness, KneePitch_Stiffness, AnkleRoll_Stiffness, AnklePitch_Stiffness = 0.0; ///< Actuator Stiffness Values
-	std::pair<float, float> HipRollBounds, HipPitchBounds, HipYawBounds, KneePitchBounds, AnklePitchBounds, AnkleRollBounds = {0,0};
 };

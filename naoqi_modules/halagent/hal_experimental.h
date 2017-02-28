@@ -29,7 +29,7 @@ class hal_experimental : public AL::ALModule {
 
 public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
-    virtual ~hal_experimental();
+    ~hal_experimental();
     static const std::string name;
 	void set_actuators();
     // static void preCallBack();
@@ -47,8 +47,8 @@ private:
     std::string head_ID; 
     std::string head_version;
 	
-	uint8_t last_reading_actuator = 254;
-	size_t actuator_update_fails = 0;
+	uint8_t last_reading_actuator;
+	size_t actuator_update_fails;
 	float dcm_time;
     boost::interprocess::managed_shared_memory shm;
     //named_semaphore semaphore;

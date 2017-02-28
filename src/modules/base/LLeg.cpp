@@ -18,7 +18,6 @@ LLeg::LLeg()
 	KneePitchBounds = std::make_pair<float, float>(-0.092346, 2.112528);
 	AnklePitchBounds = std::make_pair<float, float>(-1.189516, 0.922747);
 	AnkleRollBounds = std::make_pair<float, float>(-0.397880, 0.769001);
-	
 	std::cout << "Left Leg initialized" << std::endl;
 }
 

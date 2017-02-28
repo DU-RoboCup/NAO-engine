@@ -34,10 +34,20 @@ need to physically work with a NAO robot.
 #include <cassert>
 #include <memory>
 #include <unordered_map>
+// Add some dynamic programming abilities
 #include <boost/any.hpp>
 #include <boost/variant.hpp>
 #include <boost/optional.hpp> //Implemented in STL in C++17 :(
+// Interprocess
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #define BOOST_BIND_NO_PLACEHOLDERS
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/interprocess/sync/interprocess_condition.hpp>
+#include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/sync/named_semaphore.hpp>
+
 #include "Head.h"
 #include "RArm.h"
 #include "LArm.h"
@@ -45,6 +55,7 @@ need to physically work with a NAO robot.
 #include "RLeg.h"
 #include "include/common.h"
 #include "include/debug/debugging.h"
+
 
 
 /**
@@ -77,7 +88,7 @@ public:
 	/**
 	  * @brief Writes a new value to a hardware component.
 	  * @param hardware_component - The hardware component's name to be written to.
-	  * @param values - A vector containing list of values to be set.
+	  * @param value - A float containing the value to be set.
 	  * @return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
 	  * execute_intent_write first checks if the given harware component string is valid
@@ -87,12 +98,19 @@ public:
 	  */
 	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	/**
+	  * @brief Reads a hardware component value.
+	  * @param hardware_component - The hardware component's name to be read from.
+	  * 
+	  */
+	bool get_hardware_value(const std::string &hardware_component);
+
+	/**
 	  * @brief Reads requested hardware map values and returns the requested value.]
 	  * @param request_module - Name of the the module that requested the values
 	  * @param hardware_component - The hardware component's name to be read from.
 	  * @param requested_value - The hardware value(s) to be sent back to the module
 	  * @return - boolean which is true if operation was succesful or false if a failure occured.
-	  */
+	  */  
 	bool execute_intent_read(std::string &request_module, std::string &hardware_component, std::string &requested_value);
 	//auto get_hardware_value(std::string &args);
 	/** @brief - Synchronizes hardware data values with the module running in NAOqi
@@ -108,7 +126,6 @@ public:
 	  */
 	bool sync_pineapple(); 
 	typedef std::function<hardware_datatypes(hardware_datatypes)> generic_function;
-	generic_function f;
 	/*typedef std::map<std::string, generic_function> function_map;*/
 	
 	/**

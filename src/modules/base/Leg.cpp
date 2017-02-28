@@ -29,12 +29,21 @@ void Leg::set_knee_pitch_stiffness(float knee_stiffness) { if (check_stiffness(k
 void Leg::set_ankle_roll_stiffness(float roll_stiffness) { if (check_stiffness(roll_stiffness)) AnkleRoll_Stiffness = roll_stiffness; }
 void Leg::set_ankle_pitch_stiffness(float pitch_stiffness) { if (check_stiffness(pitch_stiffness)) AnklePitch_Stiffness = pitch_stiffness; }
 
+/// Actuator Values
 float Leg::get_hip_roll(){ return HipRoll_A; }
 float Leg::get_hip_yaw() { return HipYaw_A; }
 float Leg::get_hip_pitch() { return HipPitch_A; }
 float Leg::get_knee_pitch() { return KneePitch_A; }
 float Leg::get_ankle_pitch() { return AnklePitch_A; }
 float Leg::get_ankle_roll() { return AnkleRoll_A; }
+//Stiffness Values
+float Leg::get_hip_roll_stiffness() { return HipRoll_Stiffness;}
+float Leg::get_hip_yaw_stiffness(){ return HipYaw_Stiffness; }
+float Leg::get_hip_pitch_stiffness() { return HipPitch_Stiffness; }
+float Leg::get_knee_pitch_stiffness() { return KneePitch_Stiffness; }
+float Leg::get_ankle_roll_stiffness() { return AnkleRoll_Stiffness; }
+float Leg::get_ankle_pitch_stiffness() { return AnklePitch_Stiffness; }
+
 // BoundList get_actuator_bounds()
 // {
 // 	return BoundList {HipRollBounds, HipPitchBounds, HipYawBounds, KneePitchBounds, AnklePitchBounds, AnkleRollBounds};

@@ -4,13 +4,14 @@
 using namespace AL;
 using std::string;
 using namespace boost::interprocess;    
-const std::string hal_experimental::name("hal_experimental");
+//const std::string hal_experimental::name("hal_experimental");
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
         shm(open_or_create, "PineappleJuice", 65536) /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
 {
     setModuleDescription("Communicates between the Naoqi process and our Pineapple");
-
+    last_reading_actuator = 255;
+    actuator_update_fails = 0;
     std::cout << "Starting hal_experimental!" << std::endl;
     dcm = new DCMProxy(pBroker);
     nao_memory_proxy = new ALMemoryProxy(pBroker);
@@ -73,18 +74,19 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         commands[5][2][5] = 1.0;
         dcm->setAlias(commands);
         std::cout << "Success!" << std::endl;
-    }catch(std::exception &e) { }
+	}
+	catch (std::exception &e) { std::cout << "Error: " << e.what() << std::endl; }
 
 
     try{
         pineappleJuice = shm.construct<hal_data>("juicyData")();
-        std::cout << "hal_data created in shared memory" << std::cout;
+        std::cout << "pineappleJuice created in shared memory" << std::cout;
     } catch(boost::interprocess::interprocess_exception &e) {std::cout << "Interprocess error: " << e.what() << std::endl;}
     //set up the callbacks for ALBroker
-    dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
-    dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
-    dcm->getGenericProxy()->getModule()->atPostProcess(&hal_experimental::onPreCallBack);
-    dcm->getGenericProxy()->getModule()->atPreProcess(&hal_experimental::onPostCallBack);
+    // dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
+    // dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
+    // dcm->getGenericProxy()->getModule()->atPostProcess(&hal_experimental::onPreCallBack);
+    // dcm->getGenericProxy()->getModule()->atPreProcess(&hal_experimental::onPostCallBack);
 
     // theInstance = NULL;
 }
@@ -126,26 +128,30 @@ hal_experimental::~hal_experimental()
 // {
 //     std::cout << "postCallBack called." << std::endl;
 // }
-void set_actuators()
+void hal_experimental::set_actuators()
 {
     std::cout << "Setting actuators" << std::endl;
 
 	try
 	{
 		dcm_time = dcm->getTime(0); ///< Get's current time on NAO
-		hal_data->actuators_newest_update = hal_data->actuators_currently_being_read;
-		if (hal_data->actuators_newest_update = last_reading_actuator)
+		pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
+		if (pineappleJuice->actuators_newest_update != last_reading_actuator)
 		{
 			std::cout << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << std::endl;
 			actuator_update_fails++;
 		}
 		else actuator_update_fails = 0;
 
-		last_reading_update = hal_data->actuators_newest_update;
+		last_reading_actuator = pineappleJuice->actuators_newest_update;
 
-		boost::unique_ptr<float> read_actuators = boost::make_unique<float>(hal_data->actuators[hal_data->last_reading_actuators]);
+		float* read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
 
-	}
+	} 
+    catch(std::exception &e) 
+    {
+        std::cout << "set_actuators exception: " << e.what() << std::endl;
+    }
 }
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
 {

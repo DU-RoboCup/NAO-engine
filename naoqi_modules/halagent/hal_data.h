@@ -29,14 +29,13 @@ memory for interprocess communication.
 
 //#include "data_types/joint_data.h"
 //#include "data_types/sensor_data.h"
-#include "data_types\more_hardware_data.h"
-#include <cstdint>
+#include "data_types/more_hardware_data.h"
 
 struct hal_data {
-    uint8_t sensors_newest_update; ///< Index of the sensor with the most recently updated value 
-    uint8_t sensors_currently_being_read; ///< Index from the list of the current sensor being read
-    uint8_t actuators_new_read; ///< Index of the actuator with the most recently updated value
-    uint8_t actuators_current_read; ///< Index from the actuator of the current sensor being read
+    unsigned int sensors_newest_update; ///< Index of the sensor with the most recently updated value 
+    unsigned int sensors_newest_read; ///< Index from the list of the current sensor being read
+    unsigned int actuators_newest_update; ///< Index of the actuator with the most recently updated value
+    unsigned int actuators_current_read; ///< Index from the actuator of the current sensor being read
 
     //joint_data joints[3];
 

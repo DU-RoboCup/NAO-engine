@@ -24,7 +24,7 @@ This file stores data regarding the hardware of the robot.
 This stuff is borrowed from BHuman and rUNSWIFt.
 */
 
-enum LBHSensorIds
+enum SensorIds
 {
 	// joint sensors
 	headYawPositionSensor,
@@ -152,7 +152,7 @@ enum LBHSensorIds
 	NumOfSensorIds,
 };
 
-enum LBHActuatorIds
+enum ActuatorIds
 {
 	// joint request
 	headYawPositionActuator,
