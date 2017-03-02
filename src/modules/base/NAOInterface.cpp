@@ -44,30 +44,23 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 }
 bool NAOInterface::RunFrame()
 {
-//Processing the intent queue
-    // if (!pendingIntents.empty())
-    // {
-    //     ParsedIntent pi = Intent::Parse(pendingIntents.pop_front());
-    //     if (pi[1] = "execute_intent_write")
-    //     {
-    //         execute_intent_write(pi[2], (pi.size() != 3) ? std::vector<float>{pi[3], pi.end()} : std::vector<float>{ pi[3] });
-    //     }
-    //         else if (pi[1] = "execute_intent_read")
-    //     {
-    //         execute_intent_read(pi[3], pi[4], pi[5]);
-    //     }
-    //     else {
-    //         std::cout << "Error: NAOInterface does not contain function  " << pi[2] << std::endl;
-    //         return false;
-    //     }	
-    //     //pi is now an array of split strings...Function calls for getting/setting can go here
-	//     return true;
-	// }
 	if(!pendingIntents.empty()) 
 	{
-		//Do intent stuff
-		//auto pi = Intent::Parse(pendingIntents.pop_front())
-		sanity_test("0.o");
+		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
+		std::vector<std::string> pi;
+		Intent frontIntent(pendingIntents[0]);
+		boost::split(pi, frontIntent.value, boost::is_any_of("/"));
+		if(pi[2] == "set_hardware_value"){
+			if(set_hardware_value(pi[3], std::stof(pi[4])));
+		}
+		else if(pi[2] == "get_hardware_value")
+			get_hardware_value(pi[3]);
+		else
+		{
+			LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
+			return false; 
+		}
+		pendingIntents.pop_front();
 		LOG_DEBUG << "Doing stuff with intents";
 	}
 	return true;
@@ -91,6 +84,7 @@ bool NAOInterface::Uninstall()
 
 NAOInterface::NAOInterface()
 {
+	BOOST_LOG_FUNCTION();
 
 	head = std::make_shared<Head>();
 	RightArm = std::make_shared<RArm>();
@@ -100,11 +94,9 @@ NAOInterface::NAOInterface()
 
     randomly_set_joints();
 	//Sets up map of get function pointer and set function pointers
-	initialize_hardware_map();
 	initialize_function_map();
 
-	std::cout << "NAOInterface Initialized" << std::endl;
-	std::cout << "Testing..." << std::endl;
+	LOG_DEBUG << "NAOInterface Initialized";
 	print_hardware_map();
 	sanity_test(":/");
 
@@ -156,12 +148,12 @@ bool NAOInterface::set_hardware_value(const std::string & hardware_component, fl
 {
 	if (hardware_set_functions.find(hardware_component) == hardware_set_functions.end())
 	{
-		std::cout << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names" << std::endl;
+		LOG_WARNING << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names";
 	}
 	else 
 	{
 		hardware_set_functions[hardware_component](value);
-		std::cout << hardware_component << " Updated!" << std::endl;
+		LOG_DEBUG << hardware_component << " Updated!";
 		return true;
 	}
 	
@@ -170,7 +162,7 @@ bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 {
 	if(hardware_get_map.find(hardware_component) == hardware_get_map.end())
 	{
-		std::cout << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names" << std::endl;
+		LOG_WARNING << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names";
 	}
 	else
 	{
@@ -178,52 +170,6 @@ bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 		auto val = hardware_get_map[hardware_component]();
 		std::cout << hardware_component << ": " << val << std::endl;
 	}
-}
-
-// Currently a half-assed solution.
-bool NAOInterface::execute_intent_read(std::string & request_module, std::string & hardware_component, std::string & requested_value)
-{
-	//Checks if the hardware component referenced even exists.
-	if (joint_and_sensor_data.find(hardware_component) == joint_and_sensor_data.end())
-	{
-		std::cout << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names" << std::endl;
-		return false;
-	}
-	else {
-		std::string return_values;
-		switch (joint_and_sensor_data[hardware_component].which())
-		{
-		case 0:
-		{
-			/// typeID = std::pair<float,float>
-			std::pair<float, float> val = boost::get<std::pair<float, float>>(joint_and_sensor_data[hardware_component]);
-			return_values = "(" + std::to_string(val.first) + ", " + std::to_string(val.second) + ")";
-			break;
-		}
-		case 1:
-		{
-			/// typeID = float
-			return_values = std::to_string(boost::get<float>(joint_and_sensor_data[hardware_component]));
-			break;
-		}
-		case 2:
-		{
-			/// typeID = std::string
-			return_values = boost::get<std::string>(joint_and_sensor_data[hardware_component]);
-			break;
-		}
-		case 3:
-		{
-			/// typeID = std::unordered_map<std::string, Head::EyeLEDS>
-			// I don't know how to deal with this yet...I'm thinking writing an unordered_map to_string method 
-			// in the form: m = {{key1, val1,val2,val3},{key2, val1,val2,val3},...};
-			return_values = "Eye LEDs map....";
-			break;
-		}
-		
-		}
-	}
-	return true;
 }
 
 bool NAOInterface::sync_pineapple()
@@ -261,6 +207,7 @@ void NAOInterface::randomly_set_joints()
 	//LeftLeg->set_hip(generate_random_bound_val(LLBounds[0]), generate_random_bound_val(LLBounds[1]), generate_random_bound_val(LLBounds[2]));
 	//LeftLeg->set_knee(generate_random_bound_val(LLBounds[4]));
 	//LeftLeg->set_ankle(generate_random_bound_val(LLBounds[5]), generate_random_bound_val(LLBounds[6]));
+	
 }
 
 void NAOInterface::print_hardware_map()
@@ -269,30 +216,6 @@ void NAOInterface::print_hardware_map()
 	for (auto k : hardware_set_functions) {
 		std::cout << k.first << std::endl;
 	}
-}
-
-void NAOInterface::initialize_hardware_map()
-{
-	/**
-	* Initialize hashmap of everything....I really should make a common data structure
-	* NOTE: This is probably going to be migrated to using luatables...or a database
-	* This will (probably TM) work but it kind of sucks.
-	**/
-	// std::cout << "Initializing joint and sensor map. Test: " << head->get_actuators().first << " " << head->get_actuators().second << std::endl;
-	// joint_and_sensor_data = {
-	// 	{ "HEAD::ACTUATORS::POSITION", head->get_actuators() },
-	// 	{ "HEAD::ACTUATORS::YAW", head->get_head_yaw()},
-	// 	{ "HEAD::ACTUATORS::PITCH", head->get_head_pitch()},
-	// 	{ "HEAD::LEDS", head->get_Eye_LEDS() },
-	// 	{ "POTATO", "HEY! I am a pineapple"},
-	// };
-	// auto test_val = joint_and_sensor_data["HEAD::ACTUATORS::POSITION"];
-	// if (joint_and_sensor_data.find("test_FAIL") == joint_and_sensor_data.end())
-	// 	std::cout << "fail test passed. awesome" << std::endl;
-	// else std::cout << "Fail test failed" << std::endl;
-
-	// std::cout << "Hardware Map/Database/Cancer has been spawned. It's so easy to call values like this-> " << boost::get<std::pair<float, float>>(test_val).first << " " << boost::get<std::pair<float, float>>(test_val).second << std::endl;
-	// std::cout << "Another Test: " << boost::get<std::string>(joint_and_sensor_data["POTATO"]) << std::endl;
 }
 
 void NAOInterface::initialize_function_map()
@@ -413,9 +336,7 @@ void NAOInterface::initialize_function_map()
 void NAOInterface::sanity_test(const std::string &foo)
 {
 	const std::string fooL = "HEAD::ACTUATORS::YAW";
-	//auto t = hardware_set_functions[fooL];
-	//t(1.21);
 	set_hardware_value(fooL, 1.21);
-	std::cout << "HEAD::ACTUATORS::YAW Value is now: " << get_hardware_value(fooL) << std::endl;
+	LOG_DEBUG << "HEAD::ACTUATORS::YAW Value is now: " << get_hardware_value(fooL);
 }
 

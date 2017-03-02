@@ -34,6 +34,7 @@ need to physically work with a NAO robot.
 #include <cassert>
 #include <memory>
 #include <unordered_map>
+#include <type_traits>
 // Add some dynamic programming abilities
 #include <boost/any.hpp>
 #include <boost/variant.hpp>
@@ -47,6 +48,7 @@ need to physically work with a NAO robot.
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/sync/named_semaphore.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "Head.h"
 #include "RArm.h"
@@ -59,7 +61,7 @@ need to physically work with a NAO robot.
 
 
 /**
-  * @class NAOInterface
+  * \class NAOInterface
   * Main class/module class for the NAOInterface. A number of other classes
   * are what are really doing most of the work. 
   **/
@@ -86,10 +88,10 @@ public:
 	float generate_random_bound_val(std::pair<float, float> bounds); ///< Generates a random value given a actuators bounds (in radians, don't use degrees).
 	std::vector<std::string> command_list; ///< Stores the commands. 
 	/**
-	  * @brief Writes a new value to a hardware component.
-	  * @param hardware_component - The hardware component's name to be written to.
-	  * @param value - A float containing the value to be set.
-	  * @return - boolean which is true if operation was succesful or false if a failure occured.
+	  * \brief Writes a new value to a hardware component.
+	  * \param hardware_component - The hardware component's name to be written to.
+	  * \param value - A float containing the value to be set.
+	  * \return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
 	  * execute_intent_write first checks if the given harware component string is valid
 	  * and a real hardware component, then updates the joint_and_sensor_data map.
@@ -98,23 +100,14 @@ public:
 	  */
 	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	/**
-	  * @brief Reads a hardware component value.
-	  * @param hardware_component - The hardware component's name to be read from.
+	  * \brief Reads a hardware component value.
+	  * \param hardware_component - The hardware component's name to be read from.
 	  * 
 	  */
 	bool get_hardware_value(const std::string &hardware_component);
 
-	/**
-	  * @brief Reads requested hardware map values and returns the requested value.]
-	  * @param request_module - Name of the the module that requested the values
-	  * @param hardware_component - The hardware component's name to be read from.
-	  * @param requested_value - The hardware value(s) to be sent back to the module
-	  * @return - boolean which is true if operation was succesful or false if a failure occured.
-	  */  
-	bool execute_intent_read(std::string &request_module, std::string &hardware_component, std::string &requested_value);
-	//auto get_hardware_value(std::string &args);
-	/** @brief - Synchronizes hardware data values with the module running in NAOqi
-	  * @return - boolean which is true if operation was succesful or false if a failure occured.
+	/** \brief - Synchronizes hardware data values with the module running in NAOqi
+	  * \return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
 	  * This method is the most important of NAOInterface, it synchronizes data by reading and writing 
 	  * from/to Shared Memory. There are safety mechanisims built in (namely a semaphore) to prevent
@@ -151,7 +144,6 @@ private:
     std::deque<Intent> pendingIntents;
 
 protected: 
-	std::unordered_map<std::string, hardware_datatypes> joint_and_sensor_data; ///< Clusterf*** of a hashmap containing all of the hardware values. Subject to change...
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers
 };

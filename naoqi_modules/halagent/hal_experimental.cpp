@@ -78,10 +78,16 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 	catch (std::exception &e) { std::cout << "Error: " << e.what() << std::endl; }
 
 
-    try{
+    try
+    {
         pineappleJuice = shm.construct<hal_data>("juicyData")();
         std::cout << "pineappleJuice created in shared memory" << std::cout;
-    } catch(boost::interprocess::interprocess_exception &e) {std::cout << "Interprocess error: " << e.what() << std::endl;}
+
+    } 
+    catch(boost::interprocess::interprocess_exception &e) 
+    {
+        std::cout << "Interprocess error: " << e.what() << std::endl;
+    }
     //set up the callbacks for ALBroker
     // dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
     // dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
