@@ -18,6 +18,7 @@
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 #include "hal_data.h"
 
@@ -32,27 +33,32 @@ public:
     ~hal_experimental();
     static const std::string name;
 	void set_actuators();
-    // static void preCallBack();
-    // static void postCallBack();
-    //void setActuators();
-    //void readSensors();
+    void read_sensors();
+    void preCallBack();
+    void postCallBack();
 private:
-    //static hal_experimental *theInstance;
-    AL::DCMProxy *dcm;
+    AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
-
+    AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias, game_controller;
+    AL::ALValue commands, commandsAlias;
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
-    std::string head_ID; 
+    std::string head_ID;
     std::string head_version;
-	
+    boost::interprocess::managed_shared_memory shm;
+
 	uint8_t last_reading_actuator;
 	size_t actuator_update_fails;
 	float dcm_time;
-    boost::interprocess::managed_shared_memory shm;
-    //named_semaphore semaphore;
+    float last_requested_actuators[NumOfActuatorIds];
+
+
+
+    //Filfthy raw pointers
     hal_data *pineappleJuice;
+    float *sensor_ptrs[NumOfSensorIds];
+    static hal_experimental *instance;
 
 };
 #endif

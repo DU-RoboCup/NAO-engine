@@ -5,113 +5,160 @@ using namespace AL;
 using std::string;
 using namespace boost::interprocess;    
 //const std::string hal_experimental::name("hal_experimental");
+hal_experimental* hal_experimental::instance;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
-        shm(open_or_create, "PineappleJuice", 65536) /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+        shm(open_or_create, "PineappleJuice", 65536), /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+        dcm_proxy(NULL),
+        nao_memory_proxy(NULL)
 {
     setModuleDescription("Communicates between the Naoqi process and our Pineapple");
-    last_reading_actuator = 255;
+    last_reading_actuator = 255; ///<This is just initially set to an impossible actuator number
     actuator_update_fails = 0;
     std::cout << "Starting hal_experimental!" << std::endl;
-    dcm = new DCMProxy(pBroker);
-    nao_memory_proxy = new ALMemoryProxy(pBroker);
-    
-    body_ID = (std::string) nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0);
-    // head_ID = (std::string) nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0);
-    // body_version = (std::string) nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0);
-    // head_version = (std::string) nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0);
-    std::cout << "HeadID proxy call value: " << body_ID << std::endl;
 
-    std::cout << "Testing value set!" << std::endl;
-    //This is a test
+
+
     try
     {
-        ALValue commandsAlias;
-        ALValue commands;
-        commandsAlias.arraySetSize(2);
-        commandsAlias[0] = string("ChestLeds");
-        commandsAlias[1].arraySetSize(3);
-        commandsAlias[1][0] = string("ChestBoard/Led/Red/Actuator/Value");
-        commandsAlias[1][1] = string("ChestBoard/Led/Green/Actuator/Value");
-        commandsAlias[1][2] = string("ChestBoard/Led/Blue/Actuator/Value");
-        dcm->createAlias(commandsAlias);
-        commands.arraySetSize(6);
-        commands[0] = string("ChestLeds");
-        commands[1] = string("ClearAll");
-        commands[2] = string("time-separate");
-        commands[3] = 0;
-        commands[4].arraySetSize(6);
-        commands[4][0] = dcm->getTime(10000);
-        commands[4][1] = dcm->getTime(20000);
-        commands[4][2] = dcm->getTime(30000);
-        commands[4][3] = dcm->getTime(40000);
-        commands[4][4] = dcm->getTime(50000);
-        commands[4][5] = dcm->getTime(60000);
-        commands[5].arraySetSize(3);
-        // ChestBoard/Led/Red/Actuator/Value
-        commands[5][0].arraySetSize(6);
-        commands[5][0][0] = 1.0;
-        commands[5][0][1] = 0.0;
-        commands[5][0][2] = 1.0;
-        commands[5][0][3] = 0.0;
-        commands[5][0][4] = 1.0;
-        commands[5][0][5] = 0.0;
-        // ChestBoard/Led/Green/Actuator/Value
-        commands[5][1].arraySetSize(6);
-        commands[5][1][0] = 1.0;
-        commands[5][1][1] = 0.5;
-        commands[5][1][2] = 1.0;
-        commands[5][1][3] = 0.25;
-        commands[5][1][4] = 0.125;
-        commands[5][1][5] = 0.0;
-        // ChestBoard/Led/Blue/Actuator/Value
-        commands[5][2].arraySetSize(6);
-        commands[5][2][0] = 0.0625;
-        commands[5][2][1] = 0.125;
-        commands[5][2][2] = 0.25;
-        commands[5][2][3] = 0.50;
-        commands[5][2][4] = 0.75;
-        commands[5][2][5] = 1.0;
-        dcm->setAlias(commands);
-        std::cout << "Success!" << std::endl;
-	}
+        // Establish Communication with NaoQi
+        dcm_proxy = new DCMProxy(pBroker);
+        nao_memory_proxy = new ALMemoryProxy(pBroker);
+        body_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0));
+        // head_ID = (std::string) nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0);
+        // body_version = (std::string) nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0);
+        // head_version = (std::string) nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0);
+        std::cout << "HeadID proxy call value: " << body_ID << std::endl;
+
+        commands.arraySetSize(2); //< Two dimensional array.
+
+        ///BEGIN POSITION ACTUATOR ALIAS INITIALIZATION
+
+        commands[0] = std::string("positionActuators");
+        commands[1].arraySetSize(NumOfPositionActuatorIds); //< Ugly data structure
+        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        {
+            commands[1][i] = std::string(actuatorNames[i]);
+        }
+        // Create Memory Proxy aliases for actuator values
+        commandsAlias = dcm_proxy->createAlias(commands);
+        
+        ///END
+
+
+        ///BEGIN STIFFNESS ACTUATOR ALIAS INITIALIZATION
+       
+        commands[0] = std::string("stiffnessActuators");
+        commands[1].arraySetSize(NumOfStiffnessActuatorIds); //< Ugly data structure
+        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        {
+            commands[1][i] = std::string(actuatorNames[headYawStiffnessActuator + i]);
+        }
+        commandsAlias = dcm_proxy->createAlias(commands);
+       
+        ///END
+
+
+        ///BEGIN POSITION REQUEST ALIAS INITIALIZATION
+
+        position_request_alias.arraySetSize(6);
+        position_request_alias[0] = std::string("positionActuators");
+        position_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
+        position_request_alias[2] = std::string("time-seperate"); //Timing Paramers
+        position_request_alias[3] = 0; //idk
+        position_request_alias[4].arraySetSize(1);
+        position_request_alias[5].arraySetSize(NumOfPositionActuatorIds);
+        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        {
+            position_request_alias[5][i].arraySetSize(1);
+        }
+
+        ///END
+
+
+        ///BEGIN STIFFNESS REQUEST ALIAS INITIALIZATION
+
+        stiffness_request_alias.arraySetSize(6);
+        stiffness_request_alias[0] = std::string("stiffnessActuators");
+        stiffness_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
+        stiffness_request_alias[2] = std::string("time-seperate"); //Timing Paramers
+        stiffness_request_alias[3] = 0; //idk
+        stiffness_request_alias[4].arraySetSize(1);
+        stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
+        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        {
+            stiffness_request_alias[5][i].arraySetSize(1);
+        }
+
+        ///END
+
+
+        ///BEGIN LED REQUEST ALIAS INITIALIZATION
+
+        led_request_alias.arraySetSize(3);
+        led_request_alias[1] = std::string("ClearAll");
+        led_request_alias[2].arraySetSize(2);
+        led_request_alias[2][0][1] = 0; //As you can see, LEDS are suuuper easy to work with
+
+        ///END
+
+        //Initialize Sensor Pointers
+        for(int i = 0; i < NumOfSensorIds; ++i)
+            sensor_ptrs[i] = static_cast<float *>(nao_memory_proxy->getDataPtr(sensorNames[i]));
+        
+        ///Initialize Requested Actuators
+        std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
+        for(int i = faceLedRedLeft0DegActuator; i < chestBoardLedRedActuator; ++i)
+            last_requested_actuators[i] = -1.f;
+        
+        dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
+        dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
+        
+        
+
+
+
+    
+	} catch(AL::ALError &e) {
+        std::cerr << "Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << std::endl;
+    }
 	catch (std::exception &e) { std::cout << "Error: " << e.what() << std::endl; }
 
+    //Boost Interprocess Shared Memory Initialization:
 
     try
     {
-        pineappleJuice = shm.construct<hal_data>("juicyData")();
+        //boost::shared_memory_object::remove("juicyData"); // When the hal module is initialized, remove any pre-existing shared memory objects
+        std::cout << "[Construction] Shared Memory Object juicyData removed!" << std::endl;
+        pineappleJuice = shm.construct<hal_data>("juicyData")(/*Paramers for struct's initial values can go here*/); 
         std::cout << "pineappleJuice created in shared memory" << std::cout;
-
     } 
     catch(boost::interprocess::interprocess_exception &e) 
     {
         std::cout << "Interprocess error: " << e.what() << std::endl;
     }
     //set up the callbacks for ALBroker
-    // dcm->getGenericProxy()->getModule()->atPostProcess(boost::bind(postCallBack_, this));
-    // dcm->getGenericProxy()->getModule()->atPreProcess(boost::bind(preCallBack_, this));
-    // dcm->getGenericProxy()->getModule()->atPostProcess(&hal_experimental::onPreCallBack);
-    // dcm->getGenericProxy()->getModule()->atPreProcess(&hal_experimental::onPostCallBack);
 
-    // theInstance = NULL;
 }
-    /**
-    * The method is called by NaoQi immediately before it communicates with the chest board.
-    * It sets all the actuators.
-    */
-// static void hal_experimental::onPreCallback() 
-// {
-//     theInstance->setActuators();
-// }
+/**
+* The method is called by NaoQi immediately before it communicates with the chest board.
+* It sets all the actuators.
+*/
+void hal_experimental::preCallBack() 
+{
+    instance->set_actuators();
+}
 /**
 * The method is called by NaoQi immediately after it communicates with the chest board.
 * It reads all sensors.
 */
-//static void hal_experimental::postCallBack()
-//{
-//    theInstance->readSensors();
-//}
+void hal_experimental::postCallBack()
+{
+   instance->read_sensors();
+}
+
+
+
 hal_experimental::~hal_experimental()
 {
     std::cout << "Destructing hal_experimental" << std::endl;
@@ -119,28 +166,21 @@ hal_experimental::~hal_experimental()
       * Note: If naoqi crashes, by default all data stored in shared memory will (probably)
       * be destroyed. This is why NAOInterface keeps a local copy of the data.
       **/
+        
     shm.destroy<hal_data>("juicyData");
-    shared_memory_object::remove("PineappleJuice");
-    delete dcm;
+    std::cout << "[Destruction] Shared Memory Object juicyData removed!" << std::endl;
+    delete dcm_proxy;
     delete nao_memory_proxy;
 }
 
-
-// void hal_experimental::preCallBack(hal_experimental *hal)
-// {
-//     std::cout << "preCallBack called." << std::endl;
-// }
-// void hal_experimental::postCallBack(hal_experimental *hal)
-// {
-//     std::cout << "postCallBack called." << std::endl;
-// }
 void hal_experimental::set_actuators()
 {
     std::cout << "Setting actuators" << std::endl;
 
 	try
 	{
-		dcm_time = dcm->getTime(0); ///< Get's current time on NAO
+        pineappleJuice->semaphore.wait(); //Wait for anything using Interproc
+		dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
 		pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
 		if (pineappleJuice->actuators_newest_update != last_reading_actuator)
 		{
@@ -152,13 +192,53 @@ void hal_experimental::set_actuators()
 		last_reading_actuator = pineappleJuice->actuators_newest_update;
 
 		float* read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
-
-	} 
-    catch(std::exception &e) 
+        pineappleJuice->semaphore.post();
+        std::cout << "Actuator values set" << std::endl;
+	}
+    catch(std::exception &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
     {
         std::cout << "set_actuators exception: " << e.what() << std::endl;
     }
 }
+
+void hal_experimental::read_sensors()
+{
+    std::cout << "reading sensors" << std::endl;
+    try
+    {
+        pineappleJuice->semaphore.wait();
+        int sensor_data_written = 0;
+        if(sensor_data_written == pineappleJuice->sensors_newest_update)
+        {
+            sensor_data_written++;
+        }
+        if(sensor_data_written == pineappleJuice->sensors_newest_read && sensor_data_written == pineappleJuice->sensors_newest_update )
+        {
+            sensor_data_written++;
+        }
+
+        //Safety Test:
+        if(sensor_data_written == pineappleJuice->sensors_newest_read || sensor_data_written == pineappleJuice->sensors_newest_update)
+        {
+            std::cerr << "Sensor data being overwritten to shared memory!" << std::endl; 
+        }
+        float *current_sensor = pineappleJuice->sensors[sensor_data_written];
+        for(int i = 0; i < NumOfSensorIds; ++i)
+        {
+            current_sensor[i] = *sensor_ptrs[i];
+        }
+
+        pineappleJuice->sensors_newest_update = sensor_data_written;
+
+        pineappleJuice->semaphore.post();
+
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "An error occured while trying to read the sensor data: " << e.what() << std::endl;   
+    }
+}
+
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
 {
     AL::ALModule::createModule<hal_experimental>(pBroker, "hal_experimental");
