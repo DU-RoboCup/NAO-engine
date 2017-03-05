@@ -25,9 +25,6 @@ Container for all hal data on the NAO. This container will be inserted into shar
 memory for interprocess communication.
 */
 
-#include "data_types/joint_data.h"
-
-
 struct hal_data {
     volatile uint8_t sensors_read;
     volatile uint8_t sensors_current_read; //value of the latest reading

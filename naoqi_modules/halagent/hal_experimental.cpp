@@ -8,7 +8,6 @@ using namespace boost::interprocess;
 hal_experimental* hal_experimental::instance;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
-        shm(open_or_create, "PineappleJuice", 65536), /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
         dcm_proxy(NULL),
         nao_memory_proxy(NULL)
 {
@@ -16,8 +15,6 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     last_reading_actuator = 255; ///<This is just initially set to an impossible actuator number
     actuator_update_fails = 0;
     std::cout << "Starting hal_experimental!" << std::endl;
-
-
 
     try
     {
@@ -44,6 +41,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         commandsAlias = dcm_proxy->createAlias(commands);
         
         ///END
+
+        std::cout << "1. Actuator Alias Initialized." << std::endl;
 
 
         ///BEGIN STIFFNESS ACTUATOR ALIAS INITIALIZATION
@@ -75,6 +74,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         ///END
 
+        std::cout << "2. Position Alias Initialized." << std::endl;
+
 
         ///BEGIN STIFFNESS REQUEST ALIAS INITIALIZATION
 
@@ -92,52 +93,71 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         ///END
 
+        std::cout << "3. Stiffness Alias Initialized." << std::endl;
+
 
         ///BEGIN LED REQUEST ALIAS INITIALIZATION
 
         led_request_alias.arraySetSize(3);
         led_request_alias[1] = std::string("ClearAll");
-        led_request_alias[2].arraySetSize(2);
+        led_request_alias[2].arraySetSize(1);
+        led_request_alias[2][0].arraySetSize(2);
         led_request_alias[2][0][1] = 0; //As you can see, LEDS are suuuper easy to work with
 
         ///END
+
+        std::cout << "4. LED Alias Initialized." << std::endl;
 
         //Initialize Sensor Pointers
         for(int i = 0; i < NumOfSensorIds; ++i)
             sensor_ptrs[i] = static_cast<float *>(nao_memory_proxy->getDataPtr(sensorNames[i]));
         
+        std::cout << "5. Sensor Pointers initialized" << std::endl;
+
         ///Initialize Requested Actuators
         std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
         for(int i = faceLedRedLeft0DegActuator; i < chestBoardLedRedActuator; ++i)
             last_requested_actuators[i] = -1.f;
         
+        std::cout << "6. Requested Actuators Initialized." << std::endl;
+
         dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
         dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
         
-        
-
-
-
-    
+        std::cout << "7. Proxy call backs established." << std::endl;
 	} catch(AL::ALError &e) {
         std::cerr << "Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << std::endl;
     }
-	catch (std::exception &e) { std::cout << "Error: " << e.what() << std::endl; }
-
     //Boost Interprocess Shared Memory Initialization:
 
     try
     {
+        std::cout << "8. Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]" << std::endl;
+        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
         //boost::shared_memory_object::remove("juicyData"); // When the hal module is initialized, remove any pre-existing shared memory objects
-        std::cout << "[Construction] Shared Memory Object juicyData removed!" << std::endl;
-        pineappleJuice = shm.construct<hal_data>("juicyData")(/*Paramers for struct's initial values can go here*/); 
+        if(shm.get_size() != 65536) std::cout << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << std::endl;
+        std::cout << "9. Constructing Shared Memory Object. [juicyData]" << std::endl;
+        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Paramers for struct's initial values can go here*/); 
         std::cout << "pineappleJuice created in shared memory" << std::cout;
     } 
     catch(boost::interprocess::interprocess_exception &e) 
     {
-        std::cout << "Interprocess error: " << e.what() << std::endl;
+        std::cout << "[FATAL] An Interprocess error: " << e.what() << std::endl;
+        std::cout << "Cleaning up shared memory..." << std::endl;
+        try
+        {
+            shm.destroy<hal_data>("juicyData");
+            boost::interprocess::shared_memory_object::remove("PineappleJuice");
+        } 
+        catch(boost::interprocess::interprocess_exception &e)
+        {
+            std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
+        }
+
+
     }
-    //set up the callbacks for ALBroker
+
+    std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
 }
 /**
@@ -146,6 +166,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 */
 void hal_experimental::preCallBack() 
 {
+    std::cout << "Pre-Callback called" << std::endl;
     instance->set_actuators();
 }
 /**
@@ -154,7 +175,8 @@ void hal_experimental::preCallBack()
 */
 void hal_experimental::postCallBack()
 {
-   instance->read_sensors();
+    std::cout << "Post-Callback called" << std::endl;  
+    instance->read_sensors();
 }
 
 
@@ -167,7 +189,15 @@ hal_experimental::~hal_experimental()
       * be destroyed. This is why NAOInterface keeps a local copy of the data.
       **/
         
-    shm.destroy<hal_data>("juicyData");
+    try
+    {
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    } 
+    catch(boost::interprocess::interprocess_exception &e)
+    {
+        std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
+    }
     std::cout << "[Destruction] Shared Memory Object juicyData removed!" << std::endl;
     delete dcm_proxy;
     delete nao_memory_proxy;

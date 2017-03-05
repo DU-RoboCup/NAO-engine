@@ -55,8 +55,10 @@ need to physically work with a NAO robot.
 #include "LArm.h"
 #include "LLeg.h"
 #include "RLeg.h"
+
 #include "include/common.h"
 #include "include/debug/debugging.h"
+#include "include/memory/hal_data.h"
 
 
 
@@ -139,10 +141,9 @@ public:
 private:
     static NAOInterface* instance;
 	NAOInterface();
-
     //Intent processing
     std::deque<Intent> pendingIntents;
-
+	std::unique_ptr<hal_data> pineappleJuice;
 protected: 
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers

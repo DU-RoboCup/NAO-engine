@@ -20,7 +20,8 @@
 #include <string>
 #include <cstring>
 
-#include "hal_data.h"
+#include "../../include/memory/hal_data.h"
+
 
 namespace AL {
     class ALBroker;
