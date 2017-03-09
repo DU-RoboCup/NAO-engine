@@ -22,9 +22,9 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         dcm_proxy = new DCMProxy(pBroker);
         nao_memory_proxy = new ALMemoryProxy(pBroker);
         body_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0));
-        // head_ID = (std::string) nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0);
-        // body_version = (std::string) nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0);
-        // head_version = (std::string) nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0);
+        // head_ID = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0));
+        // body_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0));
+        // head_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0));
         std::cout << "HeadID proxy call value: " << body_ID << std::endl;
 
         commands.arraySetSize(2); //< Two dimensional array.
@@ -191,6 +191,7 @@ hal_experimental::~hal_experimental()
         
     try
     {
+        boost::interprocess::named_semaphore::remove("robo_semaphore");
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     } 

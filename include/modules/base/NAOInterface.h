@@ -108,6 +108,13 @@ public:
 	  */
 	bool get_hardware_value(const std::string &hardware_component);
 
+	/**
+	  * \brief - Helper method for initializing access to shared memory. 
+	  *
+	  * This is not in the constructor because if NaoQI crashes, or our processes
+	  * crashes in some odd way, it could be useful to re-open the shared memory.  
+	  **/
+	bool access_shared_memory();
 	/** \brief - Synchronizes hardware data values with the module running in NAOqi
 	  * \return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
@@ -119,20 +126,30 @@ public:
 	  * This method is called after all of the write intents occur and before any read intent occurs to 
 	  * ensure that both processes have the most up to date hardware values.
 	  */
-	bool sync_pineapple(); 
+	bool sync_pineapple();
+	/**
+	  *\brief - uses a semaphore to safely read values from the NaoQI Module
+	  **/
+	bool read_shared_memory();
+	/**
+	  * \brief - uses a semaphore to safely write values to shared memory,
+	  * and finally to the NaoQI module.
+	  **/
+	bool write_shared_memory(); 
 	typedef std::function<hardware_datatypes(hardware_datatypes)> generic_function;
 	/*typedef std::map<std::string, generic_function> function_map;*/
 	
-	/**
-	  * shared_ptr's for Ligaments: Due to these being shared pointers, be careful with Ref Counts and how destruction is handled (it's not automatic).
-	  * Need to be shared_ptrs for function pointers and binding.
-	  **/
+
 	static NAOInterface* Instance();
     void Reconfigure(std::string config_file, uint16_t id);
     bool RunFrame();
     bool ProcessIntent(Intent &i);
     bool Install();
     bool Uninstall();
+	/**
+	  * shared_ptr's for Ligaments: Due to these being shared pointers, be careful with Ref Counts and how destruction is handled (it's not automatic).
+	  * Need to be shared_ptrs for function pointers and binding.
+	  **/
 	std::shared_ptr<Head> head;
 	std::shared_ptr<RArm> RightArm;
 	std::shared_ptr<LArm> LeftArm;
@@ -142,8 +159,10 @@ private:
     static NAOInterface* instance;
 	NAOInterface();
     //Intent processing
-    std::deque<Intent> pendingIntents;
-	std::unique_ptr<hal_data> pineappleJuice;
+    PendingIntents pending_intents;
+	boost::interprocess::managed_shared_memory shm;
+	hal_data *pineappleJuice;
+	bool read_shm, write_shm;
 protected: 
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers

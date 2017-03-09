@@ -44,23 +44,25 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 }
 bool NAOInterface::RunFrame()
 {
-	if(!pendingIntents.empty()) 
+	if(!pending_intents.empty()) 
 	{
 		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
-		std::vector<std::string> pi;
-		Intent frontIntent(pendingIntents[0]);
-		boost::split(pi, frontIntent.value, boost::is_any_of("/"));
-		if(pi[2] == "set_hardware_value"){
-			if(set_hardware_value(pi[3], std::stof(pi[4])));
-		}
-		else if(pi[2] == "get_hardware_value")
-			get_hardware_value(pi[3]);
-		else
+		try 
 		{
-			LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
-			return false; 
+			ParsedIntent pi = pending_intents.pop_front().Parse();
+			if(pi[2] == "set_hardware_value"){
+				if(set_hardware_value(pi[3], std::stof(pi[4])));
+			}
+			else if(pi[2] == "get_hardware_value")
+				get_hardware_value(pi[3]);
+			else
+			{
+				LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
+				return false; 
+			}
+		} catch(const std::exception &e) {
+			LOG_WARNING << "Intent Parsing Exception: " << e.what() << "";
 		}
-		pendingIntents.pop_front();
 		LOG_DEBUG << "Doing stuff with intents";
 	}
 	return true;
@@ -68,7 +70,7 @@ bool NAOInterface::RunFrame()
 bool NAOInterface::ProcessIntent(Intent &i)
 {
 	//DO NOT MODIFY
-	pendingIntents.push_back(i);
+	pending_intents.push_back(i);
 	return true;
 }
 bool NAOInterface::Install()
@@ -81,6 +83,8 @@ bool NAOInterface::Uninstall()
 {
 	LOG_DEBUG << "Uninstalled 'NAOInterface' Module. The robot should be shutting down...";
 }
+
+using namespace boost::interprocess;
 
 NAOInterface::NAOInterface()
 {
@@ -100,8 +104,10 @@ NAOInterface::NAOInterface()
 	print_hardware_map();
 	sanity_test(":/");
 
-}
+	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
+	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
 
+}
 
 void NAOInterface::parse_intent(const std::string &input)
 {
@@ -171,13 +177,57 @@ bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 		std::cout << hardware_component << ": " << val << std::endl;
 	}
 }
-
+bool NAOInterface::access_shared_memory()
+{
+	try
+	{
+        shm = managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+		pineappleJuice = shm.find_or_construct<hal_data>("juicyData")();
+	}
+	catch (const interprocess_exception &e)
+	{
+		LOG_WARNING << "NAOInterface could not open required shared memory objects. Error Code: " << e.what() << ".";
+		return false;
+	}
+	return true;
+}
 bool NAOInterface::sync_pineapple()
 {
 	//ToDo: Post a semaphore and read value in shared memory using Boost.Interprocess
 	return true;
 }
-
+bool NAOInterface::read_shared_memory()
+{
+	try
+	{
+		LOG_DEBUG << "NAOInterface is accessing the semaphore";
+		pineappleJuice->semaphore.wait();
+		//Do stuff
+		pineappleJuice->semaphore.post();
+	}
+	catch (const interprocess_exception &e)
+	{
+		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
+		return false;
+	}
+	return true;
+}
+bool NAOInterface::write_shared_memory()
+{
+	try
+	{
+		LOG_DEBUG << "NAOInterface is accessing the semaphore";
+		pineappleJuice->semaphore.wait();
+		//Do stuff
+		pineappleJuice->semaphore.post();
+	}
+	catch (const interprocess_exception &e)
+	{
+		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
+		return false;
+	}
+	return true;
+}
 
 void NAOInterface::randomly_set_joints()
 {
@@ -228,71 +278,89 @@ void NAOInterface::initialize_function_map()
 		{"HEAD::ACTUATORS::PITCH", std::bind(&Head::set_pitch, head, _1) }, 
 		//TODO: EyeLEDS, Stiffness, Body
 		//RArm
-		{"RARM::SHOULDER::ACTUATORS::ROLL", std::bind(&RArm::set_shoulder_roll, RightArm, _1)},
-		{"RARM::SHOULDER::ACTUATORS::PITCH", std::bind(&RArm::set_shoulder_pitch, RightArm, _1)},
-		{"RARM::ELBOW::ACTUATORS::ROLL", std::bind(&RArm::set_elbow_roll, RightArm, _1)},
-		{"RARM::ELBOW::ACTUATORS::YAW", std::bind(&RArm::set_elbow_yaw, RightArm, _1)},
-		{"RARM::WRIST::ACTUATORS::YAW", std::bind(&RArm::set_wrist_yaw, RightArm, _1)},
+		{"RARM::SHOULDER::ACTUATORS::PITCH::POSITION", std::bind(&RArm::set_shoulder_pitch, RightArm, _1)},
+		{"RARM::SHOULDER::ACTUATORS::ROLL::POSITION", std::bind(&RArm::set_shoulder_roll, RightArm, _1)},
+		{"RARM::ELBOW::ACTUATORS::YAW::POSITION", std::bind(&RArm::set_elbow_yaw, RightArm, _1)},
+		{"RARM::ELBOW::ACTUATORS::ROLL::POSITION", std::bind(&RArm::set_elbow_roll, RightArm, _1)},
+		{"RARM::WRIST::ACTUATORS::YAW::POSITION", std::bind(&RArm::set_wrist_yaw, RightArm, _1)},
+		//{"RARM::HAND::POSITION", std::bind(&RArm::set_hand_position, RightArm, _1)},
 		//LArm
-		{ "LARM::SHOULDER::ACTUATORS::ROLL", std::bind(&LArm::set_shoulder_roll, LeftArm, _1) },
-		{ "LARM::SHOULDER::ACTUATORS::PITCH", std::bind(&LArm::set_shoulder_pitch, LeftArm, _1) },
-		{ "LARM::ELBOW::ACTUATORS::ROLL", std::bind(&LArm::set_elbow_roll, LeftArm, _1) },
-		{ "LARM::ELBOW::ACTUATORS::YAW", std::bind(&LArm::set_elbow_yaw, LeftArm, _1) },
-		{ "LARM::WRIST::ACTUATORS::YAW", std::bind(&LArm::set_wrist_yaw, LeftArm, _1) },
+		{ "LARM::SHOULDER::ACTUATORS::PITCH::POSITION", std::bind(&LArm::set_shoulder_pitch, LeftArm, _1) },
+		{ "LARM::SHOULDER::ACTUATORS::ROLL::POSITION", std::bind(&LArm::set_shoulder_roll, LeftArm, _1) },
+		{ "LARM::ELBOW::ACTUATORS::YAW::POSITION", std::bind(&LArm::set_elbow_yaw, LeftArm, _1) },
+		{ "LARM::ELBOW::ACTUATORS::ROLL::POSITION", std::bind(&LArm::set_elbow_roll, LeftArm, _1) },
+		{ "LARM::WRIST::ACTUATORS::YAW::POSITION", std::bind(&LArm::set_wrist_yaw, LeftArm, _1) },
+		//{"LARM::HAND::POSITION", std::bind(&LArm::set_hand_position, LeftArm, _1)}
 		//RLeg
 		{"RLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&RLeg::set_hip_roll, RightLeg, _1)},
-		{"RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::set_hip_roll_stiffness, RightLeg, _1)},
-
 		{"RLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&RLeg::set_hip_yaw, RightLeg, _1)},
-		{"RLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&RLeg::set_hip_yaw_stiffness, RightLeg, _1) },
-
 		{"RLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::set_hip_pitch, RightLeg, _1)},
 		//{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_hip_pitch_stiffness, RightLeg, _1) },
-
 		{"RLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::set_knee_pitch, RightLeg, _1) },
-		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_knee_pitch_stiffness, RightLeg, _1) },
-
 		{"RLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&RLeg::set_ankle_roll, RightLeg, _1) },
-		{ "RLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::set_ankle_roll_stiffness, RightLeg, _1) },
-
 		{"RLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&RLeg::set_ankle_pitch, RightLeg, _1) },
-		{ "RLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_ankle_pitch_stiffness, RightLeg, _1) },
 		//LLeg
+		//{"LLEG::HIP::ACTUATORS::YAWPITCH::POSITION", std::bind(...)}
 		{ "LLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&LLeg::set_hip_roll, LeftLeg, _1) },
-		{ "LLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::set_hip_roll_stiffness, LeftLeg, _1) },
-
+		//TODO: CHANGE YAW->PITCH and add YawPitch
 		{ "LLEG::HIP::ACTUATORS::YAW::POSITION", std::bind(&LLeg::set_hip_yaw, LeftLeg, _1) },
-		{ "LLEG::HIP::ACTUATORS::YAW::STIFFNESS", std::bind(&LLeg::set_hip_yaw_stiffness, LeftLeg, _1) },
-
-		{ "LLEG::HIP::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::set_hip_pitch, LeftLeg, _1) },
-//		{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_hip_pitch_stiffness, LeftLeg, _1) },
-
 		{ "LLEG::KNEE::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::set_knee_pitch, LeftLeg, _1) },
-		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_knee_pitch_stiffness, LeftLeg, _1) },
-
-		{ "LLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&LLeg::set_ankle_roll, LeftLeg, _1) },
-		{ "LLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::set_ankle_roll_stiffness, LeftLeg, _1) },
-
 		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&LLeg::set_ankle_pitch, LeftLeg, _1) },
+		{ "LLEG::ANKLE::ACTUATORS::ROLL::POSITION", std::bind(&LLeg::set_ankle_roll, LeftLeg, _1) },
+
+		//STIFFNESS
+
+		//{"HEAD::ACTUATORS::YAW::STIFFNESS", std::bind(&Head::set_yaw_stiffness, head, _1)},
+		//{"HEAD::ACTUATORS::PITCH::STIFFNESS", std::bind(&Head::set_pitch_stiffness, head, _1)},
+		
+		//Left Arm
+		//{"LARM::SHOULDER::ACTUATORS::PITCH::STIFFNESS", std::bind(&Arm::set_pitch_stiffness, LeftArm, _1)},
+		//{"LARM::SHOULDER::ACTUATORS::ROLL::STIFFNESS", std::bind(&Arm::set_roll_stiffness, LeftArm, _1)},
+		//{"LARM::ELBOW::ACTUATORS::YAW::STIFFNESS", std::bind(&Arm::set_elbow_yaw_stiffness, LeftArm, _1)},
+		//{"LARM::ELBOW::ACTUATORS::ROLL::STIFFNESS", std::bind(&Arm::set_elbow_roll_stiffness, LeftArm, _1)},
+		//{"LARM::WRIST::ACTUATORS::YAW::STIFFNESS", std::bind(&Arm::set_hand_yaw_stiffness, LeftArm, _1)},
+		//{"LARM::HAND::ACTUATORS::STIFFNESS", std::bind(&Arm::set_hand_stiffness, LeftArm, _1)},
+		//Right Arm
+		//{"RARM::SHOULDER::ACTUATORS::PITCH::STIFFNESS", std::bind(&Arm::set_pitch_stiffness, RightArm, _1)},
+		//{"RARM::SHOULDER::ACTUATORS::ROLL::STIFFNESS", std::bind(&Arm::set_roll_stiffness, RightArm, _1)},
+		//{"RARM::ELBOW::ACTUATORS::YAW::STIFFNESS", std::bind(&Arm::set_elbow_yaw_stiffness, RightArm, _1)},
+		//{"RARM::ELBOW::ACTUATORS::ROLL::STIFFNESS", std::bind(&Arm::set_elbow_roll_stiffness, RightArm, _1)},
+		//{"RARM::WRIST::ACTUATORS::YAW::STIFFNESS", std::bind(&Arm::set_hand_yaw_stiffness, RightArm, _1)},
+		//{"RARM::HAND::ACTUATORS::STIFFNESS", std::bind(&Arm::set_hand_stiffness, RightArm, _1)},
+		//Left Leg
+		//{"LLEG::HIP::ACTUATORS::YAWPITCH::STIFFNESS", std::bind(&LLeg::set_hip_yawpitch_stiffness, LeftLeg, _1)},
+		{ "LLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::set_hip_roll_stiffness, LeftLeg, _1) },
+		//TODO: Remove Yaw from hips
+		//{ "LLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_hip_pitch_stiffness, LeftLeg, _1) },
+		{ "LLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_knee_pitch_stiffness, LeftLeg, _1) },
 		{ "LLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&LLeg::set_ankle_pitch_stiffness, LeftLeg, _1) },
+		{ "LLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&LLeg::set_ankle_roll_stiffness, LeftLeg, _1) },
+		//Right Leg
+		//{"RLEG::HIP::ACTUATORS::YAWPITCH::STIFFNESS", std::bind(&RLeg::set_hip_yawpitch_stiffness, RightLeg, _1)},
+		{ "RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::set_hip_roll_stiffness, RightLeg, _1) },
+		//TODO: Remove Yaw from hips
+		//{ "RLEG::HIP::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_hip_pitch_stiffness,RightLeg, _1) },
+		{ "RLEG::KNEE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_knee_pitch_stiffness, RightLeg, _1) },
+		{ "RLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&RLeg::set_ankle_pitch_stiffness, RightLeg, _1) },
+		{ "RLEG::ANKLE::ACTUATORS::ROLL::STIFFNESS", std::bind(&RLeg::set_ankle_roll_stiffness, RightLeg, _1) },
 	};
 
 	hardware_get_map = {
-		{ "HEAD::ACTUATORS::YAW",  std::bind(&Head::get_head_yaw, head) },
-		{ "HEAD::ACTUATORS::PITCH", std::bind(&Head::get_head_pitch, head) },
+		{ "HEAD::ACTUATORS::YAW::POSITION",  std::bind(&Head::get_head_yaw, head) },
+		{ "HEAD::ACTUATORS::PITCH::POSITION", std::bind(&Head::get_head_pitch, head) },
 		//TODO: EyeLEDS, Stiffness, Body
 		//RArm
-		{ "RARM::SHOULDER::ACTUATORS::ROLL", std::bind(&Arm::get_shoulder_roll, RightArm) },
-		{ "RARM::SHOULDER::ACTUATORS::PITCH", std::bind(&Arm::get_shoulder_pitch, RightArm) },
-		{ "RARM::ELBOW::ACTUATORS::ROLL", std::bind(&Arm::get_elbow_roll, RightArm) },
-		{ "RARM::ELBOW::ACTUATORS::YAW", std::bind(&Arm::get_elbow_yaw, RightArm) },
-		{ "RARM::WRIST::ACTUATORS::YAW", std::bind(&Arm::get_wrist_yaw, RightArm) },
+		{ "RARM::SHOULDER::ACTUATORS::ROLL::POSITION", std::bind(&Arm::get_shoulder_roll, RightArm) },
+		{ "RARM::SHOULDER::ACTUATORS::PITCH::POSITION", std::bind(&Arm::get_shoulder_pitch, RightArm) },
+		{ "RARM::ELBOW::ACTUATORS::ROLL::POSITION", std::bind(&Arm::get_elbow_roll, RightArm) },
+		{ "RARM::ELBOW::ACTUATORS::YAW::POSITION", std::bind(&Arm::get_elbow_yaw, RightArm) },
+		{ "RARM::WRIST::ACTUATORS::YAW::POSITION", std::bind(&Arm::get_wrist_yaw, RightArm) },
 		//LArm
-		{ "LARM::SHOULDER::ACTUATORS::ROLL", std::bind(&Arm::get_shoulder_roll, LeftArm) },
-		{ "LARM::SHOULDER::ACTUATORS::PITCH", std::bind(&Arm::get_shoulder_pitch, LeftArm) },
-		{ "LARM::ELBOW::ACTUATORS::ROLL", std::bind(&Arm::get_elbow_roll, LeftArm) },
-		{ "LARM::ELBOW::ACTUATORS::YAW", std::bind(&Arm::get_elbow_yaw, LeftArm) },
-		{ "LARM::WRIST::ACTUATORS::YAW", std::bind(&Arm::get_wrist_yaw, LeftArm) },
+		{ "LARM::SHOULDER::ACTUATORS::ROLL::POSITION", std::bind(&Arm::get_shoulder_roll, LeftArm) },
+		{ "LARM::SHOULDER::ACTUATORS::PITCH::POSITION", std::bind(&Arm::get_shoulder_pitch, LeftArm) },
+		{ "LARM::ELBOW::ACTUATORS::ROLL::POSITION", std::bind(&Arm::get_elbow_roll, LeftArm) },
+		{ "LARM::ELBOW::ACTUATORS::YAW::POSITION", std::bind(&Arm::get_elbow_yaw, LeftArm) },
+		{ "LARM::WRIST::ACTUATORS::YAW::POSITION", std::bind(&Arm::get_wrist_yaw, LeftArm) },
 		//RLeg
 		{ "RLEG::HIP::ACTUATORS::ROLL::POSITION", std::bind(&Leg::get_hip_roll, RightLeg) },
 		{ "RLEG::HIP::ACTUATORS::ROLL::STIFFNESS", std::bind(&Leg::get_hip_roll_stiffness, RightLeg) },
@@ -335,8 +403,8 @@ void NAOInterface::initialize_function_map()
 
 void NAOInterface::sanity_test(const std::string &foo)
 {
-	const std::string fooL = "HEAD::ACTUATORS::YAW";
+	const std::string fooL = "HEAD::ACTUATORS::YAW::POSITION";
 	set_hardware_value(fooL, 1.21);
-	LOG_DEBUG << "HEAD::ACTUATORS::YAW Value is now: " << get_hardware_value(fooL);
+	LOG_DEBUG << "HEAD::ACTUATORS::YAW::POSITION Value is now: " << get_hardware_value(fooL);
 }
 
