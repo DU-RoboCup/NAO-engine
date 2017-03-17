@@ -56,7 +56,6 @@ private:
 
 
 
-    //Filfthy raw pointers
     hal_data *pineappleJuice;
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;

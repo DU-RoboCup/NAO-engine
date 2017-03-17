@@ -163,6 +163,9 @@ private:
 	boost::interprocess::managed_shared_memory shm;
 	hal_data *pineappleJuice;
 	bool read_shm, write_shm;
+
+	std::vector<float> sensor_vals, actuator_vals;
+
 protected: 
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers

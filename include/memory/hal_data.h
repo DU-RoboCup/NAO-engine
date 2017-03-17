@@ -28,7 +28,7 @@ memory for interprocess communication.
 #define _HAL_DATA_H
 
 #include "../util/more_hardware_data.h"
-#include <boost/interprocess/sync/named_semaphore.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 struct hal_data {
     unsigned int sensors_newest_update; ///< Index of the sensor with the most recently updated value 
@@ -44,9 +44,11 @@ struct hal_data {
 	float sensors[3][NumOfSensorIds];
 	float actuators[3][NumOfActuatorIds];
 
-    boost::interprocess::named_semaphore semaphore;
+    /* The use of semaphores here may be 1. excessive and 2. unecessary */
+    boost::interprocess::interprocess_semaphore actuator_semaphore, sensor_semaphore;
 
-    hal_data() : semaphore(boost::interprocess::open_or_create, "robo_semaphore", 0)
+    hal_data() 
+    : actuator_semaphore(1), sensor_semaphore(1)
     {}
 };
 

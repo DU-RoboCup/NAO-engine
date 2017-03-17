@@ -1,4 +1,3 @@
-
 #include "hal_experimental.h"
 
 using namespace AL;
@@ -115,7 +114,12 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         std::cout << "5. Sensor Pointers initialized" << std::endl;
 
         ///Initialize Requested Actuators
-        std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
+        void *ms_ret = std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
+        if(ms_ret == NULL)
+        {
+            std::cout << "A catastrophic error has occured! Could not set memory for actuator values." << std::endl;
+            return;
+        }
         for(int i = faceLedRedLeft0DegActuator; i < chestBoardLedRedActuator; ++i)
             last_requested_actuators[i] = -1.f;
         
@@ -134,29 +138,19 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     {
         std::cout << "8. Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]" << std::endl;
         shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-        //boost::shared_memory_object::remove("juicyData"); // When the hal module is initialized, remove any pre-existing shared memory objects
         if(shm.get_size() != 65536) std::cout << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << std::endl;
         std::cout << "9. Constructing Shared Memory Object. [juicyData]" << std::endl;
-        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Paramers for struct's initial values can go here*/); 
-        std::cout << "pineappleJuice created in shared memory" << std::cout;
+        hal_data *hal_data_ptr = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
+        //if(!shm.find("juicyData").first) std::cerr << "Error: Shared memory object juicyData does not exist" << std::endl;
+        std::cout << "pineappleJuice created in shared memory" << std::endl;
     } 
     catch(boost::interprocess::interprocess_exception &e) 
     {
         std::cout << "[FATAL] An Interprocess error: " << e.what() << std::endl;
         std::cout << "Cleaning up shared memory..." << std::endl;
-        try
-        {
-            shm.destroy<hal_data>("juicyData");
-            boost::interprocess::shared_memory_object::remove("PineappleJuice");
-        } 
-        catch(boost::interprocess::interprocess_exception &e)
-        {
-            std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
-        }
-
-
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
-
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
 }
@@ -191,7 +185,6 @@ hal_experimental::~hal_experimental()
         
     try
     {
-        boost::interprocess::named_semaphore::remove("robo_semaphore");
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     } 
@@ -206,30 +199,34 @@ hal_experimental::~hal_experimental()
 
 void hal_experimental::set_actuators()
 {
-    std::cout << "Setting actuators" << std::endl;
+    std::cout << "0. [set_actuators()] Setting actuators" << std::endl;
 
 	try
 	{
-        pineappleJuice->semaphore.wait(); //Wait for anything using Interproc
-		dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
-		pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
-		if (pineappleJuice->actuators_newest_update != last_reading_actuator)
-		{
-			std::cout << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << std::endl;
-			actuator_update_fails++;
-		}
-		else actuator_update_fails = 0;
-
-		last_reading_actuator = pineappleJuice->actuators_newest_update;
-
-		float* read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
-        pineappleJuice->semaphore.post();
-        std::cout << "Actuator values set" << std::endl;
+        pineappleJuice->actuator_semaphore.wait();
+        std::cout << "1. [set_actuators()] semaphore wait called" << std::endl;
+        dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
+        std::cout << "2. [set_actuators()] current dcm time called: " << dcm_time << std::endl;
+        pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
+        std::cout << "3. [set_actuators()] fetched new read vals" << std::endl;
+        if (pineappleJuice->actuators_newest_update != last_reading_actuator)
+        {
+            std::cout << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << std::endl;
+            actuator_update_fails++;
+        }
+        else actuator_update_fails = 0;
+        last_reading_actuator = pineappleJuice->actuators_newest_update;
+        std::cout << "4. [set_actuators()] updated last reading vals." << std::endl;
+        float* read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
+        std::cout << "5. [set_actuators()] placed read_actuators in a float*" << std::endl;
+        pineappleJuice->actuator_semaphore.post();
+        std::cout << "6. [set_actuators()] Semaphore posted" << std::endl;
 	}
-    catch(std::exception &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
+    catch(boost::interprocess::interprocess_exception &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
     {
         std::cout << "set_actuators exception: " << e.what() << std::endl;
     }
+    std::cout << "7. [set_actuators()] Finished setting Actuators." << std::endl;
 }
 
 void hal_experimental::read_sensors()
@@ -237,7 +234,8 @@ void hal_experimental::read_sensors()
     std::cout << "reading sensors" << std::endl;
     try
     {
-        pineappleJuice->semaphore.wait();
+        pineappleJuice->sensor_semaphore.wait();
+        std::cout << "[read_sensors()] Try wait was succesful" << std::endl;
         int sensor_data_written = 0;
         if(sensor_data_written == pineappleJuice->sensors_newest_update)
         {
@@ -260,9 +258,11 @@ void hal_experimental::read_sensors()
         }
 
         pineappleJuice->sensors_newest_update = sensor_data_written;
-
-        pineappleJuice->semaphore.post();
-
+        std::cout << "[read_sensors()] sensor data read...posting semaphore." << std::endl;
+        
+        pineappleJuice->sensor_semaphore.post();
+        std::cout << "[read_sensors()] semaphore posted!" << std::endl;
+        
     }
     catch (const std::exception &e)
     {

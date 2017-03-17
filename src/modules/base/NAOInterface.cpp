@@ -106,6 +106,12 @@ NAOInterface::NAOInterface()
 
 	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
 	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
+	else
+	{
+		// Pre-allocate our vectors with values. This should help provide better Caching performance.
+		sensor_vals.assign(NumOfSensorIds, 0);
+		actuator_vals.assign(NumOfActuatorIds, 0);
+	}
 
 }
 
@@ -182,7 +188,8 @@ bool NAOInterface::access_shared_memory()
 	try
 	{
         shm = managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-		pineappleJuice = shm.find_or_construct<hal_data>("juicyData")();
+		pineappleJuice = shm.find<hal_data>("juicyData").first;
+		if(!pineappleJuice) LOG_FATAL << "Could not open shared memory object pineappleJuice!";
 	}
 	catch (const interprocess_exception &e)
 	{
@@ -201,9 +208,14 @@ bool NAOInterface::read_shared_memory()
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		pineappleJuice->semaphore.wait();
-		//Do stuff
-		pineappleJuice->semaphore.post();
+		pineappleJuice->sensor_semaphore.wait();
+		// do stuff
+
+		pineappleJuice->sensor_semaphore.post();
+		pineappleJuice->actuator_semaphore.wait();
+		//...
+		pineappleJuice->actuator_semaphore.post();
+		
 	}
 	catch (const interprocess_exception &e)
 	{
@@ -217,9 +229,12 @@ bool NAOInterface::write_shared_memory()
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		pineappleJuice->semaphore.wait();
+		pineappleJuice->sensor_semaphore.wait();
 		//Do stuff
-		pineappleJuice->semaphore.post();
+		pineappleJuice->sensor_semaphore.post();
+		pineappleJuice->actuator_semaphore.wait();
+		//...
+		pineappleJuice->actuator_semaphore.post();
 	}
 	catch (const interprocess_exception &e)
 	{

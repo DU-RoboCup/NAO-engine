@@ -16,7 +16,7 @@ if [  "$1" == "cross" ] || [ "$2" == "cross" ] ; then
     make -j2
     cd /home/vagrant/NAO/NAO-engine/naoqi_modules/halagent/
     qibuild configure -c cross-compiler
-    qibuild make -c cross-compiler
+    qibuild make -c crosscompiler
     mkdir -p /home/vagrant/NAO/NAO-engine/build-cross/naoqi/
     cp /home/vagrant/NAO/NAO-engine/naoqi_modules/halagent/build-crosslinux/sdk/lib/naoqi/* /home/vagrant/NAO/NAO-engine/build-cross/naoqi
 fi
