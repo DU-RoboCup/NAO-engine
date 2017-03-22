@@ -24,6 +24,7 @@ VERSION HISTORY
 Container for all hal data on the NAO. This container will be inserted into shared
 memory for interprocess communication.
 */
+#pragma once 
 #ifndef _HAL_DATA_H
 #define _HAL_DATA_H
 

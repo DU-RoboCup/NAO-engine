@@ -80,7 +80,6 @@ public:
 	void initialize_function_map(); ///< Initializes a map for calling functions.
 	
 	//Debug Functions
-	void sanity_test(const std::string &foo); ///< Simple method for testing lookups and value sets
 	void print_commands_list(); ///< Lists all available function calls
 	void randomly_set_joints(); ///< This function randomly sets all of the joint values of the NAO's hardware.
 	void print_hardware_map(); ///< Will probably be deprecated
@@ -161,8 +160,8 @@ private:
     //Intent processing
     PendingIntents pending_intents;
 	boost::interprocess::managed_shared_memory shm;
-	hal_data *pineappleJuice;
-	bool read_shm, write_shm;
+	hal_data *pineappleJuice; // Object stored in interprocess memory
+	bool read_shm, write_shm; // Return Values for interprocess rw operations
 
 	std::vector<float> sensor_vals, actuator_vals;
 

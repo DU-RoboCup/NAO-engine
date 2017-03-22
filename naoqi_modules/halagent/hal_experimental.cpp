@@ -4,17 +4,41 @@ using namespace AL;
 using std::string;
 using namespace boost::interprocess;    
 //const std::string hal_experimental::name("hal_experimental");
-hal_experimental* hal_experimental::instance;
+hal_experimental* hal_experimental::instance = NULL;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
         dcm_proxy(NULL),
-        nao_memory_proxy(NULL)
+        nao_memory_proxy(NULL),
+        init_test(false)
 {
     setModuleDescription("Communicates between the Naoqi process and our Pineapple");
     last_reading_actuator = 255; ///<This is just initially set to an impossible actuator number
     actuator_update_fails = 0;
     std::cout << "Starting hal_experimental!" << std::endl;
 
+    try
+    {
+        std::cout << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]" << std::endl;
+        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+        if(shm.get_size() != 65536) std::cout << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << std::endl;
+        
+        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
+        shared_data_ptr = shm.find<hal_data>("juicyData");
+        if(!shared_data_ptr.first)
+        {
+            std::cout << "[FATAL] juicyData failed to be found" << std::endl;
+            return;
+        }
+        pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
+        std::cout << "pineappleJuice created in shared memory" << std::endl;
+    } 
+    catch(boost::interprocess::interprocess_exception &e) 
+    {
+        std::cout << "[FATAL] An Interprocess error: " << e.what() << std::endl;
+        std::cout << "Cleaning up shared memory..." << std::endl;
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    }
     try
     {
         // Establish Communication with NaoQi
@@ -125,6 +149,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         
         std::cout << "6. Requested Actuators Initialized." << std::endl;
 
+
+        instance = this; ///< Remove this to cause fun segfaults...
         dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
         dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
         
@@ -133,24 +159,14 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         std::cerr << "Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << std::endl;
     }
     //Boost Interprocess Shared Memory Initialization:
+            std::cout << "SEMAPHORE TEST" << std::endl;
+        pineappleJuice->actuator_semaphore.wait();
+        std::cout << "still segfaulting?" << std::endl;
+        if(dcm_proxy == NULL) std::cout << "dcm_proxy is null\n" << std::endl; else std::cout << "dcm_proxy is not null" << std::endl; 
+        dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
+        std::cout << "NO SEGFAULT: DCM Time = " << dcm_time << std::endl;
+        pineappleJuice->actuator_semaphore.post();
 
-    try
-    {
-        std::cout << "8. Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]" << std::endl;
-        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-        if(shm.get_size() != 65536) std::cout << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << std::endl;
-        std::cout << "9. Constructing Shared Memory Object. [juicyData]" << std::endl;
-        hal_data *hal_data_ptr = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
-        //if(!shm.find("juicyData").first) std::cerr << "Error: Shared memory object juicyData does not exist" << std::endl;
-        std::cout << "pineappleJuice created in shared memory" << std::endl;
-    } 
-    catch(boost::interprocess::interprocess_exception &e) 
-    {
-        std::cout << "[FATAL] An Interprocess error: " << e.what() << std::endl;
-        std::cout << "Cleaning up shared memory..." << std::endl;
-        shm.destroy<hal_data>("juicyData");
-        boost::interprocess::shared_memory_object::remove("PineappleJuice");
-    }
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
 }
@@ -199,13 +215,20 @@ hal_experimental::~hal_experimental()
 
 void hal_experimental::set_actuators()
 {
-    std::cout << "0. [set_actuators()] Setting actuators" << std::endl;
+    std::cout << "Set Actuators called" << std::endl;
+    
+    // if(dcm_proxy == NULL) std::cout << "dcm_proxy is null\n" << std::endl; else std::cout << "dcm_proxy is not null" << std::endl; 
+    // dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
+    // std::cout << "NO SEGFAULT: DCM Time = " << dcm_time << std::endl;
+    // pineappleJuice->actuator_semaphore.post();
+    // std::cout << "0. [set_actuators()] Setting actuators" << std::endl;
 
 	try
 	{
         pineappleJuice->actuator_semaphore.wait();
         std::cout << "1. [set_actuators()] semaphore wait called" << std::endl;
-        dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
+        dcm_time = dcm_proxy->getTime(0);
+        std::cout << "[test]: DCMTime = " << dcm_time << std::endl;
         std::cout << "2. [set_actuators()] current dcm time called: " << dcm_time << std::endl;
         pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
         std::cout << "3. [set_actuators()] fetched new read vals" << std::endl;
@@ -222,16 +245,31 @@ void hal_experimental::set_actuators()
         pineappleJuice->actuator_semaphore.post();
         std::cout << "6. [set_actuators()] Semaphore posted" << std::endl;
 	}
-    catch(boost::interprocess::interprocess_exception &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
+    catch(AL::ALError &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
     {
         std::cout << "set_actuators exception: " << e.what() << std::endl;
     }
-    std::cout << "7. [set_actuators()] Finished setting Actuators." << std::endl;
+    std::cout << "7. [set_actuators()] Finished setting Actuators." << std::endl; 
+    
 }
+
 
 void hal_experimental::read_sensors()
 {
-    std::cout << "reading sensors" << std::endl;
+     std::cout << "reading sensors: " << std::endl;
+    // //std::cout << "bool val: " << this->init_test << std::endl;
+    // if(this->init_test == NULL) std::cout << "The bool is null" << std::endl; else std::cout << "The Bool is NOT NULL" << std::endl;
+    // if(instance->init_test)
+    // {
+    //     instance->pineappleJuice->sensor_semaphore.wait();
+    //     //...
+    //     std::cout << "Sensor Semaphore Test!" << std::endl;
+    //     instance->pineappleJuice->sensor_semaphore.post();
+    //     std::cout << "READ SEM TEST passed" << std::endl;
+    // } else {
+    //     std::cout << "Changing init_test values" << std::endl;
+    //     instance->init_test = true;
+    // }
     try
     {
         pineappleJuice->sensor_semaphore.wait();
@@ -273,10 +311,12 @@ void hal_experimental::read_sensors()
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
 {
     AL::ALModule::createModule<hal_experimental>(pBroker, "hal_experimental");
+    std::cout << "_createModule<hal_experimental>... Called!" << std::endl;
     return 0;
 }
 
 extern "C" int _closeModule()
 {
+    std::cout << "_closeModule Called!" << std::endl;
     return 0;
 }

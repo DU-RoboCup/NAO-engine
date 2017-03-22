@@ -37,6 +37,7 @@ public:
     void read_sensors();
     void preCallBack();
     void postCallBack();
+    std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
 private:
     AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
@@ -54,7 +55,7 @@ private:
 	float dcm_time;
     float last_requested_actuators[NumOfActuatorIds];
 
-
+    bool init_test;
 
     hal_data *pineappleJuice;
     float *sensor_ptrs[NumOfSensorIds];

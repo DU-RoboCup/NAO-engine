@@ -38,9 +38,9 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 	this->ModuleID = id;
 	LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
 	this->ModuleName = mconfig["name"].get<std::string>();
-	this->ModuleFPS = (int)mconfig["rfps"].get<float>();
-	this->ModulePriority = (int)mconfig["mprio"].get<float>();
-	this->ModuleThread = (int)mconfig["mthr"].get<float>();
+	this->ModuleFPS = static_cast<int>(mconfig["rfps"].get<float>());
+	this->ModulePriority = static_cast<int>(mconfig["mprio"].get<float>());
+	this->ModuleThread = static_cast<int>(mconfig["mthr"].get<float>());
 }
 bool NAOInterface::RunFrame()
 {
@@ -102,7 +102,6 @@ NAOInterface::NAOInterface()
 
 	LOG_DEBUG << "NAOInterface Initialized";
 	print_hardware_map();
-	sanity_test(":/");
 
 	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
 	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
@@ -142,7 +141,7 @@ void NAOInterface::print_commands_list()
 float NAOInterface::generate_random_bound_val(float min, float max)
 {
 	assert(max > min);
-	float rand = ((float)std::rand()) / (float) RAND_MAX;
+	float rand = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 	float r = rand * (max - min);
 	return min + r;
 }
@@ -151,7 +150,7 @@ float NAOInterface::generate_random_bound_val(std::pair<float, float> bounds)
 	auto min = bounds.first;
 	auto max = bounds.second;
 	assert(max > min);
-	float rand = ((float)std::rand()) / (float)RAND_MAX;
+	float rand = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
 	float r = rand * (max - min);
 	return min + r;
 }
@@ -201,19 +200,30 @@ bool NAOInterface::access_shared_memory()
 bool NAOInterface::sync_pineapple()
 {
 	//ToDo: Post a semaphore and read value in shared memory using Boost.Interprocess
+
 	return true;
 }
 bool NAOInterface::read_shared_memory()
 {
+	/** Unfortunately this operation is quite slow due to the time it takes to loop through
+		the list of sensors and actuators and update their values. It is much faster to use the 
+		other provided method for reading a single value from the sensors and actuators.
+	**/
+	
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
 		pineappleJuice->sensor_semaphore.wait();
-		// do stuff
-
+		for(int i = 0; i < NumOfSensorIds;++i)
+		{
+			sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
+		}
 		pineappleJuice->sensor_semaphore.post();
 		pineappleJuice->actuator_semaphore.wait();
-		//...
+		for(int i = 0; i < NumOfActuatorIds;++i)
+		{
+			actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
+		}
 		pineappleJuice->actuator_semaphore.post();
 		
 	}
@@ -229,9 +239,6 @@ bool NAOInterface::write_shared_memory()
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		pineappleJuice->sensor_semaphore.wait();
-		//Do stuff
-		pineappleJuice->sensor_semaphore.post();
 		pineappleJuice->actuator_semaphore.wait();
 		//...
 		pineappleJuice->actuator_semaphore.post();
@@ -414,12 +421,5 @@ void NAOInterface::initialize_function_map()
 		{ "LLEG::ANKLE::ACTUATORS::PITCH::POSITION", std::bind(&Leg::get_ankle_pitch, LeftLeg) },
 		{ "LLEG::ANKLE::ACTUATORS::PITCH::STIFFNESS", std::bind(&Leg::get_ankle_pitch_stiffness, LeftLeg) },
 	};
-}
-
-void NAOInterface::sanity_test(const std::string &foo)
-{
-	const std::string fooL = "HEAD::ACTUATORS::YAW::POSITION";
-	set_hardware_value(fooL, 1.21);
-	LOG_DEBUG << "HEAD::ACTUATORS::YAW::POSITION Value is now: " << get_hardware_value(fooL);
 }
 
