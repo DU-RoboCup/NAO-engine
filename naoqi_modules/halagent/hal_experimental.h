@@ -37,6 +37,15 @@ public:
     void read_sensors();
     void preCallBack();
     void postCallBack();
+
+    void set_LEDS();
+    float* robot_state_handler(float *actuator_vals);
+    // Helper functions for setting actuators
+    void set_actuators_positions();
+    bool set_actuators_stiffness();
+    void set_actuators_leds(bool &requested_stiffness_set);
+    void print_sensors();
+    void print_actuators();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
 private:
     AL::DCMProxy *dcm_proxy;
@@ -52,12 +61,12 @@ private:
 
 	uint8_t last_reading_actuator;
 	size_t actuator_update_fails;
-	float dcm_time;
+	int dcm_time;
     float last_requested_actuators[NumOfActuatorIds];
-
-    bool init_test;
-
+    int ledIndex;
     hal_data *pineappleJuice;
+    float *read_actuators;
+    float *actuators;
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
 
