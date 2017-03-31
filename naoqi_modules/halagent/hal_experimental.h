@@ -47,6 +47,12 @@ public:
     void print_sensors();
     void print_actuators();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
+    /**
+      * \brief debug_alvalue: Insanity Check...
+      * @param v: An ALValue alias (which is a weird multidemensional jagged array)
+      * @param name: Alias name
+      **/
+    void debug_alvalue(AL::ALValue &v, std::string name);
 private:
     AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
@@ -70,5 +76,6 @@ private:
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
 
+    bool cout_debug;
 };
 #endif

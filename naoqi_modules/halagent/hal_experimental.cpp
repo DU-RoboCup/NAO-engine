@@ -9,7 +9,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     :   ALModule(pBroker, pName),
         dcm_proxy(NULL),
         nao_memory_proxy(NULL),
-        ledIndex(0)
+        ledIndex(0),
+        cout_debug(true)
 {
     setModuleDescription("Communicates between the Naoqi process and our Pineapple");
     last_reading_actuator = 255; ///<This is just initially set to an impossible actuator number
@@ -75,6 +76,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         {
             commands[1][i] = std::string(actuatorNames[headYawStiffnessActuator + i]);
         }
+        debug_alvalue(commands, "commands Alias");
         commandsAlias = dcm_proxy->createAlias(commands);
        
         ///END
@@ -93,7 +95,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         {
             position_request_alias[5][i].arraySetSize(1);
         }
-
+        debug_alvalue(position_request_alias, "position_request_alias");
         ///END
 
         std::cout << "2. Position Alias Initialized." << std::endl;
@@ -112,7 +114,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         {
             stiffness_request_alias[5][i].arraySetSize(1);
         }
-
+        debug_alvalue(stiffness_request_alias, "stiffness_request_alias");
         ///END
 
         std::cout << "3. Stiffness Alias Initialized." << std::endl;
@@ -126,6 +128,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         led_request_alias[2][0].arraySetSize(2);
         led_request_alias[2][0][1] = 0; //As you can see, LEDS are suuuper easy to work with
 
+        debug_alvalue(led_request_alias, "led_request_alias");
         ///END
 
         std::cout << "4. LED Alias Initialized." << std::endl;
@@ -224,6 +227,12 @@ void hal_experimental::set_LEDS()
 float* hal_experimental::robot_state_handler(float *actuator_vals)
 {
     return actuator_vals;
+}
+
+void hal_experimental::debug_alvalue(AL::ALValue &v, std::string name="NULL")
+{
+    if(cout_debug)
+        std::cout << "DEBUG_ALVALUE_INFO [" << name << "]: \n\t" << v.serializeToText() << "\n\t" << v.toString() << std::endl; 
 }
 
 /**
