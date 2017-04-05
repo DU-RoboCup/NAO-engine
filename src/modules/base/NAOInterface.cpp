@@ -51,7 +51,7 @@ bool NAOInterface::RunFrame()
 		{
 			ParsedIntent pi = pending_intents.pop_front().Parse();
 			if(pi[2] == "set_hardware_value"){
-				if(set_hardware_value(pi[3], std::stof(pi[4])));
+				set_hardware_value(pi[3], std::stof(pi[4]));
 			}
 			else if(pi[2] == "get_hardware_value")
 				get_hardware_value(pi[3]);
@@ -160,6 +160,7 @@ bool NAOInterface::set_hardware_value(const std::string & hardware_component, fl
 	if (hardware_set_functions.find(hardware_component) == hardware_set_functions.end())
 	{
 		LOG_WARNING << "Invalid Hardware Component Name! Please refer to the Wiki for the valid names";
+		return false;
 	}
 	else 
 	{
@@ -168,6 +169,44 @@ bool NAOInterface::set_hardware_value(const std::string & hardware_component, fl
 		return true;
 	}
 	
+}
+bool NAOInterface::set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG=DEFAULT)
+{
+	if(hardware_component < NumOfActuatorIds && hardware_component >= 0)
+	{
+		WriteRequests.push(std::make_tuple(hardware_component, value, FLAG));
+		return true;
+	}
+	else
+	{
+		LOG_WARNING << "Invalid Actuator ID: " << hardware_component; 
+		return false;
+	}
+}
+bool NAOInterface::fast_write()
+{
+	/*
+	LOG_DEBUG << "FAST_SET_REF_COUNT: " << pineappleJuice->fast_access_value.use_count();
+	if(pineappleJuice->fast_access_value.use_count() != pineappleJuice->fast_actuator_id.use_count())
+	{
+		LOG_WARNING << "Ref count of fast_actuator_id and fast_access_value are different. It be dangerous to write in this volatility!";
+		return false;
+	}
+	if(pineappleJuice->fast_access_value.use_count() <= 2 && WriteRequests.size() != 0)
+	{
+		if(pineappleJuice->fast_access_value == 0)
+		{
+			LOG_DEBUG << "We can successfully quickly write data to IPC";
+			auto data_request = WriteRequests.pop_top();
+			pineappleJuice->fast_access_value = boost::make_shared<float>(std::get<1>(data_request));
+			pineappleJuice->fast_actuator_id = boost::make_shared<int>(std::get<0>(data_request));
+			return true;
+		}
+		else return false;
+	}
+	LOG_WARNING << "Fast Write Failed.";
+	*/
+	return false;
 }
 bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 {
@@ -200,7 +239,16 @@ bool NAOInterface::access_shared_memory()
 bool NAOInterface::sync_pineapple()
 {
 	//ToDo: Post a semaphore and read value in shared memory using Boost.Interprocess
-
+	
+	
+	// Fast Write
+	pineappleJuice->actuator_semaphore.wait();
+	for(int i = 0; i < WriteRequests.size(); ++i)
+	{
+		auto &top_intent = WriteRequests.pop_top();
+		pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
+	}
+	pineappleJuice->actuator_semaphore.post();
 	return true;
 }
 bool NAOInterface::read_shared_memory()

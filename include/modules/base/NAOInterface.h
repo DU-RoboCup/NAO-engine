@@ -35,6 +35,7 @@ need to physically work with a NAO robot.
 #include <memory>
 #include <unordered_map>
 #include <type_traits>
+#include <queue>
 // Add some dynamic programming abilities
 #include <boost/any.hpp>
 #include <boost/variant.hpp>
@@ -55,7 +56,7 @@ need to physically work with a NAO robot.
 #include "LArm.h"
 #include "LLeg.h"
 #include "RLeg.h"
-
+#include "HALPriorityQueue.h"
 #include "include/common.h"
 #include "include/debug/debugging.h"
 #include "include/memory/hal_data.h"
@@ -67,9 +68,11 @@ need to physically work with a NAO robot.
   * Main class/module class for the NAOInterface. A number of other classes
   * are what are really doing most of the work. 
   **/
+
 class NAOInterface : public Module
 {
 public:
+	
 
 	/*
 	* hardware_datatypes - boost::variant datatype that can be set to a variety of different datatypes.
@@ -94,12 +97,22 @@ public:
 	  * \param value - A float containing the value to be set.
 	  * \return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
-	  * execute_intent_write first checks if the given harware component string is valid
+	  * set_hardware_value first checks if the given harware component string is valid
 	  * and a real hardware component, then updates the joint_and_sensor_data map.
 	  * After all values have been written to the local map of values, we send that data
 	  * to the Shared Memory Map using the synch_pineapple() method.
 	  */
 	bool set_hardware_value(const std::string &hardware_component, float  value); 
+	bool set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG);
+
+	/**
+	  * \brief: A dangerous way to quickly send queued requests to NAOqi
+	  * 
+	  * This method allows for lock/semaphore free passsing of a single value
+	  * to NAOqi. The value sent is simply the top of the priority queue.
+	  * Only use this for super high priority items.
+	  **/
+	bool fast_write();
 	/**
 	  * \brief Reads a hardware component value.
 	  * \param hardware_component - The hardware component's name to be read from.
@@ -154,6 +167,7 @@ public:
 	std::shared_ptr<LArm> LeftArm;
 	std::shared_ptr<LLeg> LeftLeg;
 	std::shared_ptr<RLeg> RightLeg;
+
 private:
     static NAOInterface* instance;
 	NAOInterface();
@@ -162,9 +176,10 @@ private:
 	boost::interprocess::managed_shared_memory shm;
 	hal_data *pineappleJuice; // Object stored in interprocess memory
 	bool read_shm, write_shm; // Return Values for interprocess rw operations
-
 	std::vector<float> sensor_vals, actuator_vals;
-
+	
+	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
+	HAL_PQ WriteRequests;
 protected: 
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers

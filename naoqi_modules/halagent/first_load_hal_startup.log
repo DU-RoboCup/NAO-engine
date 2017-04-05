@@ -1,0 +1,503 @@
+[I] 4221 core.naoqi: ..::: starting NAOqi version 2.1.4 :::..
+[I] 4221 core.naoqi: Copyright (c) 2005-2013, Aldebaran Robotics
+[I] 4221 core.naoqi: Build tag: system
+[I] 4221 qimessaging.servicedirectory: ServiceDirectory listener created on tcp://0.0.0.0:9559
+[I] 4221 qimessaging.transportserver: TransportServer will listen on: tcp://130.253.217.83:9559
+[I] 4221 qimessaging.transportserver: TransportServer will listen on: tcp://127.0.0.1:9559
+[I] 4221 qimessaging.servicedirectory: Registered Service "ServiceDirectory" (#1)
+[I] 4221 qimessaging.servicedirectory: Registered Service "LogManager" (#2)
+[I] 4221 core.lib.launcher: Loading "/etc/naoqi/autoload.ini"
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFileManager" (#3)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALMemory" (#4)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLogger" (#5)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPreferences" (#6)
+[E] 4221 preferencemanager.server: API Token not available: PreferenceManager won't be able to synchronize with cloud. Please connect your robot to cloud using local webpage (go to Setting/Web Services).
+[E] 4219 preferencemanager.server: API Token not available: PreferenceManager won't be able to synchronize with cloud. Please connect your robot to cloud using local webpage (go to Setting/Web Services).
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPreferenceManager" (#7)
+[E] 4221 behavior.ALFrameManager: ALPreferenceManager.getValue did not return a string, but returned: 
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFrameManager" (#8)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALServiceManager" (#9)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALDebug" (#10)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALNotificationManager" (#11)
+[I] 4221 qimessaging.servicedirectory: Registered Service "DCM" (#12)
+[I] 4224 DCM.Thread: DcmThread connect to sharedMemory : hal-ipc
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALResourceManager" (#14)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALRobotModel" (#15)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALDiagnosis" (#16)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSonar" (#17)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFsr" (#18)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSensors" (#19)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBodyTemperature" (#20)
+[W] 4221 ALMotion.ALMotionConfigurator: DIAGNOSTIC_IS_OK: 1
+[W] 4221 ALMotion.ALMotionConfigurator: ENABLE_FOOT_CONTACT_PROTECTION: 1
+[W] 4221 ALMotion.ALMotionConfigurator: ENABLE_STIFFNESS_PROTECTION: 1
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALMotion" (#21)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALTouch" (#22)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALRobotPosture" (#23)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALRedBallTracker" (#24)
+[W] 4221 motion.balltracker: ALRedBallTracker is deprecated in version 1.16. Please use the module ALTracker instead.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFaceTracker" (#25)
+[W] 4221 motion.facetracker: This module is deprecated in version 1.16. Please use the module ALTracker instead.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALMotionRecorder" (#26)
+[I] 4219 ALDiagnosis: Starting Passive diagnosis.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLeds" (#27)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALWorldRepresentation" (#28)
+[F] 4221 vision.alvideodevice.headtype: Unsupported camera version (version: "")
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALVideoDevice" (#29)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALColorBlobDetection" (#30)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALRedBallDetection" (#31)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFaceDetection" (#32)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALVisionRecognition" (#33)
+[I] 4221 vision.alvisionrecognition: Updating database, please wait...
+[I] 4221 vision.alvisionrecognition: Database did not change, no update.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLandMarkDetection" (#34)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALDarknessDetection" (#35)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBacklightingDetection" (#36)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPhotoCapture" (#37)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALVideoRecorder" (#38)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALVisualCompass" (#39)
+[E] 4221 vision.videodevice: Camera "CameraTop" not found. Please verify the camera index.
+[E] 4221 vision.videodevice: Camera "CameraTop" not found. Please verify the camera index.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALVisualSpaceHistory" (#40)
+[E] 4221 vision.ALVisualSpaceHistory: Invalid camera field of view, the module will abort.
+[I] 4221 qimessaging.servicedirectory: Unregistered Service "ALVisualSpaceHistory" (#40)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSystem" (#41)
+[I] 4217 ALSystem: No system notofication file found
+[W] 4227 ALSystem: 3% left on device: / (29188/907096 free).
+[W] 4221 packagemanager.sql.compat: Cannot check column install_time in packages
+[I] 4221 qimessaging.servicedirectory: Registered Service "PackageManager" (#42)
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: default_launchpad_plugins is already installed with the same version number (0.6.2).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/DefaultLaunchpadPlugins.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/DefaultLaunchpadPlugins.pkg from file system: system:13
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: system is already installed with the same version number (2.1.0).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/system-2.1.0.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/system-2.1.0.pkg from file system: system:13
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: diagnostic is already installed with the same version number (2.0.0).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/auto-diagnostic.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/auto-diagnostic.pkg from file system: system:13
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALUserSession" (#43)
+[I] 4215 qimessaging.servicedirectory: Registered Service "ALConnectionManager" (#44)
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: animations is already installed with the same version number (5.0.9).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/animations.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/animations.pkg from file system: system:13
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: animationMode is already installed with the same version number (4.0.1).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/animation-mode.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/animation-mode.pkg from file system: system:13
+[W] 4217 packagemanager: checkRequirements disabled
+[E] 4217 packagemanager: boot-config is already installed with the same version number (3.0.21).
+[I] 4217 packagemanager: Successfully installed system package '/usr/share/naoqi/apps/boot-configuration-3.0.21.pkg'
+[W] 4217 packagemanager: Cannot remove /usr/share/naoqi/apps/boot-configuration-3.0.21.pkg from file system: system:13
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALModularity" (#45)
+[I] 4221 qimessaging.servicedirectory: Registered Service "AudioFilterLoader" (#46)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAudioDevice" (#47)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAudioRecorder" (#48)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAudioPlayer" (#49)
+[I] 4221 audio.altexttospeech.acapela: No voice found
+[W] 4221 audio.altexttospeech.acapela: No language package has been found for Acapela Engine.
+[I] 4212 qimessaging.servicedirectory: Registered Service "ALStore" (#50)
+[W] 4203 qitype.signal: Exception caught from signal subscriber: Subscriber not compatible to signal signature
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALTextToSpeech" (#51)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAutomaticVolume" (#52)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSpeechRecognition" (#53)
+[I] 4221 audio.alspeechrecognition: Speech recognition done with 1 microphones
+[I] 4221 nuanceVoconEngineAudioIn: Initialize nuance engine audioin with 1 channels. Total buffer size 5376 bytes
+[I] 4221 audio.AsrHybridNuance: Start ASR_Recognizer thread
+[I] 4221 audio.AsrHybridNuance: Start ASR_Interpreter thread
+[I] 4221 audio.NuanceVoconEngine: Erasing all context set saves before changing acoustic model
+[I] 4221 audio.NuanceVoconEngine: SpeechRecognition: Context Compilation... Please Wait.
+***** Created context file: /home/nao/.local/share/naoqi/tmp_ws_English.lcf
+[I] 4221 audio.NuanceVoconEngine: SpeechRecognition: Context Compilation... Done
+[I] 4221 audio.NuanceVoconEngine: SpeechRecognition: Context Compilation... Please Wait.
+***** Created context file: /home/nao/.local/share/naoqi/tmp_isolated_English.lcf
+[I] 4221 audio.NuanceVoconEngine: SpeechRecognition: Context Compilation... Done
+[I] 4221 audio.NuanceVoconEngine: Set nbMaxRemoteTransaction to 0
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBattery" (#54)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALChestButton" (#55)
+[E] 4221 hardware.mecalogger: 	ALSql::ALSql::ALSql
+	Can't open database/media/internal/log/Nao_ALDR1109F005135_00:13:95:0B:0E:86.dbunable to open database file
+[E] 4221 core.lib.launcher: Launcher received exception during module creation: mecalogger Detail: 	ALSql::ALSql::ALSql
+	Can't open database/media/internal/log/Nao_ALDR1109F005135_00:13:95:0B:0E:86.dbunable to open database file
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPythonBridge" (#56)
+[I] 4221 python: ALPythonBridge: using naoqi from /usr/lib/python2.7/site-packages/naoqi.pyc
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLauncher" (#57)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLaser" (#58)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBehaviorManager" (#59)
+[W] 4221 audio.altexttospeech.main: enableNotifications() is now deprecated. 
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAnimatedSpeech" (#60)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALMemoryWatcher" (#61)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALNavigation" (#62)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBonjour" (#63)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALInfrared" (#64)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALTelepathe" (#65)
+[W] 4221 ALTracker.HeadSearcher: Could not get proxy to ALVisualSpaceHistory: 	ALProxy::ALProxy
+	Can't find service: ALVisualSpaceHistory
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALTracker" (#81)
+[E] 4221 vision.videodevice: Camera "CameraTop" not found. Please verify the camera index.
+[E] 4221 vision.videodevice: Camera "CameraTop" not found. Please verify the camera index.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALLocalization" (#82)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPanoramaCompass" (#83)
+[I] 4221 robothealthmonitor.robotinfos: could not retrieve RobotConfig/ProductId
+[I] 4221 robothealthmonitor.robotinfos: 2.1.4.13
+[I] 4221 robothealthmonitor.robotinfos: 2015-08-27 21:42:30 UTC
+[I] 4221 robothealthmonitor.robotinfos: 0a0c216a0deffb08a228d4a714a12a0a906f863d
+[E] 4194 preferencemanager.server: API Token not available: PreferenceManager won't be able to synchronize with cloud. Please connect your robot to cloud using local webpage (go to Setting/Web Services).
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALRobotHealthMonitor" (#84)
+[I] 4221 robothealthmonitor.alrobothealthmonitor: There is now a working connection : RHM will start sendind data to the cloud.
+[I] 4215 ALHttpClient: Retrieve RobotConfig/Head/FullHeadId = ALDT1109F000000
+[I] 4215 ALHttpClient: Retrieve Device/DeviceList/ChestBoard/BodyId = ALDR1109F005135
+[W] 4215 ALHttpClient: API Token not available yet.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSegmentation3D" (#86)
+[W] 4221 ALSegmentation3D: ALSegmentation3D needs a 3D sensor to work, so it is not loaded.
+[I] 4221 qimessaging.servicedirectory: Unregistered Service "ALSegmentation3D" (#86)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBarcodeReader" (#87)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALMovementDetection" (#88)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALPeoplePerception" (#89)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALEngagementZones" (#90)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSittingPeopleDetection" (#91)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALGazeAnalysis" (#92)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALWavingDetection" (#93)
+[W] 4221 ALWavingDetection: ALWavingDetection needs a 3D sensor to work, so it is not loaded.
+[I] 4221 qimessaging.servicedirectory: Unregistered Service "ALWavingDetection" (#93)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFaceCharacteristics" (#94)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALCloseObjectDetection" (#95)
+[W] 4221 ALCloseObjectDetection: ALCloseObjectDetection needs a 3D sensor to work, so it is not loaded.
+[I] 4221 qimessaging.servicedirectory: Unregistered Service "ALCloseObjectDetection" (#95)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFastPersonTracking" (#96)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALFindPersonHead" (#97)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSoundDetection" (#98)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALSoundLocalization" (#99)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAudioSourceLocalization" (#100)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALBasicAwareness" (#101)
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAutonomousMoves" (#103)
+[I] 4221 Thinking: Preloading thinking animations (package: animations)...
+[E] 4281 altelepathe: Couldn't connect, unknown reason.
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALAutonomousLife" (#138)
+[I] 4221 Dialog: Starting Dialog ...
+[W] 4221 Dialog: AI client Module not found
+[I] 4221 Dialog.LongTermMemory: User database creation succeed
+[I] 4221 Dialog.preference: No dialog history management
+[I] 4221 Dialog.preference: AI system enabled
+[I] 4221 Dialog.preference: BNF confidence 0.5
+[I] 4221 Dialog.preference: REMOTE confidence 0.3
+[I] 4221 Dialog.preference: Serialization enabled
+[I] 4221 Dialog.preference: Upper SLM 1
+[I] 4221 Dialog.preference: Enable auto update
+[I] 4221 Dialog.preference: Push mode 2
+[I] 4221 Dialog.preference: Enable full speech recognition
+[I] 4221 Dialog.preference: Audio expression enabled
+[I] 4221 Dialog.preference: Smalldisplacement enabled
+[I] 4221 Dialog.preference: Breath enabled
+[I] 4221 Dialog.preference: No animated speech configuration
+[I] 4221 Dialog.preference: Default volume 0
+[I] 4221 Dialog.preference: No dialog history management
+[I] 4221 Dialog.preference: AI system enabled
+[I] 4221 Dialog.preference: BNF confidence 0.5
+[I] 4221 Dialog.preference: REMOTE confidence 0.3
+[I] 4221 Dialog.preference: Serialization enabled
+[I] 4221 Dialog.preference: Upper SLM 1
+[I] 4221 Dialog.preference: Enable auto update
+[I] 4221 Dialog.preference: Push mode 2
+[I] 4221 Dialog.preference: Enable full speech recognition
+[I] 4221 Dialog.preference: Audio expression enabled
+[I] 4221 Dialog.preference: Smalldisplacement enabled
+[I] 4221 Dialog.preference: Breath enabled
+[I] 4221 Dialog.preference: No animated speech configuration
+[I] 4221 Dialog.preference: Default volume 0
+[I] 4221 qimessaging.servicedirectory: Registered Service "ALDialog" (#139)
+[I] 4221 core.lib.launcher: Loading "/home/nao/naoqi/preferences/autoload.ini"
+Starting hal_experimental!
+Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]
+pineappleJuice created in shared memory
+HeadID proxy call value: ALDR1109F005135
+1. Actuator Alias Initialized.
+DEBUG_ALVALUE_INFO [commands Alias]: 
+	["stiffnessActuators", ["HeadYaw/Hardness/Actuator/Value", "HeadPitch/Hardness/Actuator/Value", "LShoulderPitch/Hardness/Actuator/Value", "LShoulderRoll/Hardness/Actuator/Value", "LElbowYaw/Hardness/Actuator/Value", "LElbowRoll/Hardness/Actuator/Value", "LWristYaw/Hardness/Actuator/Value", "LHand/Hardness/Actuator/Value", "RShoulderPitch/Hardness/Actuator/Value", "RShoulderRoll/Hardness/Actuator/Value", "RElbowYaw/Hardness/Actuator/Value", "RElbowRoll/Hardness/Actuator/Value", "RWristYaw/Hardness/Actuator/Value", "RHand/Hardness/Actuator/Value", "LHipYawPitch/Hardness/Actuator/Value", "LHipRoll/Hardness/Actuator/Value", "LHipPitch/Hardness/Actuator/Value", "LKneePitch/Hardness/Actuator/Value", "LAnklePitch/Hardness/Actuator/Value", "LAnkleRoll/Hardness/Actuator/Value", "RHipRoll/Hardness/Actuator/Value", "RHipPitch/Hardness/Actuator/Value", "RKneePitch/Hardness/Actuator/Value", "RAnklePitch/Hardness/Actuator/Value", "RAnkleRoll/Hardness/Actuator/Value"]]
+	["stiffnessActuators", ["HeadYaw/Hardness/Actuator/Value", "HeadPitch/Hardness/Actuator/Value", "LShoulderPitch/Hardness/Actuator/Value", "LShoulderRoll/Hardness/Actuator/Value", "LElbowYaw/Hardness/Actuator/Value", "LElbowRoll/Hardness/Actuator/Value", "LWristYaw/Hardness/Actuator/Value", "LHand/Hardness/Actuator/Value", "RShoulderPitch/Hardness/Actuator/Value", "RShoulderRoll/Hardness/Actuator/Value", "RElbowYaw/Hardness/Actuator/Value", "RElbowRoll/Hardness/Actuator/Value", "RWristYaw/Hardness/Actuator/Value", "RHand/Hardness/Actuator/Value", "LHipYawPitch/Hardness/Actuator/Value", "LHipRoll/Hardness/Actuator/Value", "LHipPitch/Hardness/Actuator/Value", "LKneePitch/Hardness/Actuator/Value", "LAnklePitch/Hardness/Actuator/Value", "LAnkleRoll/Hardness/Actuator/Value", "RHipRoll/Hardness/Actuator/Value", "RHipPitch/Hardness/Actuator/Value", "RKneePitch/Hardness/Actuator/Value", "RAnklePitch/Hardness/Actuator/Value", "RAnkleRoll/Hardness/Actuator/Value"]]
+DEBUG_ALVALUE_INFO [position_request_alias]: 
+	["positionActuators", "ClearAll", "time-seperate", 0, [], [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]]
+	["positionActuators", "ClearAll", "time-seperate", 0, [], [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]]
+2. Position Alias Initialized.
+DEBUG_ALVALUE_INFO [stiffness_request_alias]: 
+	["stiffnessActuators", "ClearAll", "time-seperate", 0, [], [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], , , , , , , , , , , , , , , , , , , , , , , , , ]]
+	["stiffnessActuators", "ClearAll", "time-seperate", 0, [], [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], , , , , , , , , , , , , , , , , , , , , , , , , ]]
+3. Stiffness Alias Initialized.
+DEBUG_ALVALUE_INFO [led_request_alias]: 
+	[, "ClearAll", [[, 0]]]
+	[, "ClearAll", [[, 0]]]
+4. LED Alias Initialized.
+5. Sensor Pointers initialized
+6. Requested Actuators Initialized.
+7. Proxy call backs established.
+SEMAPHORE TEST
+still segfaulting?
+dcm_proxy is not null
+NO SEGFAULT: DCM Time = 889603313
+hal_experimental Fully Initialized!
+Post-Callback called
+[read_sensors()] sensor data read...posting semaphore.
+[read_sensors()] semaphore posted!
+================= SENSOR VALUES! =================
+Device/SubDeviceList/HeadYaw/Position/Sensor/Value = -0.0061779
+Device/SubDeviceList/HeadYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/HeadYaw/Temperature/Sensor/Value = 38
+Device/SubDeviceList/HeadPitch/Position/Sensor/Value = 0.23466
+Device/SubDeviceList/HeadPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/HeadPitch/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LShoulderPitch/Position/Sensor/Value = 1.64747
+Device/SubDeviceList/LShoulderPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LShoulderPitch/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LShoulderRoll/Position/Sensor/Value = 0.200912
+Device/SubDeviceList/LShoulderRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LShoulderRoll/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LElbowYaw/Position/Sensor/Value = -1.27633
+Device/SubDeviceList/LElbowYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LElbowYaw/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LElbowRoll/Position/Sensor/Value = -1.03694
+Device/SubDeviceList/LElbowRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LElbowRoll/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LWristYaw/Position/Sensor/Value = 0.162562
+Device/SubDeviceList/LWristYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LWristYaw/Temperature/Sensor/Value = 38
+[I] 4221 qimessaging.servicedirectory: Registered Service "hal_experimental" (#140)
+Device/SubDeviceList/LHand/Position/Sensor/Value = 0.0432
+Device/SubDeviceList/LHand/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHand/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RShoulderPitch/Position/Sensor/Value = 1.54018
+Device/SubDeviceList/RShoulderPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RShoulderPitch/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RShoulderRoll/Position/Sensor/Value = -0.161112
+Device/SubDeviceList/RShoulderRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RShoulderRoll/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RElbowYaw/Position/Sensor/Value = 0.941834
+Device/SubDeviceList/RElbowYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RElbowYaw/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RElbowRoll/Position/Sensor/Value = 1.17048
+Device/SubDeviceList/RElbowRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RElbowRoll/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RWristYaw/Position/Sensor/Value = -0.101286
+Device/SubDeviceList/RWristYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RWristYaw/Temperature/Sensor/Value = 38
+Device/SubDeviceList/RHand/Position/Sensor/Value = 0.0448
+Device/SubDeviceList/RHand/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHand/Temperature/Sensor/Value = 38
+Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value = -0.27301
+Device/SubDeviceList/LHipYawPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipYawPitch/Temperature/Sensor/Value = 33
+Device/SubDeviceList/LHipRoll/Position/Sensor/Value = -0.075124
+Device/SubDeviceList/LHipRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipRoll/Temperature/Sensor/Value = 27
+Device/SubDeviceList/LHipPitch/Position/Sensor/Value = -0.865134
+Device/SubDeviceList/LHipPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipPitch/Temperature/Sensor/Value = 37
+Device/SubDeviceList/LKneePitch/Position/Sensor/Value = 2.25801
+Device/SubDeviceList/LKneePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LKneePitch/Temperature/Sensor/Value = 44
+Device/SubDeviceList/LAnklePitch/Position/Sensor/Value = -1.22724
+Device/SubDeviceList/LAnklePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LAnklePitch/Temperature/Sensor/Value = 27
+Device/SubDeviceList/LAnkleRoll/Position/Sensor/Value = 0.092082
+Device/SubDeviceList/LAnkleRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LAnkleRoll/Temperature/Sensor/Value = 27
+Device/SubDeviceList/RHipRoll/Position/Sensor/Value = 0.0844119
+Device/SubDeviceList/RHipRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHipRoll/Temperature/Sensor/Value = 27
+Device/SubDeviceList/RHipPitch/Position/Sensor/Value = -0.83914
+Device/SubDeviceList/RHipPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHipPitch/Temperature/Sensor/Value = 40
+Device/SubDeviceList/RKneePitch/Position/Sensor/Value = 2.209
+Device/SubDeviceList/RKneePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RKneePitch/Temperature/Sensor/Value = 49
+Device/SubDeviceList/RAnklePitch/Position/Sensor/Value = -1.20568
+Device/SubDeviceList/RAnklePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RAnklePitch/Temperature/Sensor/Value = 27
+Device/SubDeviceList/RAnkleRoll/Position/Sensor/Value = -0.075124
+Device/SubDeviceList/RAnkleRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RAnkleRoll/Temperature/Sensor/Value = 27
+Device/SubDeviceList/Head/Touch/Front/Sensor/Value = 0
+Device/SubDeviceList/Head/Touch/Middle/Sensor/Value = 0
+Device/SubDeviceList/Head/Touch/Rear/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Back/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Left/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Right/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Back/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Left/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Right/Sensor/Value = 0
+Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value = 0
+Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value = 0
+Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value = 0
+Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value = 0
+Device/SubDeviceList/ChestBoard/Button/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/GyroscopeX/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/GyroscopeY/Sensor/Value = -0.010919
+Device/SubDeviceList/InertialSensor/GyroscopeZ/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AccelerometerX/Sensor/Value = 0.479004
+Device/SubDeviceList/InertialSensor/AccelerometerY/Sensor/Value = -0.0670606
+Device/SubDeviceList/InertialSensor/AccelerometerZ/Sensor/Value = -10.0303
+Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value = -0.0147646
+Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value = 0.0370072
+Device/SubDeviceList/Battery/Current/Sensor/Value = 0.009
+Device/SubDeviceList/Battery/Charge/Sensor/Value = 1
+Device/SubDeviceList/Battery/Charge/Sensor/Status = -32552
+Device/SubDeviceList/Battery/Temperature/Sensor/Value = 2.7
+Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value = 1.05378
+Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value = 0.476582
+Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value = 0.299101
+Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value = 0.267627
+Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value = 0.317975
+Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value = 1.03422
+Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value = 0.518172
+Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value = 0.527188
+Device/SubDeviceList/LFoot/FSR/TotalWeight/Sensor/Value = 2.09709
+Device/SubDeviceList/RFoot/FSR/TotalWeight/Sensor/Value = 2.39756
+Pre-Callback called
+NaoQi has failed at updating the actuator value. Bad NaoQi. Bad.
+An exception has occured while setting actuator positions: 	ALValue::xAssertArraySize
+	The array has a size of 25 and you want it to be of size 26
+set_actuators_positions was called
+Stiffness IDs to be set: 50
+An Exception has occured while setting stiffness actuators: 	ALValue::xAssertArraySize
+	The array has a size of 0 and you want it to be of size 1
+set_actuators_stiffness was called
+set_actuators_leds was called
+================= ACTUATOR VALUES! =================
+Device/SubDeviceList/HeadYaw/Position/Sensor/Value = 0
+Device/SubDeviceList/HeadYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/HeadYaw/Temperature/Sensor/Value = 0
+Device/SubDeviceList/HeadPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/HeadPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/HeadPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LShoulderPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/LShoulderPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LShoulderPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LShoulderRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/LShoulderRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LShoulderRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LElbowYaw/Position/Sensor/Value = 0
+Device/SubDeviceList/LElbowYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LElbowYaw/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LElbowRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/LElbowRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LElbowRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LWristYaw/Position/Sensor/Value = 0
+Device/SubDeviceList/LWristYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LWristYaw/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LHand/Position/Sensor/Value = 0
+Device/SubDeviceList/LHand/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHand/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RShoulderPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/RShoulderPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RShoulderPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RShoulderRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/RShoulderRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RShoulderRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RElbowYaw/Position/Sensor/Value = 0
+Device/SubDeviceList/RElbowYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RElbowYaw/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RElbowRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/RElbowRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RElbowRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RWristYaw/Position/Sensor/Value = 0
+Device/SubDeviceList/RWristYaw/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RWristYaw/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RHand/Position/Sensor/Value = 0
+Device/SubDeviceList/RHand/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHand/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/LHipYawPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipYawPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LHipRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/LHipRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LHipPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/LHipPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LHipPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LKneePitch/Position/Sensor/Value = 0
+Device/SubDeviceList/LKneePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LKneePitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LAnklePitch/Position/Sensor/Value = 0
+Device/SubDeviceList/LAnklePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LAnklePitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LAnkleRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/LAnkleRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/LAnkleRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RHipRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/RHipRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHipRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RHipPitch/Position/Sensor/Value = 0
+Device/SubDeviceList/RHipPitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RHipPitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RKneePitch/Position/Sensor/Value = 0
+Device/SubDeviceList/RKneePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RKneePitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RAnklePitch/Position/Sensor/Value = 0
+Device/SubDeviceList/RAnklePitch/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RAnklePitch/Temperature/Sensor/Value = 0
+Device/SubDeviceList/RAnkleRoll/Position/Sensor/Value = 0
+Device/SubDeviceList/RAnkleRoll/ElectricCurrent/Sensor/Value = 0
+Device/SubDeviceList/RAnkleRoll/Temperature/Sensor/Value = 0
+Device/SubDeviceList/Head/Touch/Front/Sensor/Value = 0
+Device/SubDeviceList/Head/Touch/Middle/Sensor/Value = 0
+Device/SubDeviceList/Head/Touch/Rear/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Back/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Left/Sensor/Value = 0
+Device/SubDeviceList/LHand/Touch/Right/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Back/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Left/Sensor/Value = 0
+Device/SubDeviceList/RHand/Touch/Right/Sensor/Value = 0
+Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value = 0
+Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value = 0
+Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value = 0
+Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value = 0
+Device/SubDeviceList/ChestBoard/Button/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/GyroscopeX/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/GyroscopeY/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/GyroscopeZ/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AccelerometerX/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AccelerometerY/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AccelerometerZ/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value = 0
+Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value = 0
+Device/SubDeviceList/Battery/Current/Sensor/Value = 0
+Device/SubDeviceList/Battery/Charge/Sensor/Value = 0
+Device/SubDeviceList/Battery/Charge/Sensor/Status = 0
+Device/SubDeviceList/Battery/Temperature/Sensor/Value = 0
+Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value = 0
+Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value = 0
+Device/SubDeviceList/LFoot/FSR/RearLeft/Sensor/Value = 0
+Device/SubDeviceList/LFoot/FSR/RearRight/Sensor/Value = 0
+Device/SubDeviceList/RFoot/FSR/FrontLeft/Sensor/Value = 0
+Device/SubDeviceList/RFoot/FSR/FrontRight/Sensor/Value = 0
+Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value = 0
+Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value = 0
+Device/SubDeviceList/LFoot/FSR/TotalWeight/Sensor/Value = 0
+Device/SubDeviceList/RFoot/FSR/TotalWeight/Sensor/Value = 0
+[I] 4221 core.naoqi.autodiagnosys: Launching auto diagnostic.
+[E] 4219 preferencemanager.server: API Token not available: PreferenceManager won't be able to synchronize with cloud. Please connect your robot to cloud using local webpage (go to Setting/Web Services).
+[I] 4197 qimessaging.servicedirectory: Registered Service "ALDiagnosticDeprecated" (#293)
+[I] 4197 behavior.box: _Behavior__diagnostic144446048__root__Diagnostic_20: launch ALDiagnosticDeprecated
+[I] 4190 audio.altexttospeech.nuance: set current voice naoenu
+[I] 4190 audio.altexttospeech.nuance: Set param defaultVoiceSpeed to 100
+[I] 4190 audio.altexttospeech.nuance: Set param speed to 100
+[I] 4208 audio.altexttospeech.nuance: Enable equalizer 1 Start synthesis of \rate=100\  \pitch=100\   Good Morning, Please put me in an open space on the floor and touch my head or my bumper, so I can wake up correctly. \rst\  
+[I] 4069 core.main: Signal received, exiting...
+[E] 4065 ALSystem: 	ALAutonomousLife::setState
+		AutonomousLife::setState
+	Calls to the setState method are not currently allowed.
+[I] 4065 ALBroker.manager: Killing broker NAOqi
+[I] 4213 qimessaging.servicedirectory: Service #44 disconnected
+[I] 4213 qimessaging.servicedirectory: Unregistered Service "ALConnectionManager" (#44)
+[I] 4065 qimessaging.servicedirectory: Unregistered Service "ALDiagnosticDeprecated" (#293)
+[I] 4065 qimessaging.servicedirectory: Unregistered Service "hal_experimental" (#140)
+[I] 4069 core.main: Signal received again, forcing exit...
+[I] 4065 qimessaging.servicedirectory: Unregistered Service "ALDialog" (#139)
+[W] 4218 qimessaging.remoteobject: Deserialize error on event: boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[I] 4190 qimessaging.servicedirectory: Service #50 disconnected
+[I] 4190 qimessaging.servicedirectory: Unregistered Service "ALStore" (#50)
+[W] 4204 qimessaging.remoteobject: Deserialize error on event: boost: mutex lock failed in pthread_mutex_lock: Invalid argument
+[I] 4065 qimessaging.servicedirectory: Unregistered Service "ALAutonomousLife" (#138)
+[W] 4182 qimessaging.remoteobject: Deserialize error on event: boost: mutex lock failed in pthread_mutex_lock: Invalid argument

@@ -5,7 +5,7 @@ SET(SOURCE_FILES 	watchdog.cpp
 )
 
 set(LIBNAOINTERFACE_SOURCES "base/NAOInterface.cpp" "base/Head.cpp" "base/Arm.cpp" "base/Leg.cpp" 
-							"base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp"  
+							"base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp" "base/HALPriorityQueue.cpp"  
 							"../../include/modules/base/NAOInterface.h"
 )
 

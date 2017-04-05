@@ -30,6 +30,7 @@ memory for interprocess communication.
 
 #include "../util/more_hardware_data.h"
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+//#include <boost/shared_ptr.hpp>
 
 struct hal_data {
     unsigned int sensors_newest_update; ///< Index of the sensor with the most recently updated value 
@@ -42,6 +43,10 @@ struct hal_data {
     char text_to_speak[3][35]; //Text to have the NAO say
     bool standing;
     
+    //A somewhat dangerous way to pass a single value
+  //  volatile boost::shared_ptr<int> fast_actuator_id;
+   // volatile boost::shared_ptr<float> fast_access_value; 
+
 	float sensors[3][NumOfSensorIds];
 	float actuators[3][NumOfActuatorIds];
 

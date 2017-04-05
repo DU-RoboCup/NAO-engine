@@ -109,7 +109,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         stiffness_request_alias[2] = std::string("time-seperate"); //Timing Paramers
         stiffness_request_alias[3] = 0; //idk
         stiffness_request_alias[4].arraySetSize(1);
-        stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
+        //stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
+        stiffness_request_alias[5].arraySetSize(50); 
         for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
         {
             stiffness_request_alias[5][i].arraySetSize(1);
@@ -260,7 +261,6 @@ void hal_experimental::set_actuators_positions()
 bool hal_experimental::set_actuators_stiffness()
 {
     std::cout << "Stiffness IDs to be set: " << headYawStiffnessActuator + NumOfStiffnessActuatorIds << std::endl;
-    //std::cout << "Array Size: " << 
     try{
         for(int i = headYawStiffnessActuator; i < headYawStiffnessActuator + NumOfStiffnessActuatorIds; ++i)
         {

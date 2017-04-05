@@ -38,8 +38,8 @@ for other modules
 #include <boost/algorithm/string.hpp>
 
 
-typedef std::vector<std::string> ParsedIntent; 
-
+//typedef std::vector<std::string> ParsedIntent; 
+using ParsedIntent = std::vector<std::string>;
 // Intents form the backbone of IMC, each intent is processed 
 // by the modules, and so - any module can willingly ignore the
 // pending intents. Each intent is string recognized and matched
