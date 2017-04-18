@@ -56,6 +56,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         commands[0] = std::string("positionActuators");
         commands[1].arraySetSize(NumOfPositionActuatorIds); //< Ugly data structure
+
         for(int i = 0; i < NumOfPositionActuatorIds; ++i)
         {
             commands[1][i] = std::string(actuatorNames[i]);
@@ -87,7 +88,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         position_request_alias.arraySetSize(6);
         position_request_alias[0] = std::string("positionActuators");
         position_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
-        position_request_alias[2] = std::string("time-seperate"); //Timing Paramers
+        position_request_alias[2] = std::string("time-separate"); //Timing Paramers
         position_request_alias[3] = 0; //idk
         position_request_alias[4].arraySetSize(1);
         position_request_alias[5].arraySetSize(NumOfPositionActuatorIds);
@@ -106,11 +107,10 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         stiffness_request_alias.arraySetSize(6);
         stiffness_request_alias[0] = std::string("stiffnessActuators");
         stiffness_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
-        stiffness_request_alias[2] = std::string("time-seperate"); //Timing Paramers
+        stiffness_request_alias[2] = std::string("time-separate"); //Timing Paramers
         stiffness_request_alias[3] = 0; //idk
         stiffness_request_alias[4].arraySetSize(1);
-        //stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
-        stiffness_request_alias[5].arraySetSize(50); 
+        stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
         for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
         {
             stiffness_request_alias[5][i].arraySetSize(1);
@@ -267,7 +267,7 @@ bool hal_experimental::set_actuators_stiffness()
             if(actuators[i] != last_requested_actuators[i])
             {
                 stiffness_request_alias[4][0] = dcm_time;
-                for(int j = 0; j < NumOfActuatorIds; ++j)
+                for(int j = 0; j < NumOfStiffnessActuatorIds; ++j)
                     stiffness_request_alias[5][j][0] = last_requested_actuators[headYawStiffnessActuator + j] = actuators[headYawStiffnessActuator + j];
                 dcm_proxy->setAlias(stiffness_request_alias);
                 return true; //Stiffness values succesfully set
@@ -283,8 +283,8 @@ bool hal_experimental::set_actuators_stiffness()
 
 /**
   * \brief: Helper function to set LED values on the NAO
-  **/
-void hal_experimental::set_actuators_leds(bool &requested_stiffness_set)
+  **/ 
+void hal_experimental::set_actuators_leds(bool &requested_stiffness_set) //TODO check value
 {
     if(!requested_stiffness_set)
     {
@@ -295,7 +295,7 @@ void hal_experimental::set_actuators_leds(bool &requested_stiffness_set)
                 //Local LED index. Don't confuse with ledIndex variable
                 int led_index = faceLedBlueLeft180DegActuator + ledIndex;
                 //Ensure our ledIndex isnt > actual number of leds
-                if(NumOfLedActuatorIds == ledIndex++) ledIndex = 0;
+                if(NumOfLedActuatorIds == ++ledIndex) ledIndex = 0;
                 if(actuators[led_index] != last_requested_actuators[led_index])
                 {
                     led_request_alias[0] = std::string(actuatorNames[led_index]);

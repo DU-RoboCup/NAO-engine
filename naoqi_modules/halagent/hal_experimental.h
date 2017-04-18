@@ -67,7 +67,8 @@ private:
 
 	uint8_t last_reading_actuator;
 	size_t actuator_update_fails;
-	int dcm_time;
+	//int dcm_time;
+    int dcm_time;
     float last_requested_actuators[NumOfActuatorIds];
     int ledIndex;
     hal_data *pineappleJuice;
