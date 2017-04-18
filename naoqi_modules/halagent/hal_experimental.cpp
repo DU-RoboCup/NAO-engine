@@ -245,7 +245,7 @@ void hal_experimental::set_actuators_positions()
     {
         //Set positions
         position_request_alias[4][0] = dcm_time; 
-        for(int i = 0; i < NumOfActuatorIds; ++i)
+        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
             position_request_alias[5][i][0] = actuators[i];
         dcm_proxy->setAlias(position_request_alias); //Assign the alias for the naoqi DCM
     } 
