@@ -40,6 +40,12 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
+    /** \Brief: This part is complicated and you really need to shouldn't care about it.
+      * 
+      * Inside this try block we are doing quite a few things. To summarize, we establish communication
+      * proxies with NAOQi, then we begin creating AL::Aliases to (questionably) more effeciently
+      * send values to the DCM.
+      **/
     try
     {
         // Establish Communication with NaoQi

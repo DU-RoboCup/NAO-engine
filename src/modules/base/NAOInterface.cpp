@@ -183,6 +183,28 @@ bool NAOInterface::set_hardware_value(const int &hardware_component, float value
 		return false;
 	}
 }
+bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, const float value)
+{
+	LOG_DEBUG << "Attempting to do a direct hardware value write.";
+	if(! hardware_component >= NumOfActuatorIds)
+	{
+		try
+		{
+			pineappleJuice->actuator_semaphore.wait();
+			//The write
+			pineappleJuice->actuators[0][hardware_component] = value;
+			pineappleJuice->actuators_newest_update = hardware_component;
+			LOG_DEBUG << actuatorNames[hardware_component] << " set to value " << value;
+
+			pineappleJuice->actuator_semaphore.post();
+			
+		}
+		catch (const interprocess_exception &e)
+		{
+			LOG_WARNING << "Value failed to be set due to: " << e.what();	
+		}
+	}
+}
 bool NAOInterface::fast_write()
 {
 	/*
@@ -218,7 +240,7 @@ bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 	{
 		//Todo: Implement Return Intent with requested value
 		auto val = hardware_get_map[hardware_component]();
-		std::cout << hardware_component << ": " << val << std::endl;
+		LOG_DEBUG << hardware_component << ": " << val;
 	}
 }
 bool NAOInterface::access_shared_memory()
@@ -288,7 +310,8 @@ bool NAOInterface::write_shared_memory()
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
 		pineappleJuice->actuator_semaphore.wait();
-		//...
+		// For now we're just going to use the PriorityQueue for sending values
+		
 		pineappleJuice->actuator_semaphore.post();
 	}
 	catch (const interprocess_exception &e)
@@ -298,7 +321,28 @@ bool NAOInterface::write_shared_memory()
 	}
 	return true;
 }
+void NAOInterface::hardware_write_test()
+{
+	std::vector<std::pair<const unsigned int, const float>> writeTests {
+		{faceLedGreenLeft180DegActuator, 1.0},
+		{faceLedGreenLeft225DegActuator, 1.0},
+		{faceLedBlueLeft90DegActuator, 1.0},
+		{faceLedRedLeft0DegActuator, 1.0},
+		{lShoulderPitchStiffnessActuator, 0.9},
+		{lShoulderRollStiffnessActuator, 0.9}
 
+	};
+
+	for (auto &val : writeTests)
+	{
+		if(set_hardware_value(val.first, val.second))
+		{
+			LOG_DEBUG << actuatorNames[val.first] << " written successfully!";
+		} else {
+			LOG_WARNING << actuatorNames[val.first] << " failed to write successfully.";
+		}
+	}
+}
 void NAOInterface::randomly_set_joints()
 {
 	//Todo: Stiffness values

@@ -104,7 +104,7 @@ public:
 	  */
 	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	bool set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG);
-
+	bool set_hardware_value(const unsigned int &hardware_component, const float value);
 	/**
 	  * \brief: A dangerous way to quickly send queued requests to NAOqi
 	  * 
@@ -113,6 +113,7 @@ public:
 	  * Only use this for super high priority items.
 	  **/
 	bool fast_write();
+
 	/**
 	  * \brief Reads a hardware component value.
 	  * \param hardware_component - The hardware component's name to be read from.
@@ -148,6 +149,10 @@ public:
 	  * and finally to the NaoQI module.
 	  **/
 	bool write_shared_memory(); 
+
+	// Hardware Write Tests
+	void hardware_write_test();
+
 	typedef std::function<hardware_datatypes(hardware_datatypes)> generic_function;
 	/*typedef std::map<std::string, generic_function> function_map;*/
 	
