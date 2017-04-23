@@ -78,7 +78,6 @@ public:
 	* hardware_datatypes - boost::variant datatype that can be set to a variety of different datatypes.
 	**/
 	typedef boost::variant < std::pair<float, float>, float, std::string, std::unordered_map<std::string, Head::EyeLED> > hardware_datatypes;
-	void parse_intent(const std::string &input);
 	void initialize_hardware_map(); ///< Initially sets all of the values of our absurd hashmap.
 	void initialize_function_map(); ///< Initializes a map for calling functions.
 	

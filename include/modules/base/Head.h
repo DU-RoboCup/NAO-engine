@@ -31,7 +31,7 @@ public:
 
 	Head();
 	~Head();
-	typedef struct EyeLED { float RED = 0.0; float GREEN = 1.0; float BLUE = 0.0; }; //% of each LED, 0 being off, 1 being full brightness
+	struct EyeLED { float RED = 0.0; float GREEN = 1.0; float BLUE = 0.0; }; //% of each LED, 0 being off, 1 being full brightness
 	
 	std::string get_current_thought();
 	std::unordered_map<float, std::pair<float, float>> pitch_limits_map;

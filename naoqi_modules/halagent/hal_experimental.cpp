@@ -3,12 +3,26 @@
 using namespace AL;
 using std::string;
 using namespace boost::interprocess;    
+
+
+
+
+//non-blocking say, only says once every 3 seconds
+//string encoding must be UTF-8
+//
+// Borrowed and modified from rUNSWift 2016 release
+// 
+// Not really thread safe
+
+#define SAY(text) speak_proxy->post.say(text); 
+
 //const std::string hal_experimental::name("hal_experimental");
 hal_experimental* hal_experimental::instance = NULL;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
         dcm_proxy(NULL),
         nao_memory_proxy(NULL),
+        speak_proxy(NULL),
         ledIndex(0),
         cout_debug(true)
 {
@@ -51,6 +65,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         // Establish Communication with NaoQi
         dcm_proxy = new DCMProxy(pBroker);
         nao_memory_proxy = new ALMemoryProxy(pBroker);
+        speak_proxy = new ALTextToSpeechProxy("localhost", 9559);
         body_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0));
         // head_ID = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0));
         // body_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0));
@@ -176,6 +191,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         std::cout << "NO SEGFAULT: DCM Time = " << dcm_time << std::endl;
         pineappleJuice->actuator_semaphore.post();
 
+    SAY("I am ready for action! Woohoo");
+
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
 }
@@ -219,6 +236,7 @@ hal_experimental::~hal_experimental()
     }
     delete dcm_proxy;
     delete nao_memory_proxy;
+    delete speak_proxy;
 }
 
 void hal_experimental::set_LEDS()
@@ -349,6 +367,7 @@ void hal_experimental::set_actuators()
         std::cout << "set_actuators_stiffness was called\n";
         set_actuators_leds(was_set);
         std::cout << "set_actuators_leds was called" << std::endl;
+        SAY("My hardware values have been updated");
         //TODO: Gamecontroller stuff (team info)
         
 	}
@@ -400,6 +419,7 @@ void hal_experimental::read_sensors()
     }
     print_sensors();
 }
+
 
 void hal_experimental::print_sensors()
 {

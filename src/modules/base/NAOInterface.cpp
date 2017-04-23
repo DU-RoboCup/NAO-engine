@@ -51,7 +51,23 @@ bool NAOInterface::RunFrame()
 		{
 			ParsedIntent pi = pending_intents.pop_front().Parse();
 			if(pi[2] == "set_hardware_value"){
-				set_hardware_value(pi[3], std::stof(pi[4]));
+				if(pi.size() < 5)
+					set_hardware_value(pi[3], std::stof(pi[4]));
+
+				//TODO: Write Dispatch Table for ENUM C++
+				// else 
+				// {
+				// 	try{
+				// 		
+				// 		std::string hw_cmp = pi[3];
+				// 		QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
+				// 		set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
+				// 	}
+				// 	catch(const std::exception &e)
+				// 	{
+				// 		std::cout << "An exception has occured: " << e.what() << "\n";
+				// 	}
+				// }
 			}
 			else if(pi[2] == "get_hardware_value")
 				get_hardware_value(pi[3]);
@@ -101,7 +117,7 @@ NAOInterface::NAOInterface()
 	initialize_function_map();
 
 	LOG_DEBUG << "NAOInterface Initialized";
-	print_hardware_map();
+	// print_hardware_map();
 
 	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
 	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
@@ -112,21 +128,6 @@ NAOInterface::NAOInterface()
 		actuator_vals.assign(NumOfActuatorIds, 0);
 	}
 
-}
-
-void NAOInterface::parse_intent(const std::string &input)
-{
-	if (command_list.size() != 0) command_list.clear(); //clear list
-	size_t pos = 0;
-	std::string cpy = input;
-	std::string delimiter = "/";
-	while ((pos = cpy.find(delimiter)) != std::string::npos) {
-		command_list.push_back(cpy.substr(0, pos));
-		cpy.erase(0, pos + delimiter.length());
-	}
-	command_list.push_back(cpy);
-	std::cout << "Intents parsed, command list size: " << command_list.size() << std::endl;
-	//TODO: Stuff with intent list. Only intent[3] and [4] matter
 }
 
 void NAOInterface::print_commands_list()
@@ -155,7 +156,8 @@ float NAOInterface::generate_random_bound_val(std::pair<float, float> bounds)
 	return min + r;
 }
 
-bool NAOInterface::set_hardware_value(const std::string & hardware_component, float  value)
+[[deprecated("please use the other set_hardware_value functions, which allow prioritization")]]
+bool NAOInterface::set_hardware_value(const std::string & hardware_component, float value)
 {
 	if (hardware_set_functions.find(hardware_component) == hardware_set_functions.end())
 	{
@@ -175,17 +177,18 @@ bool NAOInterface::set_hardware_value(const int &hardware_component, float value
 	if(hardware_component < NumOfActuatorIds && hardware_component >= 0)
 	{
 		WriteRequests.push(std::make_tuple(hardware_component, value, FLAG));
-		return true;
 	}
 	else
 	{
 		LOG_WARNING << "Invalid Actuator ID: " << hardware_component; 
 		return false;
 	}
+	return true;
 }
 bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, const float value)
 {
 	LOG_DEBUG << "Attempting to do a direct hardware value write.";
+	bool all_success = false;
 	if(! hardware_component >= NumOfActuatorIds)
 	{
 		try
@@ -197,13 +200,16 @@ bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, co
 			LOG_DEBUG << actuatorNames[hardware_component] << " set to value " << value;
 
 			pineappleJuice->actuator_semaphore.post();
-			
+			all_success = true;
 		}
 		catch (const interprocess_exception &e)
 		{
-			LOG_WARNING << "Value failed to be set due to: " << e.what();	
+			LOG_WARNING << "Value failed to be set due to: " << e.what();
+			all_success = false;
+				
 		}
 	}
+	return all_success;
 }
 bool NAOInterface::fast_write()
 {
@@ -269,6 +275,7 @@ bool NAOInterface::sync_pineapple()
 	{
 		auto &top_intent = WriteRequests.pop_top();
 		pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
+	
 	}
 	pineappleJuice->actuator_semaphore.post();
 	return true;
@@ -310,7 +317,12 @@ bool NAOInterface::write_shared_memory()
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
 		pineappleJuice->actuator_semaphore.wait();
-		// For now we're just going to use the PriorityQueue for sending values
+		while(!WriteRequests.size() == 0)
+		{
+			auto &request = WriteRequests.pop_top();
+			pineappleJuice->actuators[0][std::get<0>(request)] = std::get<1>(request);
+			pineappleJuice->actuators_current_read = std::get<0>(request);
+		}
 		
 		pineappleJuice->actuator_semaphore.post();
 	}

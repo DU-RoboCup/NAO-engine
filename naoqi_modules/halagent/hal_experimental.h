@@ -9,6 +9,7 @@
 #include "alcommon/almodule.h"
 #include "alvalue/alvalue.h"
 #include "alproxies/dcmproxy.h"
+#include <alproxies/altexttospeechproxy.h>
 
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -16,6 +17,7 @@
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/sync/named_semaphore.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -56,6 +58,7 @@ public:
 private:
     AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
+    AL::ALTextToSpeechProxy *speak_proxy;
     AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias, game_controller;
     AL::ALValue commands, commandsAlias;
     //Head and Body ID's and Version number. Useful for compatability checking
