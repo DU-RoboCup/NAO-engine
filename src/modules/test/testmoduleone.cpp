@@ -13,16 +13,6 @@ TestModuleOne* TestModuleOne::Instance() {
 	return TestModuleOne::instance;
 }
 
-void TestModuleOne::Reconfigure(std::string config_file, uint16_t id) {
-	this->ModuleID = id;
-
-	LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
-	this->ModuleName = mconfig["name"].get<std::string>();
-	this->ModuleFPS = (int)mconfig["rfps"].get<double>();
-	this->ModulePriority = (int)mconfig["mprio"].get<double>();
-	this->ModuleThread = (int)mconfig["mthr"].get<double>();
-}
-
 bool TestModuleOne::RunFrame() {
 
 	LuaTable ltable = LuaTable::fromFile("../config/modules/myfile.lua");

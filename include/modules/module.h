@@ -27,12 +27,9 @@ Module header file - presents the front interface for dynamic class loading
 #ifndef _MODULE_h_GUARD
 #define _MODULE_h_GUARD
 
-#include "common.h"
-#include "memory/intent.h"
+#include "../common.h"
 #include <string> 
 #include <stdint.h>
-
-
 
 class Module {
     public:
@@ -44,7 +41,14 @@ class Module {
          * @param   uint8_t     The priority of the module
          * @param   std::string The Name of the module
          */
-        virtual void Reconfigure(std::string config_file, uint16_t id) = 0;
+        virtual void Reconfigure(std::string config_file, uint16_t id) {
+	        this->ModuleID = id;
+	        LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
+	        this->ModuleName = mconfig["name"].get<std::string>();
+	        this->ModuleFPS = (int)mconfig["rfps"].get<double>();
+	        this->ModulePriority = (int)mconfig["mprio"].get<double>();
+	        this->ModuleThread = (int)mconfig["mthr"].get<double>();
+        }
 
         /**
          * Run the first time that the module is installed

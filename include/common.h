@@ -27,6 +27,10 @@ This file contains a number of includes which are necessary for most of the proj
 #ifndef _COMMON_h_GUARD
 #define _COMMON_h_GUARD
 
+// Necessary headers for luatables
+#include "lib/luatables/luatables.h"
+#include <string>
+
 // Macros
 #include "util/branch_macros.h"
 #include "modules/module_macros.h"
@@ -40,13 +44,5 @@ This file contains a number of includes which are necessary for most of the proj
 
 // Debugging
 #include "debug/debugging.h"
-
-// Necessary headers for luatables
-#include "lib/luatables/luatables.h"
-#include <string>
-
-
-
-
 
 #endif /*_COMMON_h_GUARD */

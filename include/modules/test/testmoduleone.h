@@ -12,10 +12,7 @@
 
 class TestModuleOne : public Module {
 	public:
-		static TestModuleOne* Instance();
-
-		void Reconfigure(std::string config_file, uint16_t id);
-		
+		static TestModuleOne* Instance();	
 		bool RunFrame();
 		bool ProcessIntent(Intent &i);
 		bool Install();
