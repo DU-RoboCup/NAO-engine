@@ -93,8 +93,16 @@ void Context::Execute() {
 	std::shared_ptr<boost::any> gc = Bazaar::Get("Global/Clock");
 	LOG_DEBUG << "Created main reference clock: " << boost::any_cast<clock_t>(*gc);
 
+    // Setup the scheduling window for the main thread 
+	auto sched_window = std::chrono::nanoseconds(static_cast<uint64_t>((1.0/500)*1000000000));
+
+
 	while (!this->is_dead) {
-		// Check that all threads have both checked in and if they have, then schedule the alarm
+
+	    // Start the clock timer	
+		auto start_chrono = std::chrono::high_resolution_clock::now();
+        
+        // Check that all threads have both checked in and if they have, then schedule the alarm
 		bool check = true;
 		for (auto x = m_check.begin(); x != m_check.end(); x++) {
 			if ((*x).second == false) {
@@ -113,6 +121,12 @@ void Context::Execute() {
 		// Update the global clock time
 		(*gc) = clock();
 		Bazaar::UpdateListing("Global/Clock", gc);
+
+        // Need to give priority to other threads     
+		auto end_chrono = std::chrono::high_resolution_clock::now();
+		if (LIKELY((end_chrono-start_chrono) < sched_window))
+			std::this_thread::sleep_for(sched_window - (end_chrono-start_chrono));
+
 	}
 	// Set the alarm for some more time to deal with the cleanup
 	alarm(30);
@@ -124,9 +138,9 @@ void Context::MainThreadLoop(Context* myFrame, ModuleRecord& m) {
 	auto sched_window = std::chrono::nanoseconds(static_cast<uint64_t>((1.0/m.requested_fps)*1000000000));
 	LOG_DEBUG << "Scheduling window is " << sched_window.count() << "ns for module: " << m.module_handle->GetName();
 
-	// Declare as real time
+	// Set high priority main thread loop
 	struct sched_param param;
-	param.sched_priority = sched_get_priority_max(SCHED_FIFO) - m.module_handle->GetPriority();
+	param.sched_priority = sched_get_priority_max(SCHED_FIFO) - 3 - m.module_handle->GetPriority();
     if(sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
         LOG_ERROR << "Setting the priority of module " << m.module_handle->GetName() << " failed. Are you running as root?";
         myFrame->Kill();

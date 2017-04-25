@@ -1,8 +1,0 @@
-module = {
-    name = "NAOInterface Module",
-    liblocation = "../lib/libNAOInterface.so",
-    rfps = 40,
-    mprio = 1,
-    mthr = 1
-}
-return module

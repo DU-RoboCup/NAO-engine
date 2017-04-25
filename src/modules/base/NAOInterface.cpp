@@ -44,6 +44,7 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 }
 bool NAOInterface::RunFrame()
 {
+    hardware_write_test();
 	if(!pending_intents.empty()) 
 	{
 		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object

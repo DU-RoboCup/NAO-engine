@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 
 	// Setup the base priority
 	struct sched_param param;
-	param.sched_priority = sched_get_priority_max(SCHED_FIFO);
+	param.sched_priority = sched_get_priority_max(SCHED_FIFO) - 3;
     if(sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
         LOG_ERROR << "Setting the priority of the base thread failed. Are you running as root?";
         LOG_DEBUG << "Finished running";
