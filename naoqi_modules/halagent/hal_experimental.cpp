@@ -183,7 +183,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         std::cerr << "Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << std::endl;
     }
     //Boost Interprocess Shared Memory Initialization:
-            std::cout << "SEMAPHORE TEST" << std::endl;
+        std::cout << "SEMAPHORE TEST" << std::endl;
         pineappleJuice->actuator_semaphore.wait();
         std::cout << "still segfaulting?" << std::endl;
         if(dcm_proxy == NULL) std::cout << "dcm_proxy is null\n" << std::endl; else std::cout << "dcm_proxy is not null" << std::endl; 
@@ -204,6 +204,7 @@ void hal_experimental::preCallBack()
 {
     std::cout << "Pre-Callback called" << std::endl;
     instance->set_actuators();
+    instance->speak();
 }
 /**
 * The method is called by NaoQi immediately after it communicates with the chest board.
@@ -215,8 +216,23 @@ void hal_experimental::postCallBack()
     instance->read_sensors();
 }
 
-
-
+/**
+* speak: Make the NAO say things (textToSpeech)
+* This method is currently not really really race condition safe.
+* Not my fault if the NAO starts speaking giberish (well actually 100% my fault but its halarious)
+**/
+void hal_experimental::speak()
+{
+    pineappleJuice->speak_semaphore.wait();
+    //See if there's anything new to talk about
+    if(pineappleJuice->text_to_speak_unsafe[0] != ' ' || pineappleJuice->text_to_speak_unsafe[0] != '0')
+    {
+        SAY(pineappleJuice->text_to_speak_unsafe);
+         //Mark as already have talked. Prevents parrots from attacking our pineapples.
+        pineappleJuice->text_to_speak_unsafe[0] = ' ';
+    }
+    pineappleJuice->speak_semaphore.post();
+}
 hal_experimental::~hal_experimental()
 {
     std::cout << "Destructing hal_experimental" << std::endl;
@@ -249,6 +265,7 @@ void hal_experimental::set_LEDS()
     actuators[faceLedGreenLeft180DegActuator] = blink_val;
 }
 
+// I don't remember why I made this function...it should probably be removed
 float* hal_experimental::robot_state_handler(float *actuator_vals)
 {
     return actuator_vals;
@@ -271,6 +288,7 @@ void hal_experimental::set_actuators_positions()
         position_request_alias[4][0] = dcm_time; 
         for(int i = 0; i < NumOfPositionActuatorIds; ++i)
             position_request_alias[5][i][0] = actuators[i];
+            //position_request_alias[5][i][0] = actuators[?][i];
         dcm_proxy->setAlias(position_request_alias); //Assign the alias for the naoqi DCM
     } 
     catch (const AL::ALError &e)
@@ -285,14 +303,17 @@ void hal_experimental::set_actuators_positions()
 bool hal_experimental::set_actuators_stiffness()
 {
     std::cout << "Stiffness IDs to be set: " << headYawStiffnessActuator + NumOfStiffnessActuatorIds << std::endl;
-    try{
+    try
+    {
         for(int i = headYawStiffnessActuator; i < headYawStiffnessActuator + NumOfStiffnessActuatorIds; ++i)
         {
             if(actuators[i] != last_requested_actuators[i])
             {
-                stiffness_request_alias[4][0] = dcm_time;
+                stiffness_request_alias[4][0] = dcm_time; //First Time Value (based on internal clock)
                 for(int j = 0; j < NumOfStiffnessActuatorIds; ++j)
+                    //First command for the jth stiffness actuator
                     stiffness_request_alias[5][j][0] = last_requested_actuators[headYawStiffnessActuator + j] = actuators[headYawStiffnessActuator + j];
+                    //stiffness_request_alias[5][j][0] = last_requested_actuators[headYawStiffnessActuator + j] = actuators[headYawStiffnessActuator + j];
                 dcm_proxy->setAlias(stiffness_request_alias);
                 return true; //Stiffness values succesfully set
             }
@@ -322,14 +343,18 @@ void hal_experimental::set_actuators_leds(bool &requested_stiffness_set) //TODO 
                 if(NumOfLedActuatorIds == ++ledIndex) ledIndex = 0;
                 if(actuators[led_index] != last_requested_actuators[led_index])
                 {
+                    //Alias name
                     led_request_alias[0] = std::string(actuatorNames[led_index]);
                     //Update last_requested_actuators val to actuators val
                     last_requested_actuators[led_index] = actuators[led_index];
-                    //Finish setting value and tell naoqi
+                    //last_requested_actuators[led_index] = actuators[led_index];
+                    ////Finish setting value and tell naoqi
+                    //Value for LED (0..1 float)
                     led_request_alias[2][0][0] = last_requested_actuators[led_index];
+                    //DCM time for light to be changed. Currently set to be current time (i.e. instant)
                     led_request_alias[2][0][1] = dcm_time;
                     dcm_proxy->set(led_request_alias);
-                    return;
+                    return; //break out of loop? I forget why I did this. It might be wrong
                 }
             }
         } 
@@ -339,22 +364,30 @@ void hal_experimental::set_actuators_leds(bool &requested_stiffness_set) //TODO 
         }
     }
 }
+/**
+  * set_actuators: Set Actuators main function + helper function calls.
+  * 
+  **/
 void hal_experimental::set_actuators()
 {
 	try
 	{
         pineappleJuice->actuator_semaphore.wait();
         dcm_time = dcm_proxy->getTime(0);
+        
+        //currently actuator update fails aren't handled
         pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
         if (pineappleJuice->actuators_newest_update != last_reading_actuator)
         {
-            if(actuator_update_fails == 0)
+            if(actuator_update_fails == 0) 
                 std::cout << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << std::endl;
             actuator_update_fails++;
         }
         else actuator_update_fails = 0;
         last_reading_actuator = pineappleJuice->actuators_newest_update;
-        read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
+        //read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
+        read_actuators = pineappleJuice->actuators_unsafe;
+        
         //Get actual actuator vals to be assigned. These values won't exactly correspond to
         //what NAOInterface passed due to the various states the robot may be in.
         actuators = robot_state_handler(read_actuators);
@@ -386,6 +419,7 @@ void hal_experimental::read_sensors()
     {
         pineappleJuice->sensor_semaphore.wait();
         int sensor_data_written = 0;
+        //currently support for dropped reads/writes is disabled
         if(sensor_data_written == pineappleJuice->sensors_newest_update)
         {
             sensor_data_written++;
@@ -400,7 +434,8 @@ void hal_experimental::read_sensors()
         {
             std::cerr << "Sensor data being overwritten to shared memory!" << std::endl; 
         }
-        float *current_sensor = pineappleJuice->sensors[sensor_data_written];
+        //float *current_sensor = pineappleJuice->sensors[sensor_data_written];
+        float *current_sensor = pineappleJuice->sensors_unsafe;
         for(int i = 0; i < NumOfSensorIds; ++i)
         {
             current_sensor[i] = *sensor_ptrs[i];
@@ -426,7 +461,8 @@ void hal_experimental::print_sensors()
     std::cout << "================= SENSOR VALUES! =================" << std::endl;
     pineappleJuice->sensor_semaphore.wait();
     for(int i = 0; i < NumOfSensorIds; ++i)
-        std::cout << sensorNames[i] << " = " << pineappleJuice->sensors[pineappleJuice->sensors_newest_update][i] << std::endl;
+        std::cout << sensorNames[i] << " = " << pineappleJuice->sensors_unsafe[i] << std::endl;
+    //    std::cout << sensorNames[i] << " = " << pineappleJuice->sensors[pineappleJuice->sensors_newest_update][i] << std::endl;
     pineappleJuice->sensor_semaphore.post(); 
 }
 void hal_experimental::print_actuators()
@@ -434,7 +470,8 @@ void hal_experimental::print_actuators()
     std::cout << "================= ACTUATOR VALUES! =================" << std::endl;
     pineappleJuice->actuator_semaphore.wait();
     for(int i = 0; i < NumOfActuatorIds; ++i)
-        std::cout << sensorNames[i] << " = " << pineappleJuice->actuators[pineappleJuice->actuators_newest_update][i] << std::endl;
+           std::cout << sensorNames[i] << " = " << pineappleJuice->actuators_unsafe[i] << std::endl;
+    //    std::cout << sensorNames[i] << " = " << pineappleJuice->actuators[pineappleJuice->actuators_newest_update][i] << std::endl;
     pineappleJuice->sensor_semaphore.post(); 
 }
 

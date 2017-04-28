@@ -186,6 +186,20 @@ bool NAOInterface::set_hardware_value(const int &hardware_component, float value
 	}
 	return true;
 }
+bool NAOInterface::speak(const std::string &text)
+{
+	if(text.size() > 34)
+	{
+		//Realistically the NAO will overheat if the text is too long (apparently...have not tested yet)
+		LOG_WARNING << "The Text you have asked NAO to say is too long for it to remember.";
+		return false;
+	}
+	pineappleJuice->speak_semaphore.wait();
+	std::strcpy(pineappleJuice->text_to_speak_unsafe, text.c_str());
+	//std::strncpy(pineappleJuice->text_to_speak_unsafe, text, sizeof(pineappleJuice->text_to_speak_unsafe)-1);
+	pineappleJuice->speak_semaphore.post();
+	return true;
+}
 bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, const float value)
 {
 	LOG_DEBUG << "Attempting to do a direct hardware value write.";
@@ -196,7 +210,8 @@ bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, co
 		{
 			pineappleJuice->actuator_semaphore.wait();
 			//The write
-			pineappleJuice->actuators[0][hardware_component] = value;
+			//pineappleJuice->actuators[0][hardware_component] = value;
+			pineappleJuice->actuators_unsafe[hardware_component] = value;
 			pineappleJuice->actuators_newest_update = hardware_component;
 			LOG_DEBUG << actuatorNames[hardware_component] << " set to value " << value;
 
@@ -275,7 +290,8 @@ bool NAOInterface::sync_pineapple()
 	for(int i = 0; i < WriteRequests.size(); ++i)
 	{
 		auto &top_intent = WriteRequests.pop_top();
-		pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
+		pineappleJuice->actuators_unsafe[std::get<0>(top_intent)] = std::get<1>(top_intent);
+		//pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
 	
 	}
 	pineappleJuice->actuator_semaphore.post();
@@ -294,13 +310,17 @@ bool NAOInterface::read_shared_memory()
 		pineappleJuice->sensor_semaphore.wait();
 		for(int i = 0; i < NumOfSensorIds;++i)
 		{
-			sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
+			//vector<float> <------- float[]
+			sensor_vals[i] = pineappleJuice->sensors_unsafe[i];
+			//sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
 		}
 		pineappleJuice->sensor_semaphore.post();
 		pineappleJuice->actuator_semaphore.wait();
 		for(int i = 0; i < NumOfActuatorIds;++i)
 		{
-			actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
+			//vector<float> <------- float[]
+			actuator_vals[i] = pineappleJuice->actuators_unsafe[i];
+			//actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
 		}
 		pineappleJuice->actuator_semaphore.post();
 		
@@ -321,7 +341,8 @@ bool NAOInterface::write_shared_memory()
 		while(!WriteRequests.size() == 0)
 		{
 			auto &request = WriteRequests.pop_top();
-			pineappleJuice->actuators[0][std::get<0>(request)] = std::get<1>(request);
+			pineappleJuice->actuators_unsafe[std::get<0>(request)] = std::get<1>(request);
+			//pineappleJuice->actuators[0][std::get<0>(request)] = std::get<1>(request);
 			pineappleJuice->actuators_current_read = std::get<0>(request);
 		}
 		

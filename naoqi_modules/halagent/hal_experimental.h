@@ -46,6 +46,7 @@ public:
     void set_actuators_positions();
     bool set_actuators_stiffness();
     void set_actuators_leds(bool &requested_stiffness_set);
+    void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...

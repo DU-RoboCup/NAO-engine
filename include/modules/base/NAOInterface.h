@@ -149,6 +149,12 @@ public:
 	  **/
 	bool write_shared_memory(); 
 
+	/**
+	  * \brief - make the NAO say the desired text. 
+	  * Text MUST be 35 characters or less
+	  **/
+	bool speak(const std::string &text);
+
 	// Hardware Write Tests
 	void hardware_write_test();
 
