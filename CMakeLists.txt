@@ -19,7 +19,7 @@ endif()
 project(NAO-engine)
 include(/usr/share/cmake-2.8/Modules/ExternalProject.cmake)
 
-# Setup the cross compiler 
+# Setup the cross compiler
 set(CROSS_RPATH_LOCATION "/var/persistent/cross-atom/lib:/var/persistent/cross-atom/i686-nptl-linux-gnu/lib:/var/persistent/cross-atom/lib/gcc/i686-nptl-linux-gnu/5.2.0")
 set(CROSS_DYN_LINKER_LOCATION "/var/persistent/cross-atom/i686-nptl-linux-gnu/lib/ld-linux.so.2")
 set(CROSS_INC_PATH "/var/persistent/cross-atom/include")
@@ -35,7 +35,7 @@ include_directories(${INC_DIRECTORIES})
 include_directories(${CMAKE_SOURCE_DIR})
 
 # Set version information
-add_definitions(-DPINEAPPLE_VERSION_0_0_2 -DNAO_SDK_VERSION_2_1_4_13 -D_GLIBCXX_USE_NANOSLEEP)
+add_definitions(-DPINEAPPLE_VERSION_0_0_2 -DNAO_SDK_VERSION_2_1_4_13 -D_GLIBCXX_USE_NANOSLEEP -DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
 # Main build system
 if (${IS_CROSS} STREQUAL "TRUE")
@@ -66,10 +66,10 @@ if (${IS_CROSS} STREQUAL "TRUE")
     add_subdirectory(src)
 
     # Install configuration files
-    file( COPY ${CMAKE_SOURCE_DIR}/config DESTINATION ${CMAKE_SOURCE_DIR}/build-cross)  
+    file( COPY ${CMAKE_SOURCE_DIR}/config DESTINATION ${CMAKE_SOURCE_DIR}/build-cross)
 
 else()
-    
+
     message("Building with SDK compilation...")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -march=native -Wno-deprecated-declarations")
@@ -100,14 +100,14 @@ else()
 	# Build the luatables library
 	add_library(luatables SHARED lib/luatables/luatables.h lib/luatables/luatables.cc)
     target_link_libraries(luatables lua5.1)
-    
-    add_subdirectory(src)  
+
+    add_subdirectory(src)
 
     # Install configuration files
-    file( COPY ${CMAKE_SOURCE_DIR}/config DESTINATION ${CMAKE_SOURCE_DIR}/build-local)  
+    file( COPY ${CMAKE_SOURCE_DIR}/config DESTINATION ${CMAKE_SOURCE_DIR}/build-local)
 
 endif()
-    
+
 #export compilation flags for YouCompleteMe
 set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 

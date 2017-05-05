@@ -1,16 +1,9 @@
 #ifndef _HAL_EXPERIMENTAL_H
 #define _HAL_EXPERIMENTAL_H
 
+//Boost Includes
 #define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <boost/shared_ptr.hpp>
-#include "alcommon/albroker.h"
-#include "alcommon/alproxy.h"
-#include "alproxies/almemoryproxy.h"
-#include "alcommon/almodule.h"
-#include "alvalue/alvalue.h"
-#include "alproxies/dcmproxy.h"
-#include <alproxies/altexttospeechproxy.h>
-
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
@@ -18,12 +11,23 @@
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+//Aldabaran Includes
+#include "alcommon/albroker.h"
+#include "alcommon/alproxy.h"
+#include "alproxies/almemoryproxy.h"
+#include "alcommon/almodule.h"
+#include "alvalue/alvalue.h"
+#include "alproxies/dcmproxy.h"
+#include <alproxies/altexttospeechproxy.h>
+//Standard Library Includes
 #include <iostream>
 #include <string>
 #include <cstring>
-
+#include <stdexcept>
+#include <stdio.h>
+#include <fstream>
+//Project Includes
 #include "../../include/memory/hal_data.h"
-
 
 namespace AL {
     class ALBroker;
@@ -49,13 +53,17 @@ public:
     void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
+    void get_ip_address();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
+    // Execute shell commands
+    std::string execute_shell_command(const char* command);
     /**
       * \brief debug_alvalue: Insanity Check...
       * @param v: An ALValue alias (which is a weird multidemensional jagged array)
       * @param name: Alias name
       **/
     void debug_alvalue(AL::ALValue &v, std::string name);
+    std::ofstream log_file;
 private:
     AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
@@ -67,6 +75,8 @@ private:
     std::string body_version;
     std::string head_ID;
     std::string head_version;
+
+    std::string my_ip_address;
     boost::interprocess::managed_shared_memory shm;
 
 	uint8_t last_reading_actuator;

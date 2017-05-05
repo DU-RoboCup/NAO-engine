@@ -30,6 +30,15 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     last_reading_actuator = 255; ///<This is just initially set to an impossible actuator number
     actuator_update_fails = 0;
     std::cout << "Starting hal_experimental!" << std::endl;
+    try
+    {
+        //Debug
+       log_file.open("/home/nao/NAOQI-LOG2.log", std::ios::out);
+       log_file << "Initializing NAOQI" << '\n';
+       log_file << "Another log file test" << '\n';
+    } catch(...) {
+        SAY("I could't use the LOG Fie");
+    }
 
     try
     {
@@ -46,11 +55,13 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         }
         pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
         std::cout << "pineappleJuice created in shared memory" << std::endl;
+        log_file << "pineappleJuice created in shared memory" << '\n';
     } 
     catch(boost::interprocess::interprocess_exception &e) 
     {
         std::cout << "[FATAL] An Interprocess error: " << e.what() << std::endl;
         std::cout << "Cleaning up shared memory..." << std::endl;
+        log_file << "Shared Memory failed...cleaning up" << std::endl;
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
@@ -184,14 +195,17 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     }
     //Boost Interprocess Shared Memory Initialization:
         std::cout << "SEMAPHORE TEST" << std::endl;
+        log_file << "Testing actuator semaphore wait...\n";
         pineappleJuice->actuator_semaphore.wait();
         std::cout << "still segfaulting?" << std::endl;
         if(dcm_proxy == NULL) std::cout << "dcm_proxy is null\n" << std::endl; else std::cout << "dcm_proxy is not null" << std::endl; 
         dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
         std::cout << "NO SEGFAULT: DCM Time = " << dcm_time << std::endl;
+        log_file << "woohoo I'm in a semaphore" << '\n';
         pineappleJuice->actuator_semaphore.post();
 
     SAY("I am ready for action! Woohoo");
+    get_ip_address();
 
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
@@ -203,7 +217,9 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 void hal_experimental::preCallBack() 
 {
     std::cout << "Pre-Callback called" << std::endl;
+    log_file << "preCallBack called" << '\n';
     instance->set_actuators();
+    log_file << "preCallBack: set_actuators succcessfully called\n";
     instance->speak();
 }
 /**
@@ -213,7 +229,9 @@ void hal_experimental::preCallBack()
 void hal_experimental::postCallBack()
 {
     std::cout << "Post-Callback called" << std::endl;  
+    log_file << "postCallBack successfully called\n";
     instance->read_sensors();
+    log_file << "Sensors have been read\n";
 }
 
 /**
@@ -223,18 +241,45 @@ void hal_experimental::postCallBack()
 **/
 void hal_experimental::speak()
 {
-    pineappleJuice->speak_semaphore.wait();
+    log_file << "Horrible unsafe speak method called\n";
+    pineappleJuice->speak_semaphore.post();
     //See if there's anything new to talk about
+    SAY("I've been asked to speak. I am mute.");
     if(pineappleJuice->text_to_speak_unsafe[0] != ' ' || pineappleJuice->text_to_speak_unsafe[0] != '0')
     {
         SAY(pineappleJuice->text_to_speak_unsafe);
          //Mark as already have talked. Prevents parrots from attacking our pineapples.
         pineappleJuice->text_to_speak_unsafe[0] = ' ';
     }
-    pineappleJuice->speak_semaphore.post();
+    log_file << "I have left the terrible unsafe, widely spoken lands" << std::endl;
+   // pineappleJuice->speak_semaphore.post();
+}
+/**
+* get_ip_address: Executes a shell command to retrieve the NAO's IP Address
+*/
+void hal_experimental::get_ip_address()
+{
+    my_ip_address = execute_shell_command("awk '{print $2}' <(ifconfig eth0 | grep 'inet ')");
+    //my_ip_address = execute_shell_command("echo $SSH_CONNECTION");
+    log_file << "[get ip address]: " << my_ip_address << '\n';
+    // try
+    // {
+    //     my_ip_address = my_ip_address.substr(4, my_ip_address.size());
+    //     log_file << "IP Address Result: " << my_ip_address << std::endl;
+
+    // }
+    // catch(const std::out_of_range &e)
+    // {
+    //     SAY("I have failed to find out where I am.");
+    //     log_file << e.what() << ": Something went wrong trying to get the NAO's ip address. Passed String =  " << my_ip_address << std::endl;
+    //     return;
+    // }
+    SAY(my_ip_address);
+    
 }
 hal_experimental::~hal_experimental()
 {
+    SAY("Time to die.");
     std::cout << "Destructing hal_experimental" << std::endl;
     /**
       * Note: If naoqi crashes, by default all data stored in shared memory will (probably)
@@ -250,6 +295,9 @@ hal_experimental::~hal_experimental()
     {
         std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
     }
+    log_file << "My journey is over. **Kills self**\n";
+    log_file << "Narator: And that is how the tragic life of the dumb robot ended." << std::endl;
+    log_file.close();
     delete dcm_proxy;
     delete nao_memory_proxy;
     delete speak_proxy;
@@ -263,14 +311,15 @@ void hal_experimental::set_LEDS()
     float blink_val = float(dcm_time / 500 & 1);
     actuators[faceLedGreenRight180DegActuator] =  blink_val;
     actuators[faceLedGreenLeft180DegActuator] = blink_val;
+    log_file << "LEDS were set\n";
 }
 
-// I don't remember why I made this function...it should probably be removed
+//The outline for a great state machine.
 float* hal_experimental::robot_state_handler(float *actuator_vals)
 {
     return actuator_vals;
 }
-
+//Stupid Debug thing. Will be removed when things work.
 void hal_experimental::debug_alvalue(AL::ALValue &v, std::string name="NULL")
 {
     if(cout_debug)
@@ -289,7 +338,9 @@ void hal_experimental::set_actuators_positions()
         for(int i = 0; i < NumOfPositionActuatorIds; ++i)
             position_request_alias[5][i][0] = actuators[i];
             //position_request_alias[5][i][0] = actuators[?][i];
+        log_file << "dcm time: " << dcm_time <<  " positions were set.\n";
         dcm_proxy->setAlias(position_request_alias); //Assign the alias for the naoqi DCM
+        log_file << "Alias set for position request\n";
     } 
     catch (const AL::ALError &e)
     {
@@ -315,9 +366,10 @@ bool hal_experimental::set_actuators_stiffness()
                     stiffness_request_alias[5][j][0] = last_requested_actuators[headYawStiffnessActuator + j] = actuators[headYawStiffnessActuator + j];
                     //stiffness_request_alias[5][j][0] = last_requested_actuators[headYawStiffnessActuator + j] = actuators[headYawStiffnessActuator + j];
                 dcm_proxy->setAlias(stiffness_request_alias);
-                return true; //Stiffness values succesfully set
             }
         }
+        log_file << "Position Stiffness was set properly\n";
+        return true; //Stiffness values succesfully set
     }
     catch(const AL::ALError &e)
     {
@@ -354,9 +406,12 @@ void hal_experimental::set_actuators_leds(bool &requested_stiffness_set) //TODO 
                     //DCM time for light to be changed. Currently set to be current time (i.e. instant)
                     led_request_alias[2][0][1] = dcm_time;
                     dcm_proxy->set(led_request_alias);
-                    return; //break out of loop? I forget why I did this. It might be wrong
+                    log_file << "Actuators LED set \n";
+                    return;
                 }
             }
+            log_file << "set_actuator_leds successfully called\n";
+
         } 
         catch (const AL::ALError &e)
         {
@@ -372,7 +427,8 @@ void hal_experimental::set_actuators()
 {
 	try
 	{
-        pineappleJuice->actuator_semaphore.wait();
+        log_file << "[dcm_time:" << dcm_time << "] set_actuators has been called. Stupid dangerous UNSAFE mode is enabled (lol)\n";
+        //pineappleJuice->actuator_semaphore.wait();
         dcm_time = dcm_proxy->getTime(0);
         
         //currently actuator update fails aren't handled
@@ -391,7 +447,8 @@ void hal_experimental::set_actuators()
         //Get actual actuator vals to be assigned. These values won't exactly correspond to
         //what NAOInterface passed due to the various states the robot may be in.
         actuators = robot_state_handler(read_actuators);
-        pineappleJuice->actuator_semaphore.post();
+        //pineappleJuice->actuator_semaphore.post();
+        log_file << "I may have gotten through the unsafe part with only minimal irreversible brain damage.\n";
 
         //Set Actuator values
         set_actuators_positions();
@@ -400,8 +457,10 @@ void hal_experimental::set_actuators()
         std::cout << "set_actuators_stiffness was called\n";
         set_actuators_leds(was_set);
         std::cout << "set_actuators_leds was called" << std::endl;
+        log_file << "Hardware values updated" << '\n';
         SAY("My hardware values have been updated");
         //TODO: Gamecontroller stuff (team info)
+        log_file << "I should have said something dumb about my hardware values being updated\n";
         
 	}
     catch(AL::ALError &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
@@ -417,7 +476,8 @@ void hal_experimental::read_sensors()
 {
     try
     {
-        pineappleJuice->sensor_semaphore.wait();
+        log_file << "Reading Sensor Values in a stupid UNSAFE way\n";
+        //pineappleJuice->sensor_semaphore.wait();
         int sensor_data_written = 0;
         //currently support for dropped reads/writes is disabled
         if(sensor_data_written == pineappleJuice->sensors_newest_update)
@@ -443,8 +503,9 @@ void hal_experimental::read_sensors()
         //Update sensor values in shared memory
         pineappleJuice->sensors_newest_update = sensor_data_written;
         std::cout << "[read_sensors()] sensor data read...posting semaphore." << std::endl;
-        
-        pineappleJuice->sensor_semaphore.post();
+        log_file << "Done with UNSAFE sensor stuff\n";
+        //pineappleJuice->sensor_semaphore.post();
+        SAY("My Sensor Values have been updated");
         std::cout << "[read_sensors()] semaphore posted!" << std::endl;
         
     }
@@ -473,6 +534,37 @@ void hal_experimental::print_actuators()
            std::cout << sensorNames[i] << " = " << pineappleJuice->actuators_unsafe[i] << std::endl;
     //    std::cout << sensorNames[i] << " = " << pineappleJuice->actuators[pineappleJuice->actuators_newest_update][i] << std::endl;
     pineappleJuice->sensor_semaphore.post(); 
+}
+
+//Execute shell commands
+std::string hal_experimental::execute_shell_command(const char* command)
+{
+    char buffer[128];
+    std::string res = "";
+    FILE *pipe = popen(command, "rw+");
+    if(!pipe) {
+        log_file << "[Execute Command]: !pipe was raised \n";
+        return "NULL"; //If something breaks or an invalid command is issued, safely returns a null string.
+    }
+    try
+    {
+        while(!feof(pipe))
+        {
+            if(fgets(buffer, 128, pipe) != NULL)
+                res += buffer;
+            else
+                log_file << "Something went wrong acquiring the buffer \n";
+        }
+        log_file << "[Execute Command]: " << res << '\n';
+    }
+    catch(const std::exception &e) {
+        pclose(pipe);
+        log_file << "Invalid command PIPED: " << e.what() << '\n';
+        return "NULL";
+    }
+    pclose(pipe);
+    log_file << "result of execute command: " << res << std::endl;
+    return res;
 }
 
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
