@@ -27,7 +27,10 @@
 *.exe
 *.out
 *.app
-
+GPATH
+GRTAGS
+GSYMS
+GTAGS
 # Directories
 build-local/
 build-cross/
