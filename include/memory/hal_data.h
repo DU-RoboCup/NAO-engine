@@ -25,8 +25,8 @@ Container for all hal data on the NAO. This container will be inserted into shar
 memory for interprocess communication.
 */
 #pragma once 
-#ifndef _HAL_DATA_H
-#define _HAL_DATA_H
+#ifndef _HAL_DATA_H_
+#define _HAL_DATA_H_
 
 #include "../util/more_hardware_data.h"
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>

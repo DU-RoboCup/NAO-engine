@@ -27,8 +27,8 @@ The main context loop for the robot, deals with initialization, scheduling, and 
 */
 
 
-#ifndef _CONTEXT_h_GUARD_
-#define _CONTEXT_h_GUARD_
+#ifndef _CONTEXT_H_
+#define _CONTEXT_H_
 
 #include "common.h"
 #include "engine/main/mloader.h"
@@ -85,4 +85,4 @@ class Context {
 		std::map<uint8_t, std::atomic<bool>> m_check;
 };
 
-#endif /*_FRAME_h_GUARD_*/
+#endif /*_CONTEXT_H__*/

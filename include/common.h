@@ -24,8 +24,8 @@ VERSION HISTORY
 This file contains a number of includes which are necessary for most of the projects we are developing. It allows us to include with only one step.
 */
 
-#ifndef _COMMON_h_GUARD
-#define _COMMON_h_GUARD
+#ifndef _COMMON_H_
+#define _COMMON_H_
 
 // Necessary headers for luatables
 #include "lib/luatables/luatables.h"
@@ -45,4 +45,4 @@ This file contains a number of includes which are necessary for most of the proj
 // Debugging
 #include "debug/debugging.h"
 
-#endif /*_COMMON_h_GUARD */
+#endif /*_COMMON_H_ */

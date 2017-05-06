@@ -1,0 +1,8 @@
+module = {
+    name = "Hello World Module"
+    liblocation = "../lib/libHelloWorldModule.so"
+    rfps = 20
+    mprio = 4
+    mthr = 1
+}
+return module
