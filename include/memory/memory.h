@@ -27,8 +27,8 @@ for other modules
 
 */
 
-#ifndef _MEMORY_h_GUARD_
-#define _MEMORY_h_GUARD_
+#ifndef _MEMORY_H_
+#define _MEMORY_H_
 
 // INCLUDES
 #include <boost/any.hpp> 		// Boost ANY for payload storage
@@ -111,4 +111,4 @@ namespace Bazaar {
 
 
 
-#endif /*_MEMORY_h_GUARD_*/
+#endif /*_MEMORY_H_*/

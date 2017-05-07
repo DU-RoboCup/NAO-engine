@@ -23,8 +23,8 @@ is that we can simulate modules communicating with the NAO hardware, so for deve
 need to physically work with a NAO robot.
 */
 
-#ifndef NAO_INTERFACE_H
-#define NAO_INTERFACE_H
+#ifndef _NAO_INTERFACE_H_
+#define _NAO_INTERFACE_H_
 
 //INCLUDES
 

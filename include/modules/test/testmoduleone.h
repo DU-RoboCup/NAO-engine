@@ -1,7 +1,7 @@
 /* TestModules header */
 
-#ifndef testmoduleone
-#define testmoduleone
+#ifndef _TESTMODULEONE_H_
+#define _TESTMODULEONE_H_
 
 #include <iostream>
 #include "lib/luatables/luatables.h"

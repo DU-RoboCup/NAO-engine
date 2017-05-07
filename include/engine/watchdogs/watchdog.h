@@ -27,8 +27,8 @@ and makes sure that they check in from time to time.
 
 */
 
-#ifndef _WATCHDOG_h_GUARD_
-#define _WATCHDOG_h_GUARD_
+#ifndef _WATCHDOG_H_
+#define _WATCHDOG_H_
 
 // INCLUDES
 #include "engine/main/context.h"
@@ -53,4 +53,4 @@ int main(int argc, char** argv);
  */
 void watchdog(int sig);
 
-#endif /*_WATCHDOG_h_GUARD_*/
+#endif /*_WATCHDOG_H_*/

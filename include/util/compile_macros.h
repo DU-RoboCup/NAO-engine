@@ -24,8 +24,8 @@ VERSION HISTORY
 Define a bunch of GCC specific macros for compiling
 */
 
-#ifndef _COMPILE_MACROS_h_GUARD
-#define _COMPILE_MACROS_h_GUARD
+#ifndef _COMPILE_MACROS_H_
+#define _COMPILE_MACROS_H_
 
 #include <ctime>
 #include // DEBUG
@@ -39,4 +39,4 @@ Define a bunch of GCC specific macros for compiling
 									LOG_WARNING << "Action " << #X << " Took longer than expected (Took " << ((float)t)/CLOCKS_PER_SEC << "s instead of" << #TIME << "s)" << std::endl; \
 							 }
 
-#endif /*_COMPILE_MACROS_h_GUARD */
+#endif /*_COMPILE_MACROS_H_*/

@@ -28,8 +28,8 @@ for other modules
 
 */
 
-#ifndef _INTENT_h_GUARD_
-#define _INTENT_h_GUARD_
+#ifndef _INTENT_H_
+#define _INTENT_H_
 
 #include <string>
 #include <vector>
@@ -95,4 +95,4 @@ typedef struct {
 } PendingIntents;
 
 
-#endif /*_INTENT_h_GUARD_*/
+#endif /*_INTENT_H_*/

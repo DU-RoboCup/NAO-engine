@@ -1,7 +1,7 @@
 /* Module managing animation and motion */
 
-#ifndef AnimationModule
-#define AnimationModule
+#ifndef _ANIMATIONMODULE_H_
+#define _ANIMATIONMODULE_H_
 
 #include <iostream>
 #include "lib/luatables/luatables.h"
@@ -25,4 +25,4 @@ class AnimationModule : public Module {
 };
 
 
-#endif // END #ifdef AnimationModule
+#endif // END #ifdef _ANIMATIONMODULE_H_

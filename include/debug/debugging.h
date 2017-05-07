@@ -23,8 +23,8 @@ VERSION HISTORY
     This is the global logger modules header file.
 */
 
-#ifndef _DEBUGGER_H_
-#define _DEBUGGER_H_
+#ifndef _DEBUGGING_H_
+#define _DEBUGGING_H_
 
 #define BOOST_LOG_DYN_LINK 1 // necessary when linking the boost_log library dynamically
 

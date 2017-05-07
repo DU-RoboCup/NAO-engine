@@ -24,10 +24,10 @@ VERSION HISTORY
 Define a bunch of GCC specific macros
 */
 
-#ifndef _BRANCH_PRED_MACROS_h_GUARD
-#define _BRANCH_PRED_MACROS_h_GUARD
+#ifndef _BRANCH_MACROS_H_
+#define _BRANCH_MACROS_H_
 
 #define LIKELY(x)        __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)      __builtin_expect(!!(x), 0)
 
-#endif /*_BRANCH_PRED_MACROS_h_GUARD */
+#endif /*_BRANCH_MACROS_H_*/

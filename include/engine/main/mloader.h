@@ -25,8 +25,8 @@ Module loader class - responsible for loading individual modules and maintaining
 
 */
 
-#ifndef _MLOADER_h_GUARD
-#define _MLOADER_h_GUARD
+#ifndef _MLOADER_H_
+#define _MLOADER_H_
 
 // Includes
 #include "common.h"
@@ -99,4 +99,4 @@ class ModuleLoader {
 		std::map<uint16_t, void*> handles;
 };
 
-#endif /*_MLOADER_h_GUARD */
+#endif /*_MLOADER_H_*/

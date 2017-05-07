@@ -24,11 +24,11 @@ VERSION HISTORY
 Define some useful floating point macros
 */
 
-#ifndef _CONSTANTS_h_GUARD
-#define _CONSTANTS_h_GUARD
+#ifndef _CONSTANTS_H_
+#define _CONSTANTS_H_
 
 #define EPSILON    0.0000001
 #define PI         3.1415926
 #define PHI        2.6180339
 
-#endif /*_CONSTANTS_h_GUARD */
+#endif /*_CONSTANTS_H_*/
