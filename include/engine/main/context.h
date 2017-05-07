@@ -85,4 +85,4 @@ class Context {
 		std::map<uint8_t, std::atomic<bool>> m_check;
 };
 
-#endif /*_CONTEXT_H__*/
+#endif /*_CONTEXT_H_*/
