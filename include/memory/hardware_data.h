@@ -25,8 +25,8 @@ Values are from the NaoQi docs.
 
 */
 
-#ifndef _HARDWARE_DATA_H
-#define _HARDWARE_DATA_H
+#ifndef _HARDWARE_DATA_H_
+#define _HARDWARE_DATA_H_
 
 #include <string>
 

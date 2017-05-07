@@ -26,8 +26,8 @@ This file deals with scheduling of modules on the main core
 */
 
 
-#ifndef _SCHED_h_GUARD_
-#define _SCHED_h_GUARD_
+#ifndef _SCHEDULE_H_
+#define _SCHEDULE_H_
 
 #include "common.h"
 #include <functional>
@@ -74,4 +74,4 @@ class RoundRobin /*: public Schedule*/ {
 
 
 
-#endif /*_SCHED_h_GUARD_*/
+#endif /*_SCHEDULE_H_*/

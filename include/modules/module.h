@@ -24,8 +24,8 @@ VERSION HISTORY
 Module header file - presents the front interface for dynamic class loading
 */
 
-#ifndef _MODULE_h_GUARD
-#define _MODULE_h_GUARD
+#ifndef _MODULE_H_
+#define _MODULE_H_
 
 #include "../common.h"
 #include <string> 
@@ -107,4 +107,4 @@ class Module {
 };
 
 
-#endif /*_MODULE_h_GUARD */
+#endif /*_MODULE_H_*/
