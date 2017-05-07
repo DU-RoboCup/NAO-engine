@@ -259,23 +259,21 @@ void hal_experimental::speak()
 */
 void hal_experimental::get_ip_address()
 {
-    my_ip_address = execute_shell_command("awk '{print $2}' <(ifconfig eth0 | grep 'inet ')");
-    //my_ip_address = execute_shell_command("echo $SSH_CONNECTION");
-    log_file << "[get ip address]: " << my_ip_address << '\n';
-    // try
-    // {
-    //     my_ip_address = my_ip_address.substr(4, my_ip_address.size());
-    //     log_file << "IP Address Result: " << my_ip_address << std::endl;
+    //Listen up kids, this here is how you can easily introduce a 
+    //buffer overflow and use an exploit to make the NAO part of your botnet (lol).
+    char network_info_buffer[128];
+    FILE *fp = fp = popen("ifconfig wlan0 | grep 'inet addr' | awk '{ print $2 }'", "r"); 
+    if(fp == NULL)
+        log_file << "ERROR: popen = NULL \n";
+    while(fgets(network_info_buffer, 128, fp) != NULL)
+    {
+        log_file << "Network Info: " << network_info_buffer << "\n";
+        SAY(network_info_buffer);
+    }
+    auto status = pclose(fp);
+    if(status == -1)
+        log_file << "Error: fpclose status = -1";
 
-    // }
-    // catch(const std::out_of_range &e)
-    // {
-    //     SAY("I have failed to find out where I am.");
-    //     log_file << e.what() << ": Something went wrong trying to get the NAO's ip address. Passed String =  " << my_ip_address << std::endl;
-    //     return;
-    // }
-    SAY(my_ip_address);
-    
 }
 hal_experimental::~hal_experimental()
 {
