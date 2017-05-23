@@ -91,6 +91,7 @@ private:
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
 
+    FILE *fp;
     bool cout_debug;
 };
 #endif
