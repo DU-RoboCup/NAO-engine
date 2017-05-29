@@ -83,113 +83,122 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         // body_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0));
         // head_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0));
         log_file << "HeadID proxy call value: " << body_ID << "\n";
-        commands.arraySetSize(2); //< Two dimensional array.
+        SAY("You better have fixed me this time!");
+        // commands.arraySetSize(2); //< Two dimensional array.
 
-        ///BEGIN POSITION ACTUATOR ALIAS INITIALIZATION
+        // ///BEGIN POSITION ACTUATOR ALIAS INITIALIZATION
 
-        commands[0] = std::string("positionActuators");
-        commands[1].arraySetSize(NumOfPositionActuatorIds); //< Ugly data structure
+        // commands[0] = std::string("positionActuators");
+        // commands[1].arraySetSize(NumOfPositionActuatorIds); //< Ugly data structure
 
-        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-        {
-            commands[1][i] = std::string(actuatorNames[i]);
-        }
-        // Create Memory Proxy aliases for actuator values
-        commandsAlias = dcm_proxy->createAlias(commands);
+        // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        // {
+        //     commands[1][i] = std::string(actuatorNames[i]);
+        // }
+        // // Create Memory Proxy aliases for actuator values
+        // commandsAlias = dcm_proxy->createAlias(commands);
         
-        ///END
+        // ///END
 
-        log_file << "1. Actuator Alias Initialized.\n";
+        // log_file << "1. Actuator Alias Initialized.\n";
 
 
-        ///BEGIN STIFFNESS ACTUATOR ALIAS INITIALIZATION
+        // ///BEGIN STIFFNESS ACTUATOR ALIAS INITIALIZATION
        
-        commands[0] = std::string("stiffnessActuators");
-        commands[1].arraySetSize(NumOfStiffnessActuatorIds); //< Ugly data structure
-        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
-        {
-            commands[1][i] = std::string(actuatorNames[headYawStiffnessActuator + i]);
-        }
-        debug_alvalue(commands, "commands Alias");
-        commandsAlias = dcm_proxy->createAlias(commands);
+        // commands[0] = std::string("stiffnessActuators");
+        // commands[1].arraySetSize(NumOfStiffnessActuatorIds); //< Ugly data structure
+        // for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        // {
+        //     commands[1][i] = std::string(actuatorNames[headYawStiffnessActuator + i]);
+        // }
+        // debug_alvalue(commands, "commands Alias");
+        // commandsAlias = dcm_proxy->createAlias(commands);
        
-        ///END
+        // ///END
 
 
-        ///BEGIN POSITION REQUEST ALIAS INITIALIZATION
+        // ///BEGIN POSITION REQUEST ALIAS INITIALIZATION
 
-        position_request_alias.arraySetSize(6);
-        position_request_alias[0] = std::string("positionActuators");
-        position_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
-        position_request_alias[2] = std::string("time-separate"); //Timing Paramers
-        position_request_alias[3] = 0; //idk
-        position_request_alias[4].arraySetSize(1);
-        position_request_alias[5].arraySetSize(NumOfPositionActuatorIds);
-        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-        {
-            position_request_alias[5][i].arraySetSize(1);
-        }
-        debug_alvalue(position_request_alias, "position_request_alias");
-        ///END
+        // position_request_alias.arraySetSize(6);
+        // position_request_alias[0] = std::string("positionActuators");
+        // position_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
+        // position_request_alias[2] = std::string("time-separate"); //Timing Paramers
+        // position_request_alias[3] = 0; //idk
+        // position_request_alias[4].arraySetSize(1);
+        // position_request_alias[5].arraySetSize(NumOfPositionActuatorIds);
+        // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        // {
+        //     position_request_alias[5][i].arraySetSize(1);
+        // }
+        // debug_alvalue(position_request_alias, "position_request_alias");
+        // ///END
 
-        log_file << "2. Position Alias Initialized.\n";
-
-
-        ///BEGIN STIFFNESS REQUEST ALIAS INITIALIZATION
-
-        stiffness_request_alias.arraySetSize(6);
-        stiffness_request_alias[0] = std::string("stiffnessActuators");
-        stiffness_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
-        stiffness_request_alias[2] = std::string("time-separate"); //Timing Paramers
-        stiffness_request_alias[3] = 0; //idk
-        stiffness_request_alias[4].arraySetSize(1);
-        stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
-        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
-        {
-            stiffness_request_alias[5][i].arraySetSize(1);
-        }
-        debug_alvalue(stiffness_request_alias, "stiffness_request_alias");
-        ///END
-
-        log_file << "3. Stiffness Alias Initialized.\n";
+        // log_file << "2. Position Alias Initialized.\n";
 
 
-        ///BEGIN LED REQUEST ALIAS INITIALIZATION
+        // ///BEGIN STIFFNESS REQUEST ALIAS INITIALIZATION
 
-        led_request_alias.arraySetSize(3);
-        led_request_alias[1] = std::string("ClearAll");
-        led_request_alias[2].arraySetSize(1);
-        led_request_alias[2][0].arraySetSize(2);
-        led_request_alias[2][0][1] = 0; //As you can see, LEDS are suuuper easy to work with
+        // stiffness_request_alias.arraySetSize(6);
+        // stiffness_request_alias[0] = std::string("stiffnessActuators");
+        // stiffness_request_alias[1] = std::string("ClearAll"); //Clear any set values in the alias
+        // stiffness_request_alias[2] = std::string("time-separate"); //Timing Paramers
+        // stiffness_request_alias[3] = 0; //idk
+        // stiffness_request_alias[4].arraySetSize(1);
+        // stiffness_request_alias[5].arraySetSize(NumOfStiffnessActuatorIds);
+        // for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        // {
+        //     stiffness_request_alias[5][i].arraySetSize(1);
+        // }
+        // debug_alvalue(stiffness_request_alias, "stiffness_request_alias");
+        // ///END
 
-        debug_alvalue(led_request_alias, "led_request_alias");
-        ///END
+        // log_file << "3. Stiffness Alias Initialized.\n";
 
-        log_file << "4. LED Alias Initialized.\n";
 
-        //Initialize Sensor Pointers
-        for(int i = 0; i < NumOfSensorIds; ++i)
-            sensor_ptrs[i] = static_cast<float *>(nao_memory_proxy->getDataPtr(sensorNames[i]));
+        // ///BEGIN LED REQUEST ALIAS INITIALIZATION
+
+        // led_request_alias.arraySetSize(3);
+        // led_request_alias[1] = std::string("ClearAll");
+        // led_request_alias[2].arraySetSize(1);
+        // led_request_alias[2][0].arraySetSize(2);
+        // led_request_alias[2][0][1] = 0; //As you can see, LEDS are suuuper easy to work with
+
+        // debug_alvalue(led_request_alias, "led_request_alias");
+        // ///END
+
+        // log_file << "4. LED Alias Initialized.\n";
+
+        // //Initialize Sensor Pointers
+        // for(int i = 0; i < NumOfSensorIds; ++i)
+        //     sensor_ptrs[i] = static_cast<float *>(nao_memory_proxy->getDataPtr(sensorNames[i]));
         
-        log_file << "5. Sensor Pointers initialized" << '\n';
+        // log_file << "5. Sensor Pointers initialized" << '\n';
 
-        ///Initialize Requested Actuators
-        void *ms_ret = std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
-        if(ms_ret == NULL)
-        {
-            log_file << "A catastrophic error has occured! Could not set memory for actuator values." << std::endl;
-            return;
-        }
-        for(int i = faceLedRedLeft0DegActuator; i < chestBoardLedRedActuator; ++i)
-            last_requested_actuators[i] = -1.f;
+        // ///Initialize Requested Actuators
+        // void *ms_ret = std::memset(last_requested_actuators, 0, sizeof(last_reading_actuator)); //Allocate memory
+        // if(ms_ret == NULL)
+        // {
+        //     log_file << "A catastrophic error has occured! Could not set memory for actuator values." << std::endl;
+        //     return;
+        // }
+        // for(int i = faceLedRedLeft0DegActuator; i < chestBoardLedRedActuator; ++i)
+        //     last_requested_actuators[i] = -1.f;
         
-        log_file << "6. Requested Actuators Initialized." << "\n";
+        // log_file << "6. Requested Actuators Initialized." << "\n";
 
 
         instance = this; ///< Remove this to cause fun segfaults...
-        dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
-        dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
-        
+        testLEDRot = 0;
+        try {
+            dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
+            dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
+            SAY("Wooho I am ready");
+            std::cout << "Ready for things. Making LEDS blink now" << std::endl;
+           // testLEDS(true);
+            //set_LEDS();
+        } catch (std::exception &e) {
+            log_file << "ERROR: dcm proxy error: " << e.what() << "\n";
+        }
         log_file << "7. Proxy call backs established.\n";
 	} catch(AL::ALError &e) {
         log_file << "[ERROR] Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << "\n";
@@ -206,9 +215,28 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         log_file << "NO SEGFAULT: DCM Time = " << dcm_time << "\n";
         log_file << "woohoo I'm in a semaphore" << '\n';
         pineappleJuice->actuator_semaphore.post();
-
+        try
+        {
+            commandsAlias.arraySetSize(2);
+            commandsAlias[0] = std::string("ChestLeds");
+            commandsAlias[1].arraySetSize(3);
+            commandsAlias[1][0] = std::string("ChestBoard/Led/Red/Actuator/Value");
+            commandsAlias[1][1] = std::string("ChestBoard/Led/Green/Actuator/Value");
+            commandsAlias[1][2] = std::string("ChestBoard/Led/Blue/Actuator/Value");
+            dcm_proxy->createAlias(commandsAlias);
+            std::cout << "test LEDs aliass created" << std::endl;
+            commands.arraySetSize(4);
+            commands[0] = std::string("ChestLeds");
+            commands[1] = std::string("ClearAll");
+            commands[2] = std::string("time-mixed");
+        }
+        catch (const AL::ALError &e) {
+            log_file << "Oh damn there was an error with the testLEDS: " << e.what() << "\n";
+        }
     SAY("I am ready for action! Woohoo");
-    get_ip_address();
+ //   get_ip_address();
+    lastTime = dcm_proxy->getTime(0);
+    testLEDS(true);
 
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
@@ -221,9 +249,12 @@ void hal_experimental::preCallBack()
 {
     std::cout << "Pre-Callback called" << std::endl;
     log_file << "preCallBack called" << '\n';
-    instance->set_actuators();
-    log_file << "preCallBack: set_actuators succcessfully called\n";
-    instance->speak();
+    instance->testLEDS(true);
+    //set_actuators();
+    //log_file << "preCallBack: set_actuators succcessfully called\n";
+    //instance->speak();
+    //SAY("HURR DURR I'm a sheep");
+
 }
 /**
 * The method is called by NaoQi immediately after it communicates with the chest board.
@@ -233,8 +264,10 @@ void hal_experimental::postCallBack()
 {
     std::cout << "Post-Callback called" << std::endl;  
     log_file << "postCallBack successfully called\n";
-    instance->read_sensors();
-    log_file << "Sensors have been read\n";
+    //instance->testLEDS(false);
+    //instance->read_sensors();
+    //log_file << "Sensors have been read\n";
+    //SAY("RIP in peace!");
 }
 
 /**
@@ -264,24 +297,23 @@ void hal_experimental::get_ip_address()
 {
     //Listen up kids, this here is how you can easily introduce a 
     //buffer overflow and use an exploit to make the NAO part of your botnet (lol).
-    char network_info_buffer[128];
-    
-    fp = popen("ip addr | grep 'inet' | awk '{ print $2 }'", "r");
-    if(fp == NULL)
-        log_file << "fp was null" << "\n";
-    while(fgets(network_info_buffer,128, fp) != NULL)
+    log_file << "get_ip_address: Performing Sanity Check\n";
+    FILE *cmdResult;
+    char cmdBuffer[512];
+    if(!(cmdResult = popen("ls","r")))
     {
-        log_file << "Network Info: " << network_info_buffer << "\n";
+        log_file << "get_ip_address: Sanity check failed!\n";
+        SAY("I am insane");
+        return;
     }
-    log_file << "fgets reached a NULL result"  << "\n";
+    while(fgets(cmdBuffer, sizeof(cmdBuffer), cmdResult) != NULL)
+    {
+        log_file << "get_ip_address [SANITY CHECK]: " << std::string(cmdBuffer) << "\n";
+        SAY(string(cmdBuffer));
+    }
+    pclose(cmdResult);
 
-    int status = pclose(fp);
-    if(status == -1) {
-        log_file << "Status Error on closing" << "\n";
-    } else {
-        log_file << "Success!!!: Result = " << network_info_buffer << "\n";
-        SAY(network_info_buffer);
-    }
+    SAY("I have given up on becoming a leet haxor")
 }
 hal_experimental::~hal_experimental()
 {
@@ -314,7 +346,8 @@ void hal_experimental::set_LEDS()
     for(int i = faceLedRedLeft0DegActuator; i <= faceLedBlueRight315DegActuator; ++i)
         actuators[i] = 0.f;
     // LED Debug stuff can go here
-    float blink_val = float(dcm_time / 500 & 1);
+    //float blink_val = float(dcm_time / 500 & 1);
+    float blink_val = 0.35;
     actuators[faceLedGreenRight180DegActuator] =  blink_val;
     actuators[faceLedGreenLeft180DegActuator] = blink_val;
     log_file << "LEDS were set" << std::endl;
@@ -343,7 +376,7 @@ void hal_experimental::set_actuators_positions()
         //Set positions
         position_request_alias[4][0] = dcm_time; 
         for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-            position_request_alias[5][i][0] = actuators[i];
+            position_request_alias[5][i][0] = 0.2;//actuators[i];
             //position_request_alias[5][i][0] = actuators[?][i];
         log_file << "dcm time: " << dcm_time <<  " positions were set.\n";
         dcm_proxy->setAlias(position_request_alias); //Assign the alias for the naoqi DCM
@@ -407,11 +440,11 @@ void hal_experimental::set_actuators_leds(bool &requested_stiffness_set) //TODO 
                     //Alias name
                     led_request_alias[0] = std::string(actuatorNames[led_index]);
                     //Update last_requested_actuators val to actuators val
-                    last_requested_actuators[led_index] = actuators[led_index];
+                    last_requested_actuators[led_index] = 1.0;//actuators[led_index];
                     //last_requested_actuators[led_index] = actuators[led_index];
                     ////Finish setting value and tell naoqi
                     //Value for LED (0..1 float)
-                    led_request_alias[2][0][0] = last_requested_actuators[led_index];
+                    led_request_alias[2][0][0] = 1.0;//last_requested_actuators[led_index];
                     //DCM time for light to be changed. Currently set to be current time (i.e. instant)
                     led_request_alias[2][0][1] = dcm_time;
                     dcm_proxy->set(led_request_alias);
@@ -481,7 +514,11 @@ void hal_experimental::set_actuators()
     print_actuators();    
 }
 
+void hal_experimental::init() 
+{
+    std::cout << "Hello world! This proves naoqi calls things automatically" << std::endl;
 
+}
 
 void hal_experimental::read_sensors()
 {
@@ -575,11 +612,66 @@ std::string hal_experimental::execute_shell_command(const char* command)
     }
     pclose(pipe);
     log_file << "result of execute command: " << res << std::endl;
-    return res;
+    return res; 
+}
+
+void hal_experimental::testLEDS(bool debug)
+{
+       //SAY("I will try to make lights blink");
+       //std::cout << "Waiting to set LEDS!" << std::endl;
+       //boost::this_thread::sleep(boost::posix_time::seconds(20));
+       std::cout << "Actually setting LEDS now" << std::endl;
+       try
+       {
+        std::cout << "Setting chest LEDS" << std::endl;
+		commands[3].arraySetSize(3);
+		if (testLEDRot == 0 && (dcm_proxy->getTime(0) - lastTime > 2000)) {
+            //ChestBoard/Led/Red/Actuator/Value
+            commands[3][0].arraySetSize(2);
+            commands[3][0][0].arraySetSize(2);
+            commands[3][0][0][0] = 1.0;
+            commands[3][0][0][1] = dcm_proxy->getTime(0);
+            commands[3][0][1].arraySetSize(2);
+            commands[3][0][1][0] = 0.0;
+            commands[3][0][1][1] = dcm_proxy->getTime(2000);
+            testLEDRot++;
+            lastTime = dcm_proxy->getTime(0);
+            std::cout << "Red value should be set\n";
+        } else if (testLEDRot == 1 && (dcm_proxy->getTime(0) - lastTime > 2000)) {
+            //ChestBoard/Led/Green/Actuator/Value
+            commands[3][1].arraySetSize(1);
+            commands[3][1][0].arraySetSize(2);
+            commands[3][1][0][0] = 0.25;
+            commands[3][1][0][1] = dcm_proxy->getTime(2000);
+            testLEDRot++;
+            lastTime = dcm_proxy->getTime(0);
+            std::cout << "Green value should be set\n";
+        } else if (testLEDRot == 2 && (dcm_proxy->getTime(0) - lastTime > 2000)) { 
+            //ChestBoard/Led/Blue/Actuator/Value
+            commands[3][2].arraySetSize(1);
+            commands[3][2][0].arraySetSize(2);
+            commands[3][2][0][0] = 0.125;
+            commands[3][2][0][1] = dcm_proxy->getTime(2000);
+            testLEDRot = 0;
+            lastTime = dcm_proxy->getTime(0);
+            std::cout << "Blue value should be set\n";
+    //     SAY("My chest LEDS should be doing stuff");
+        }
+        dcm_proxy->setAlias(commands);
+        std::cout << "Chest LEDS should have been set" << std::endl;
+       } catch(const AL::ALError &e) {
+           std::cout << "LED setting error occured: " << e.what() << std::endl;
+           log_file << "LED setting error occured: " << e.what() << "\n";
+  //         SAY("I cannot even LED");
+
+       }
+  //     SAY("My LED's should have blinked!");
 }
 
 extern "C" int _createModule(boost::shared_ptr<AL::ALBroker> pBroker)
 {
+    AL::ALBrokerManager::setInstance(pBroker->fBrokerManager.lock());
+    AL::ALBrokerManager::getInstance()->addBroker(pBroker);
     AL::ALModule::createModule<hal_experimental>(pBroker, "hal_experimental");
     return 0;
 }

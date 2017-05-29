@@ -11,8 +11,10 @@
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/thread.hpp>
 //Aldabaran Includes
 #include "alcommon/albroker.h"
+#include "alcommon/albrokermanager.h"
 #include "alcommon/alproxy.h"
 #include "alproxies/almemoryproxy.h"
 #include "alcommon/almodule.h"
@@ -37,7 +39,7 @@ class hal_experimental : public AL::ALModule {
 
 public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
-    ~hal_experimental();
+   ~hal_experimental();
     static const std::string name;
 	void set_actuators();
     void read_sensors();
@@ -50,9 +52,12 @@ public:
     void set_actuators_positions();
     bool set_actuators_stiffness();
     void set_actuators_leds(bool &requested_stiffness_set);
+    void init();
+    void testLEDS(bool debug);
     void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
+    void dummyfunction();
     void get_ip_address();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
     // Execute shell commands
@@ -90,6 +95,10 @@ private:
     float *actuators;
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
+    //TESTS
+    unsigned int testLEDRot;
+
+    int lastTime;
 
     FILE *fp;
     bool cout_debug;
