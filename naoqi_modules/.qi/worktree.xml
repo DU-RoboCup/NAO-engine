@@ -1,1 +1,3 @@
-<worktree />
+<worktree>
+  <project src="secondbrain" />
+</worktree>

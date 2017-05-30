@@ -12,6 +12,7 @@
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/unordered_map.hpp>
 //Aldabaran Includes
 #include "alcommon/albroker.h"
 #include "alcommon/albrokermanager.h"
@@ -30,6 +31,9 @@
 #include <fstream>
 //Project Includes
 #include "../../include/memory/hal_data.h"
+#include "../../include/util/hardwaremap.h"
+
+
 
 namespace AL {
     class ALBroker;
@@ -80,7 +84,6 @@ private:
     std::string body_version;
     std::string head_ID;
     std::string head_version;
-
     std::string my_ip_address;
     boost::interprocess::managed_shared_memory shm;
 

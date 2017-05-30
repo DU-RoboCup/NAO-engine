@@ -4,11 +4,63 @@ using namespace AL;
 using std::string;
 using namespace boost::interprocess;    
 
+struct HardwareMap 
+{
+    typedef std::pair<int, std::string> _value;
+    typedef boost::unordered_map<std::string, _value> hashmap;
+    //HardwareMap generator...brought to you by the power of Reflection.
+    //Constructor ensures we populate both maps from the start
+    HardwareMap() 
+    {
+        std::cout << "Constructing hardware map in hal_experimental" << std::endl;
+        //Generate sensor map 
+
+        for (size_t index = 0; index < BetterSensorIds::_values().size(); ++index)
+        {
+            BetterSensorIds _sensor = BetterSensorIds::_values()[index];
+            _value v = std::make_pair<int, std::string>(_sensor, sensorNames[_sensor]);
+            SensorMap.emplace(_sensor._to_string(), v);
+        }
+        std::cout << "Done initializing sensor map!\nInitializing Actuators Map" << std::endl;
+        for (size_t index = 0; index < BetterActuatorIds::_values().size(); ++index)
+        {
+            BetterActuatorIds _actuator = BetterActuatorIds::_values()[index];
+            _value v = std::make_pair<int, std::string>(_actuator, sensorNames[_actuator]);
+            ActuatorMap.emplace(_actuator._to_string(), v);
+        }
+    }
+    //Default destructor, nothing special
+    ~HardwareMap() {}
+
+    //Overloaded subscript operator for accessing keys from either map
+     const _value& operator[](const std::string key)
+    {
+        //Handle runtime exceptions of non-existent key lookup
+        //TODO: This can be optimized to constant time lookups
+        if(!(this->SensorMap.find(key) == this->SensorMap.end()))
+            return this->SensorMap[key];
+        else if (!(this->ActuatorMap.find(key) == this->ActuatorMap.end()))
+            return this->ActuatorMap[key];
+        else
+        {
+            _value null_val = std::make_pair<int,std::string>(0,"NULL");
+            return null_val;
+        }
+    }
+    const hashmap getSensorMap()
+    {
+        return SensorMap;
+    }
+    const hashmap getActuatorMap()
+    {
+        return ActuatorMap;
+    }
 
 
-
-//non-blocking say, only says once every 3 seconds
-//string encoding must be UTF-8
+    private:
+        hashmap SensorMap;
+        hashmap ActuatorMap;
+};
 //
 // Borrowed and modified from rUNSWift 2016 release
 // 
@@ -66,6 +118,9 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
+
+
+    HardwareMap hm;
     /** \Brief: This part is complicated and you really need to shouldn't care about it.
       * 
       * Inside this try block we are doing quite a few things. To summarize, we establish communication
@@ -79,10 +134,10 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         nao_memory_proxy = new ALMemoryProxy(pBroker);
         speak_proxy = new ALTextToSpeechProxy("localhost", 9559);
         body_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0));
-        // head_ID = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/FullHeadId", 0));
+        head_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/Head/FullHeadId", 0));
         // body_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0));
         // head_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0));
-        log_file << "HeadID proxy call value: " << body_ID << "\n";
+        log_file << "HeadID proxy call value: " << head_ID << "\n" << "BodyID: " << body_ID;
         SAY("You better have fixed me this time!");
         // commands.arraySetSize(2); //< Two dimensional array.
 
