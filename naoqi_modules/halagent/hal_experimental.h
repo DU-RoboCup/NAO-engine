@@ -56,7 +56,7 @@ public:
     void set_actuators_positions();
     bool set_actuators_stiffness();
     void set_actuators_leds(bool &requested_stiffness_set);
-    void init();
+    void init_aliases();
     void testLEDS(bool debug);
     void speak(); // This can be used to annoy people
     void print_sensors();
