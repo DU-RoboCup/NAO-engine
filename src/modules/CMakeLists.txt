@@ -4,30 +4,27 @@ SET(SOURCE_FILES 	watchdog.cpp
 					../../memory/memory.cpp
 )
 
-set(LIBNAOINTERFACE_SOURCES "base/NAOInterface.cpp" "base/Head.cpp" "base/Arm.cpp" "base/Leg.cpp" 
-							"base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp" "base/HALPriorityQueue.cpp"  
-							"../../include/modules/base/NAOInterface.h"
-)
+set(LIBNAOINTERFACE_SOURCES "base/NAOInterface.cpp" "base/Head.cpp" "base/Arm.cpp" "base/Leg.cpp" "base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp" "base/HALPriorityQueue.cpp" "../../include/modules/base/NAOInterface.h")
 
 # SET(WTFSOURCES "test/plzworkmodule.cpp" "../../include/modules/test/plzworkmodule.h")
 
 if (${IS_CROSS} STREQUAL "TRUE")
-	set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed, -Wall")
+	set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
 	add_definitions(-DBETTER_ENUMS_MACRO_FILE="../../include/util/enum_macros.h")
 	add_library(tmoduleone SHARED "test/testmoduleone.cpp" "../../include/modules/test/testmoduleone.h")
-	add_library(NAOInterface SHARED ${LIBNAOINTERFACE_SOURCES})
-	add_library(plzworkmodule SHARED ${WTFSOURCES})
+	add_library(NAOInterface SHARED "base/NAOInterface.cpp" "base/Head.cpp" "base/Arm.cpp" "base/Leg.cpp" "base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp" "base/HALPriorityQueue.cpp" "../../include/modules/base/NAOInterface.h")
+    #add_library(plzworkmodule SHARED ${WTFSOURCES})
 	target_link_libraries(tmoduleone luatables lua pthread boost_system-mt boost_log-mt boost_log_setup-mt boost_thread-mt)
-	target_link_libraries(plzworkmodule luatables lua pthread boost_system-mt boost_log-mt boost_log_setup-mt boost_thread-mt)
+    #target_link_libraries(plzworkmodule luatables lua pthread boost_system-mt boost_log-mt boost_log_setup-mt boost_thread-mt)
 	target_link_libraries(NAOInterface luatables lua pthread boost_system-mt boost_log-mt boost_log_setup-mt boost_thread-mt)
 	set(Boost_USE_MULTITHREADED ON)
 else()
 	set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
 	add_library(tmoduleone SHARED "test/testmoduleone.cpp" "../../include/modules/test/testmoduleone.h")
 	add_definitions(-DBETTER_ENUMS_MACRO_FILE="../../include/util/enum_macros.h")
-	add_library(NAOInterface SHARED ${LIBNAOINTERFACE_SOURCES})
+	add_library(NAOInterface SHARED "base/NAOInterface.cpp" "base/Head.cpp" "base/Arm.cpp" "base/Leg.cpp" "base/LArm.cpp" "base/LLeg.cpp" "base/RArm.cpp" "base/RLeg.cpp" "base/HALPriorityQueue.cpp" "../../include/modules/base/NAOInterface.h")
 	# add_library(plzworkmodule SHARED ${WTFSOURCES})
-	add_library(plzworkmodule SHARED "test/plzworkmodule.cpp" "../../include/modules/test/plzworkmodule.h")
+    #add_library(plzworkmodule SHARED "test/plzworkmodule.cpp" "../../include/modules/test/plzworkmodule.h")
 	target_link_libraries(tmoduleone luatables lua5.1 dl pthread boost_system boost_log_setup boost_log boost_thread dl)
 	target_link_libraries(NAOInterface luatables lua5.1 dl pthread boost_system boost_log_setup boost_log boost_thread dl)
 	target_link_libraries(plzworkmodule luatables lua5.1 dl pthread boost_system boost_log_setup boost_log boost_thread dl)
