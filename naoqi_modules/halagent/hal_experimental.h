@@ -29,9 +29,10 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <fstream>
+#include <limits>
 //Project Includes
 #include "../../include/memory/hal_data.h"
-#include "../../include/util/hardwaremap.h"
+//#include "../../include/util/hardwaremap.h"
 
 
 
@@ -55,17 +56,18 @@ public:
     // Helper functions for setting actuators
     void set_actuators_positions();
     bool set_actuators_stiffness();
-    void set_actuators_leds(bool &requested_stiffness_set);
+    void set_actuators_leds(); //bool &requested_stiffness_set
     void init_aliases();
-    void testLEDS(bool debug);
+    //test
+    void testLEDS();
+    void testAliases();
     void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
     void dummyfunction();
     void get_ip_address();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
-    // Execute shell commands
-    std::string execute_shell_command(const char* command);
+
     /**
       * \brief debug_alvalue: Insanity Check...
       * @param v: An ALValue alias (which is a weird multidemensional jagged array)
@@ -95,13 +97,15 @@ private:
     int ledIndex;
     hal_data *pineappleJuice;
     float *read_actuators;
-    float *actuators;
+    //float *actuators;
+    float actuators[NumOfActuatorIds];
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
     //TESTS
-    unsigned int testLEDRot;
+    unsigned long long testLEDRot;
 
     int lastTime;
+    bool testLEDInitialized;
 
     FILE *fp;
     bool cout_debug;

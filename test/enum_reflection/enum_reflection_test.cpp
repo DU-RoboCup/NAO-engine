@@ -1,4 +1,4 @@
-#include "include/util/hardwaremap.h"
+#include "enum_reflection_test.h"
 //HardwareMap generator...brought to you by the power of Reflection.
 //Constructor ensures we populate both maps from the start
 HardwareMap::HardwareMap() 
@@ -83,15 +83,19 @@ const hashmap HardwareMap::getActuatorMap()
     return ActuatorMap;
 }
 
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
-// int main() 
-// {
-//     std::cout << "hello world!" << std::endl;
-//     HardwareMap hmap;
-//     //std::unique_ptr<HardwareMap> hmap = make_unique<HardwareMap>();
-//     std::cout << "sensor get test [lHandPositionSensor]: " << hmap.get("lHandPositionSensor").second << std::endl;
+int main() 
+{
+    std::cout << "hello world!" << std::endl;
+    HardwareMap hmap;
+    //std::unique_ptr<HardwareMap> hmap = make_unique<HardwareMap>();
+    std::cout << "sensor get test [lHandPositionSensor]: " << hmap.get("lHandPositionSensor").second << std::endl;
 
-//     std::cout << "sensor get test [lHandPositionSensor]: " << hmap["lHandPositionSensor"].second << std::endl;
-//     return 0;
+    std::cout << "sensor get test [lHandPositionSensor]: " << hmap["lHandPositionSensor"].second << std::endl;
+    return 0;
 
-// }
+}
