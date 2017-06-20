@@ -23,7 +23,10 @@ VERSION HISTORY
 This file stores data regarding the hardware of the robot.
 This stuff is borrowed from BHuman and rUNSWIFt.
 */
-//#define BETTER_ENUMS_MACRO_FILE "enum_macros.h" //Required for more than 64 vals in the enum
+#ifndef BETTER_ENUMS_MACRO_FILE
+#define BETTER_ENUMS_MACRO_FILE "enum_macros.h" //Required for more than 64 vals in the enum
+#endif
+
 #include "enum.h" //Better enum library which adds reflection
 
 ////////////////////////////////

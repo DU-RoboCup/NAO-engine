@@ -23,5 +23,4 @@ private:
     hashmap SensorMap;
     hashmap ActuatorMap;
     _value null_val;
-
 };

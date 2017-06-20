@@ -76,11 +76,17 @@ public:
     void debug_alvalue(AL::ALValue &v, std::string name);
     std::ofstream log_file;
 private:
+
+    float deg2rad(float degress);
     AL::DCMProxy *dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
     AL::ALTextToSpeechProxy *speak_proxy;
-    AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias, game_controller;
+    //Main aliases
+    AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias;
     AL::ALValue commands, commandsAlias;
+    // Test Aliases
+    AL::ALValue commandsTestAlias, commandsTest; //Chest LEDS
+    AL::ALValue positionTestAlias, testAlias; //Actuator Positions
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
@@ -105,7 +111,8 @@ private:
     unsigned long long testLEDRot;
 
     int lastTime;
-    bool testLEDInitialized;
+    int mult;
+    bool testLEDInitialized, testAliasesInitialized;
 
     FILE *fp;
     bool cout_debug;

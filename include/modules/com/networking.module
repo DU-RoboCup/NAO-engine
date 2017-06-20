@@ -1,0 +1,8 @@
+module = {
+	name = "Networking Module",
+	liblocation = "../lib/libnetworking.so",
+	rfps = 10,
+	mprio = 3,
+	mthr = 1
+}
+return module

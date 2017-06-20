@@ -4,7 +4,6 @@
 
 REGISTER_MODULE(HelloWorldModule)
 
-
 HelloWorldModule* HelloWorldModule::instance;
 HelloWorldModule* HelloWorldModule::Instance(){
     if(UNLIKELY(HelloWorldModule::instance == 0)){
