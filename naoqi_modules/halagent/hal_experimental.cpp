@@ -11,6 +11,7 @@ using namespace boost::interprocess;
 hal_experimental* hal_experimental::instance = NULL;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
+        fMemoryFastAccess(boost::shared_ptr<AL::ALMemoryFastAccess>(new AL::ALMemoryFastAccess())),
         dcm_proxy(NULL),
         nao_memory_proxy(NULL),
         speak_proxy(NULL),
@@ -87,16 +88,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         instance = this; ///< Remove this to cause fun segfaults...
 
-        try {
-            dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
-            dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
-            SAY("Wooho I am ready");
-            std::cout << "Ready for things. Making LEDS blink now" << std::endl;
-        } catch (std::exception &e) {
-            log_file << "ERROR: dcm proxy error: " << e.what() << "\n";
-        }
 
-        log_file << "7. Proxy call backs established.\n";
 	} catch(AL::ALError &e) {
         log_file << "[ERROR] Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << "\n";
     }
@@ -116,17 +108,58 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         for(int i = 0; i < NumOfActuatorIds; ++i)
             actuators[i] = 0.f;
-    get_ip_address();
+   // get_ip_address();
     //SAY("I am ready for action! Oh shoot I forgot I'm paralyzed!");
- //   get_ip_address();
+    SAY("I will say my IP Address in a moment. It's just, well Linux hates me.");
+    get_ip_address();
     lastTime = dcm_proxy->getTime(0);
     //testLEDS();
 
     //init_aliases();
-    testAliases();
+    // testAliases();
+    //initialize_everything();
+    connectToDCMLoop(pBroker);
+
+    std::cout << "Everything Initialized!" << std::endl;
 
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
+}
+hal_experimental::~hal_experimental()
+{
+    SAY("Time to die.");
+    std::cout << "Destructing hal_experimental" << std::endl;
+    /**
+      * Note: If naoqi crashes, by default all data stored in shared memory will (probably)
+      * be destroyed. This is why NAOInterface keeps a local copy of the data.
+      **/
+        
+    try
+    {
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    } 
+    catch(boost::interprocess::interprocess_exception &e)
+    {
+        std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
+    }
+    log_file << "My journey is over. **Kills self**\n";
+    log_file << "Narator: And that is how the tragic life of the dumb robot ended." << std::endl;
+    log_file.close();
+    delete dcm_proxy;
+    delete nao_memory_proxy;
+    delete speak_proxy;
+}
+
+void hal_experimental::initialize_everything()
+{
+    create_fast_sensor_access();
+    create_actuator_position_aliases();
+    create_actuator_stiffness_aliases();
+    std::cout << "All aliases created!" << std::endl;
+    set_all_actuator_stiffnesses(0.2f);
+    init_actuator_position_aliases();
+    SAY("I should have done things.");
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -142,12 +175,56 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 * The method is called by NaoQi immediately before it communicates with the chest board.
 * It sets all the actuators.
 */
+void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
+{
+    try {
+        dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
+        dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
+        std::cout << "Connected to dcm! Trying to connect fast memory..." << std::endl;
+        fMemoryFastAccess->ConnectToVariables(pBroker, fSensorKeys, false);
+        std::cout << "Fast Memory Connection Established!" << std::endl;
+        //SAY("Wooho I am ready");
+        std::cout << "Woohoo I am ready!" << std::endl;
+    } catch (std::exception &e) {
+        log_file << "ERROR: dcm proxy error: " << e.what() << "\n";
+    }
+    log_file << "7. Proxy call backs established.\n";
+
+    ///UNCOMMENT THIS 
+    // try
+    // {
+    //     std::cout << "Trying to get sensor values with fast access..." << std::endl;
+    //     fMemoryFastAccess->GetValues(sensorValues);
+    //     //DEBUG
+    //     try
+    //     {
+    //         std::cout << "[connectToDCMLoop] Trying to print sensorValues..." << std::endl;
+    //         for(int i = 0; i < sensorValues.size(); ++i)
+    //             std::cout << sensorNames[i] << " = " << sensorValues[i] << std::endl;
+    //     } 
+    //     catch(const std::exception &e)
+    //     {
+    //         std::cout << "Error printing sensor values: " << e.what() << std::endl;
+    //     }
+    //     std::cout << "Got sensor values with fast access! " << std::endl;
+    //     for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    //     {
+    //         initialJointSensorValues.push_back(sensorValues[i]);
+    //     }
+    // }
+    // catch(const AL::ALError &e)
+    // {
+    //     std::cout << "Error while getting initial sensor values: " << e.toString() << std::endl;
+    // }
+
+
+}
 void hal_experimental::preCallBack() 
 {
     //std::cout << "Pre-Callback called" << std::endl;
     //log_file << "preCallBack called" << '\n';
 
-    instance->testAliases();
+    //instance->testAliases();
     instance->testLEDS();
     //instance->set_actuators();
     //instance->set_LEDS();
@@ -162,10 +239,53 @@ void hal_experimental::preCallBack()
 */
 void hal_experimental::postCallBack()
 {
-    //instance->testLEDS(false);
-    //instance->read_sensors();
-    //log_file << "Sensors have been read\n";
-    //SAY("RIP in peace!");
+    //CRY BECAUSE THIS SEGFAULT EVRY TIEM
+    // int current_dcm_time;
+    // try
+    // {
+    //     current_dcm_time = dcm_proxy->getTime(0);
+    // }
+    // catch(const AL::ALError &e)
+    // {
+    //     log_file << "[postCallBack RT][ERROR]: Error accessing dcm: " << e.toString() << std::endl;
+    //     std::cout << "[postCallBack RT][ERROR]: Error accessing dcm: " << e.toString() << std::endl;
+    // }
+
+    // //Time for the next cycle. Note there needs to be 10ms between sets,
+    // //however this ammount of time should happen naturally.
+    // try
+    // {
+    //     commands[4][0] = current_dcm_time; 
+    //     for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    //     {
+    //         commands[5][i][0] = initialJointSensorValues[i];
+    //     }
+
+    //     std::cout << "Trying to get sensor values with fast access..." << std::endl;
+    //     fMemoryFastAccess->GetValues(sensorValues);
+    //     std::cout << "Got sensor values with fast access! " << std::endl;
+    //     //Test
+    //     commands[5][lShoulderPitchPositionActuator][0] =   sensorValues[rShoulderPitchPositionActuator];
+    //     commands[5][lShoulderRollPositionActuator][0]  = - sensorValues[rShoulderRollPositionActuator];
+    //     commands[5][lElbowYawPositionActuator][0]      = - sensorValues[rElbowYawPositionActuator];
+    //     commands[5][lElbowRollPositionActuator][0]     = - sensorValues[rElbowRollPositionActuator];
+    // }
+    // catch(const AL::ALError &e)
+    // {
+    //     std::cout << "[DCM POST LOOP][ERROR] An error occurred in the post DCM callback loop: " << e.toString() << std::endl;
+    // }
+
+    // try
+    // {
+    //     std::cout << "Trying to set postcallback commands alias..." << std::endl;
+    //     dcm_proxy->setAlias(commands);
+    //     std::cout << "Post callback vals should be set!" << std::endl;
+    // } 
+    // catch(const AL::ALError &e)
+    // {
+    //     log_file << "[postCallBack RT][ERROR]: Error setting dcm alias: " << e.toString() << std::endl;
+    //     std::cout << "[postCallBack RT][ERROR]: Error setting dcm alias: " << e.toString() << std::endl;
+    // }
 }
 
 ///////////////// END REAL TIME HOOKS //////////////////////
@@ -199,7 +319,7 @@ void hal_experimental::get_ip_address()
     //buffer overflow and use an exploit to make the NAO part of your botnet.
     log_file << "get_ip_address: Performing Sanity Check\n";
     try {
-        system("python /home/nao/get_ip_address.py");
+        system("python /home/nao/say_ip_address.py");
     } 
     catch(const std::exception &e)
     {
@@ -208,32 +328,159 @@ void hal_experimental::get_ip_address()
 
     //SAY("I should have said my IP Address");
 }
-hal_experimental::~hal_experimental()
+
+/////////////////////////////////////////////////////
+///////// Alias Creation and Initialization  ///////
+////////////////////////////////////////////////////
+
+/**
+ * create_fast_sensor_access
+ * \brief: Following the Aldabaran FastGetSet module, we can read and write sensor
+ *         and actuator vals in 10ms. This method sets up the fast DCM memory access
+ **/
+void hal_experimental::create_fast_sensor_access()
 {
-    SAY("Time to die.");
-    std::cout << "Destructing hal_experimental" << std::endl;
-    /**
-      * Note: If naoqi crashes, by default all data stored in shared memory will (probably)
-      * be destroyed. This is why NAOInterface keeps a local copy of the data.
-      **/
-        
-    try
+    std::cout << "[fast_mem_init]: Fast Sensor Access initializing..." << std::endl;
+    log_file << "[fast_mem_init]: Fast Sensor Access initializing..." << std::endl;
+    fSensorKeys.clear();
+    fSensorKeys.resize(NumOfSensorIds);
+    for(int i = 0; i < NumOfSensorIds; ++i)
     {
-        shm.destroy<hal_data>("juicyData");
-        boost::interprocess::shared_memory_object::remove("PineappleJuice");
-    } 
-    catch(boost::interprocess::interprocess_exception &e)
-    {
-        std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
+        fSensorKeys[i] = sensorNames[i];
     }
-    log_file << "My journey is over. **Kills self**\n";
-    log_file << "Narator: And that is how the tragic life of the dumb robot ended." << std::endl;
-    log_file.close();
-    delete dcm_proxy;
-    delete nao_memory_proxy;
-    delete speak_proxy;
+
+
+
+    std::cout << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
+    log_file << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
 }
 
+/**
+  * \brief: Creates an alias for all the position actuators.
+  **/
+void hal_experimental::create_actuator_position_aliases()
+{
+    std::cout << "[create_actuator_pos]: create actuator position initializing..." << std::endl;
+    log_file << "[create_actuator_pos]: create actuator position initializing..." << std::endl;
+
+    AL::ALValue jointAliases;
+
+    jointAliases.arraySetSize(2);
+    jointAliases[0] = std::string("jointActuators");
+    jointAliases[1].arraySetSize(NumOfPositionActuatorIds);
+    for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    {
+        jointAliases[1][i] = actuatorNames[i];
+    }
+
+    try
+    {
+        dcm_proxy->createAlias(jointAliases);
+        log_file << "position alias added to DCM!\n";
+
+    }
+    catch(const AL::ALError &e)
+    {
+        log_file << "[create_actuaor_pos][ERROR]: Error creating actuator position aliases: " << e.toString() << std::endl;
+        std::cout << "[create_actuaor_pos][ERROR]: Error creating actuator position aliases: " << e.toString() << std::endl;
+
+    }
+
+    std::cout << "[create_actuator_pos]: create actuator position initialized" << std::endl;
+    log_file << "[create_actuator_pos]: create actuator position initialized" << std::endl;
+}
+
+/**
+  * \brief: Initialize the previously created joint position aliases
+  **/
+void hal_experimental::init_actuator_position_aliases()
+{
+    commands.arraySetSize(6);
+    commands[0] = std::string("jointActuators");
+    commands[1] = std::string("ClearAll");
+    commands[2] = std::string("time-separate");
+    commands[3] = 0; //Aldabaran never implemented this
+
+    commands[4].arraySetSize(1);
+    commands[5].arraySetSize(NumOfPositionActuatorIds);
+
+    for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    {
+        commands[5][i].arraySetSize(1);
+    }
+
+}
+/**
+  * \brief: Set the stiffness value for every joint on the robot to a single value
+  **/
+void hal_experimental::set_all_actuator_stiffnesses(const float &stiffnessVal)
+{
+    log_file << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
+    std::cout << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
+    AL::ALValue stiffnessComands;
+    int DCMTime;
+
+    try
+    {
+        DCMTime = dcm_proxy->getTime(1000); //Time NAOQi has been running + 1000ms
+    }
+    catch(const AL::ALError &e)
+    {
+        log_file << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
+        std::cout << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
+
+    }
+    log_file << "[set_all_stiffness] Done Setting all stiffness values to: " << stiffnessVal << std::endl;
+    std::cout << "[set_all_stiffness] Done Setting All stiffness values to: " << stiffnessVal << std::endl;
+}
+
+/**
+  * \brief: Create the aliases for controlling the joint stiffnesses.
+  **/
+void hal_experimental::create_actuator_stiffness_aliases()
+{
+    std::cout << "[create_actuator_stiffness]: create actuator stiffness initializing..." << std::endl;
+    log_file << "[create_actuator_pos]: create actuator stiffness initializing..." << std::endl;
+
+    // const int num_stiffness_actuators = rAnkleRollStiffnessActuator - headYawStiffnessActuator;
+    // Recycle our last used alias
+    AL::ALValue jointAliases;
+    try
+    {
+        jointAliases.clear();
+        jointAliases.arraySetSize(2);
+        jointAliases[0] = std::string("jointStiffness");
+        jointAliases[1].arraySetSize(NumOfStiffnessActuatorIds);
+
+        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        {
+            jointAliases[1][i] = actuatorNames[i];
+        }
+
+    }
+    catch(const AL::ALError &e)
+    {
+        std::cout << "[create_actuator_stiffness][ERROR]: Error setting up the aliase: " << e.toString() << std::endl;
+    }
+
+    try
+    {
+        dcm_proxy->createAlias(jointAliases);
+        log_file << "stiffness alias added to DCM!\n";
+    }
+    catch(const AL::ALError &e)
+    {
+        log_file << "[create_actuator_stiffness][ERROR]: An error occured while creating stiffness actuator aliases: " << e.toString() << std::endl;
+        std::cout << "[create_actuator_stiffness][ERROR]: An error occured while creating stiffness actuator aliases: " << e.toString() << std::endl;
+    }
+
+
+    std::cout << "[create_actuator_stiffness]: create actuator stiffness initialized" << std::endl;
+    log_file << "[create_actuator_stiffness]: create actuator stiffness initialized" << std::endl;
+
+}
+
+/////////// End Alias Initialization /////////////
 void hal_experimental::set_LEDS()
 {
     //This is causing a segfault
@@ -363,6 +610,7 @@ void hal_experimental::set_actuators_leds() //TODO check value: bool &requested_
         }
     //}
 }
+
 /**
   * set_actuators: Set Actuators main function + helper function calls.
   * 

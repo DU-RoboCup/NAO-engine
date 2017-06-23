@@ -22,6 +22,8 @@
 #include "alvalue/alvalue.h"
 #include "alproxies/dcmproxy.h"
 #include <alproxies/altexttospeechproxy.h>
+#include <almemoryfastaccess/almemoryfastaccess.h>
+
 //Standard Library Includes
 #include <iostream>
 #include <string>
@@ -30,6 +32,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <limits>
+#include <vector>
 //Project Includes
 #include "../../include/memory/hal_data.h"
 //#include "../../include/util/hardwaremap.h"
@@ -38,6 +41,7 @@
 
 namespace AL {
     class ALBroker;
+    class ALMemoryFastAccess;
 }
 
 class hal_experimental : public AL::ALModule {
@@ -48,8 +52,25 @@ public:
     static const std::string name;
 	void set_actuators();
     void read_sensors();
+
+    
+    void initialize_everything();
+    void connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker);
     void preCallBack();
     void postCallBack();
+    
+    /// Alias initialization
+    //Creation
+    void create_fast_sensor_access();
+    void create_actuator_position_aliases();
+    void create_actuator_stiffness_aliases();
+    //Preparation
+    void init_actuator_position_aliases();
+    //void init_actuator_stiffness_aliases();
+
+    //Control
+    void set_all_actuator_stiffnesses(const float &stiffnessVal);    
+
 
     void set_LEDS();
     float* robot_state_handler(float *actuator_vals);
@@ -84,9 +105,15 @@ private:
     //Main aliases
     AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias;
     AL::ALValue commands, commandsAlias;
+
+    //Sensor names for fast memory access
+    std::vector<std::string> fSensorKeys;
+    //Pointer for fast memory access
+    boost::shared_ptr<AL::ALMemoryFastAccess> fMemoryFastAccess;
+
     // Test Aliases
     AL::ALValue commandsTestAlias, commandsTest; //Chest LEDS
-    AL::ALValue positionTestAlias, testAlias; //Actuator Positions
+    AL::ALValue positionTestAlias, testAlias; //Actuator Position
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
@@ -105,6 +132,9 @@ private:
     float *read_actuators;
     //float *actuators;
     float actuators[NumOfActuatorIds];
+    std::vector<float> sensorValues;
+    std::vector<float> initialJointSensorValues;
+
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
     //TESTS

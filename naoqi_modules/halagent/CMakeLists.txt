@@ -8,7 +8,7 @@ find_package(qibuild)
 
 # qi_use_lib(hal_agent ALCOMMON ALPROXIES BOOST)
 qi_create_lib(hal_experimental "hal_experimental.cpp" "hal_experimental.h"  SUBFOLDER naoqi)
-qi_use_lib(hal_experimental ALCOMMON ALPROXIES BOOST)
+qi_use_lib(hal_experimental ALCOMMON ALPROXIES ALMEMORYFASTACCESS BOOST)
 
 # Add a simple test:
 #qi_create_test(test_hal_agent "test.cpp")
