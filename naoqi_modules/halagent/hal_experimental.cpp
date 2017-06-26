@@ -121,7 +121,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     log_file << "[connectToDCMLoop] connecting to DCM Loop" << std::endl;
     std::cout << "[connectToDCMLoop] begconnecting to DCM Loop" << std::endl;
     try {
-        dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
+        //dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
         //dcm_proxy->getGenericProxy()->getModule()->atPostProcess(boost::bind(&hal_experimental::postCallBack, this));
 //        fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&FastGetSetDCM::synchronisedDCMcallback, this));
         std::cout << "Connected to dcm! Trying to connect fast memory..." << std::endl;
@@ -209,12 +209,18 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
         log_file << "[connectToDCMLoop] Values Got with FastAccess: " << sensorValues.size() << std::endl;
         std::cout << "[connectToDCMLoop] Values Got with FastAccess: " << sensorValues.size() << std::endl;
         //DEBUG
+
         try
         {
-            log_file << "[connectToDCMLoop] Trying to print sensorValues: " << sensorValues.size() << std::endl;
-            std::cout << "[connectToDCMLoop] Trying to print sensorValues: " << sensorValues.size() << std::endl;
-            for(int i = 0; i < sensorValues.size(); ++i)
-                std::cout << sensorNames[i] << " = " << sensorValues[i] << std::endl;
+            log_file << "[connectToDCMLoop] fSensorKeys size = " << fSensorKeys.size() << "Trying to print sensorValues: " << sensorValues.size() << std::endl;
+            std::cout << "[connectToDCMLoop] fSensorKeys size = " << fSensorKeys.size() << "Trying to print sensorValues: " << sensorValues.size() << std::endl;
+            if(fSensorKeys.size() != 0)
+            {
+                for(int i = 0; i < sensorValues.size(); ++i)
+                    std::cout << fSensorKeys[i] << " = " << sensorValues[i] << std::endl;
+            }
+            else
+                log_file << "[connectToDCMLoop][ERROR]: fSensorKeys.size = 0" << std::endl;
         } 
         catch(const std::exception &e)
         {
@@ -230,11 +236,15 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
 
         try
         {
-            log_file << "[connectToDCMLoop] setting up post process hook..." << std::endl;
-            std::cout << "[connectToDCMLoop] setting up post process hook..." << std::endl;
+            log_file << "[connectToDCMLoop] setting up pre/post process hooks..." << std::endl;
+            std::cout << "[connectToDCMLoop] setting up pre/post process hooks..." << std::endl;
+
+            //Connect our real time functions to the DCM
             fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::actuator_joint_test, this));
-            log_file << "[connectToDCMLoop] postProcess hook connected!" << std::endl;
-            std::cout << "[connectToDCMLoop] postProcess hook connected!" << std::endl;
+            //dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
+            fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
+            log_file << "[connectToDCMLoop] pre/postProcess hook connected!" << std::endl;
+            std::cout << "[connectToDCMLoop] pre/postProcess hook connected!" << std::endl;
         }
         catch(const AL::ALError &e)
         {
@@ -250,27 +260,24 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
 
 
 }
-void hal_experimental::preCallBack() 
-{
-    //std::cout << "Pre-Callback called" << std::endl;
-    //log_file << "preCallBack called" << '\n';
 
-    //instance->testAliases();
-    instance->testLEDS();
-    //instance->set_actuators();
-    //instance->set_LEDS();
-    //instance->set_actuators_leds();
-    //set_actuators();
-    //log_file << "preCallBack: set_actuators succcessfully called\n";
+/**
+  * Real time function called before DCM I/O.
+  * Primary use is for setting actuator
+  **/
+void hal_experimental::onPreProcess()
+{
 
 }
+
 /**
-* The method is called by NaoQi immediately after it communicates with the chest board.
-* It reads all sensors.
-*/
-void hal_experimental::postCallBack()
+  * Real time function called after DCM I/O.
+  * Primary use for reading sensor values.
+  **/
+
+void hal_experimental::onPostProcess()
 {
-    instance->actuator_joint_test();
+
 }
 
 ///////////////// END REAL TIME HOOKS //////////////////////
@@ -332,9 +339,10 @@ void hal_experimental::create_fast_sensor_access()
     for(int i = 0; i < NumOfSensorIds; ++i)
     {
         fSensorKeys[i] = sensorNames[i];
+        std::cout << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
+        log_file << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
+
     }
-
-
 
     std::cout << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
     log_file << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
@@ -368,7 +376,6 @@ void hal_experimental::create_actuator_position_aliases()
     {
         log_file << "[create_actuaor_pos][ERROR]: Error creating actuator position aliases: " << e.toString() << std::endl;
         std::cout << "[create_actuaor_pos][ERROR]: Error creating actuator position aliases: " << e.toString() << std::endl;
-
     }
 
     std::cout << "[create_actuator_pos]: create actuator position initialized" << std::endl;
@@ -466,6 +473,10 @@ void hal_experimental::create_actuator_stiffness_aliases()
 }
 
 /////////// End Alias Initialization /////////////
+
+
+
+
 void hal_experimental::set_LEDS()
 {
     //This is causing a segfault
@@ -850,8 +861,8 @@ void hal_experimental::print_actuators()
 void hal_experimental::actuator_joint_test()
 {
     //CRY BECAUSE THIS SEGFAULT EVRY TIEM
-    std::cout << "[actuator_jt]: Starting Test..." << std::endl;
-    log_file << "[actuator_jt]: Starting Test..." << std::endl;
+    // std::cout << "[actuator_jt]: Starting Test..." << std::endl;
+    // log_file << "[actuator_jt]: Starting Test..." << std::endl;
     int current_dcm_time;
     try
     {
@@ -862,33 +873,33 @@ void hal_experimental::actuator_joint_test()
         log_file << "[postCallBack RT][ERROR]: Error accessing dcm: " << e.what() << std::endl;
         std::cout << "[postCallBack RT][ERROR]: Error accessing dcm: " << e.what() << std::endl;
     }
-    std::cout << "[actuator_jt]: Got time! " << current_dcm_time << std::endl;
-    log_file << "[actuator_jt]: Got time! " << current_dcm_time << std::endl;
+    // std::cout << "[actuator_jt]: Got time! " << current_dcm_time << std::endl;
+    // log_file << "[actuator_jt]: Got time! " << current_dcm_time << std::endl;
     //Time for the next cycle. Note there needs to be 10ms between sets,
     //however this ammount of time should happen naturally.
     try
     {
-        std::cout << "[actuator_jt]: Attempting to set values..." << std::endl;
-        log_file << "[actuator_jt]: Attempting to set values..." << std::endl;
-        std::cout << "[actuator_jt]: 1. Setting Time..." << std::endl;
-        log_file << "[actuator_jt]: 1. Setting Time..." << std::endl;
+        // std::cout << "[actuator_jt]: Attempting to set values..." << std::endl;
+        // log_file << "[actuator_jt]: Attempting to set values..." << std::endl;
+        // std::cout << "[actuator_jt]: 1. Setting Time..." << std::endl;
+        // log_file << "[actuator_jt]: 1. Setting Time..." << std::endl;
         commands[4][0] = current_dcm_time; 
 
 
         if(initialJointSensorValues.size() == 0)
         {
-            std::cout << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
-            log_file << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
+            // std::cout << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
+            // log_file << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
             for(int i = 0; i < NumOfPositionActuatorIds; ++i)
             {
                 initialJointSensorValues.push_back(sensorValues[i]);
-                log_file << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
-                std::cout << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
+                // log_file << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
+                // std::cout << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
             }
         }
 
-        std::cout << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size()  << " | " << NumOfPositionActuatorIds << std::endl;
-        log_file << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size() << " | " << NumOfPositionActuatorIds << std::endl;
+        // std::cout << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size()  << " | " << NumOfPositionActuatorIds << std::endl;
+        // log_file << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size() << " | " << NumOfPositionActuatorIds << std::endl;
 
        
        
@@ -897,22 +908,28 @@ void hal_experimental::actuator_joint_test()
             commands[5][i][0] = initialJointSensorValues[i];
         }
 
-        std::cout << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
-        log_file << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
+        // std::cout << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
+        // log_file << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
         fMemoryFastAccess->GetValues(sensorValues);
-        std::cout << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
-        log_file << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
+        // std::cout << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
+        // log_file << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
         //Test
-        commands[5][lShoulderPitchPositionActuator][0] =   sensorValues[rShoulderPitchPositionActuator];
-        commands[5][lShoulderRollPositionActuator][0]  = - sensorValues[rShoulderRollPositionActuator];
-        commands[5][lElbowYawPositionActuator][0]      = - sensorValues[rElbowYawPositionActuator];
-        commands[5][lElbowRollPositionActuator][0]     = - sensorValues[rElbowRollPositionActuator];
+        std::cout << "Trying to set commands[5][lShoulderPitchPositionActuator][0] =  " <<  sensorValues[rShoulderPitchPositionSensor] << std::endl;
+        std::cout << "commands[5][lShoulderRollPositionActuator][0]  = " << -sensorValues[rShoulderRollPositionSensor] << std::endl;
+        std::cout << "commands[5][lElbowYawPositionActuator][0]      = " << - sensorValues[rElbowRollPositionSensor] << std::endl;
+        std::cout << "commands[5][lElbowRollPositionActuator][0]     = " << - sensorValues[rElbowRollPositionSensor] << std::endl;
+        
+        //!!IMPORTANT!! commands[5][..PositionACTUATOR][0] = sensorValues[..PositionSENSOR];
+        commands[5][lShoulderPitchPositionActuator][0] =  sensorValues[rShoulderPitchPositionSensor];
+        commands[5][lShoulderRollPositionActuator][0]  = -sensorValues[rShoulderRollPositionSensor];
+        commands[5][lElbowYawPositionActuator][0]      = -sensorValues[rElbowRollPositionSensor];
+        commands[5][lElbowRollPositionActuator][0]     = -sensorValues[rElbowRollPositionSensor];
 
 
-        commands[5][headYawPositionActuator][0] = 0.3;
+        commands[5][headYawPositionActuator][0] = sensorValues[headYawPositionSensor] + deg2rad(10);
         //commands[5][headYawPositionActuator][0] = 0.3;
-        std::cout << "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
-        log_file <<  "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
+        // std::cout << "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
+        // log_file <<  "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
     }
     catch(const AL::ALError &e)
     {
@@ -923,17 +940,17 @@ void hal_experimental::actuator_joint_test()
 
     try
     {
-        std::cout << "Trying to set postcallback commands alias..." << std::endl;
+    //    std::cout << "Trying to set postcallback commands alias..." << std::endl;
         dcm_proxy->setAlias(commands);
-        std::cout << "Post callback vals should be set!" << std::endl;
+     //   std::cout << "Post callback vals should be set!" << std::endl;
     } 
     catch(const AL::ALError &e)
     {
         log_file << "[postCallBack RT][ERROR]: Error setting dcm alias: " << e.what() << std::endl;
         std::cout << "[postCallBack RT][ERROR]: Error setting dcm alias: " << e.what() << std::endl;
     }
-    std::cout << "[actuator_jt]: Should be done!" << std::endl;
-    log_file <<  "[actuator_jt]: Should be done!" << std::endl;
+    // std::cout << "[actuator_jt]: Should be done!" << std::endl;
+    // log_file <<  "[actuator_jt]: Should be done!" << std::endl;
 }
 
 void hal_experimental::testAliases()

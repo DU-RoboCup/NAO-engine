@@ -52,12 +52,12 @@ public:
     static const std::string name;
 	void set_actuators();
     void read_sensors();
-
+    void onPreProcess();
+    void onPostProcess();
     
     void initialize_everything();
     void connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker);
-    void preCallBack();
-    void postCallBack();
+
     
     /// Alias initialization
     //Creation
@@ -115,7 +115,7 @@ private:
     // Test Aliases
     AL::ALValue commandsTestAlias, commandsTest; //Chest LEDS
     AL::ALValue positionTestAlias, testAlias; //Actuator Position
-    ProcessSignalConnection fDCMPostProcessConnection;
+    ProcessSignalConnection fDCMPostProcessConnection, fDCMPreProcessConnection;
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
