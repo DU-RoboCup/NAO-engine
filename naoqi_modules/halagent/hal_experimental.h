@@ -82,6 +82,7 @@ public:
     //test
     void testLEDS();
     void testAliases();
+    void actuator_joint_test();
     void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
@@ -114,6 +115,7 @@ private:
     // Test Aliases
     AL::ALValue commandsTestAlias, commandsTest; //Chest LEDS
     AL::ALValue positionTestAlias, testAlias; //Actuator Position
+    ProcessSignalConnection fDCMPostProcessConnection;
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
