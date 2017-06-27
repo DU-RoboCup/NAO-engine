@@ -12,7 +12,6 @@ hal_experimental* hal_experimental::instance = NULL;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
     :   ALModule(pBroker, pName),
         fMemoryFastAccess(boost::shared_ptr<AL::ALMemoryFastAccess>(new AL::ALMemoryFastAccess())),
-        dcm_proxy(NULL),
         nao_memory_proxy(NULL),
         speak_proxy(NULL),
         ledIndex(0),
@@ -75,7 +74,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     try
     {
         // Establish Communication with NaoQi
-        dcm_proxy = new DCMProxy(pBroker);
+        //dcm_proxy = new DCMProxy(pBroker);
+        //dcm_proxy = getParentBroker()->getDcmProxy();
         nao_memory_proxy = new ALMemoryProxy(pBroker);
         speak_proxy = new ALTextToSpeechProxy("localhost", 9559);
         //body_ID = static_cast<std::string>(nao_memory_proxy->getData("Device/DeviceList/ChestBoard/BodyId", 0));
@@ -83,7 +83,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         // body_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Body/BaseVersion", 0));
         // head_version = static_cast<std::string>(nao_memory_proxy->getData("RobotConfig/Head/BaseVersion", 0));
         //log_file << "HeadID proxy call value: " << head_ID << "\n" << "BodyID: " << body_ID;
-        SAY("You better have fixed me this time!");
+        //SAY("You better have fixed me this time!");
         
 
         instance = this; ///< Remove this to cause fun segfaults...
@@ -93,17 +93,12 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         log_file << "[ERROR] Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << "\n";
     }
     //Boost Interprocess Shared Memory Initialization:
-        log_file << "Testing actuator semaphore wait...\n";
-        pineappleJuice->actuator_semaphore.wait();
-        log_file << "still segfaulting?\n";
-        if(dcm_proxy == NULL) 
-            log_file << "dcm_proxy is null\n"; 
-        else 
-            log_file << "dcm_proxy is not null\n";
-        dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
-        log_file << "NO SEGFAULT: DCM Time = " << dcm_time << "\n";
-        log_file << "woohoo I'm in a semaphore" << '\n';
-        pineappleJuice->actuator_semaphore.post();
+        // log_file << "Testing actuator semaphore wait...\n";
+        // pineappleJuice->actuator_semaphore.wait();
+        // //dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
+        // log_file << "NO SEGFAULT: DCM Time = " << dcm_time << "\n";
+        // log_file << "woohoo I'm in a semaphore" << '\n';
+        // pineappleJuice->actuator_semaphore.post();
         
 
         for(int i = 0; i < NumOfActuatorIds; ++i)
@@ -111,13 +106,10 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
     // SAY("I will say my IP Address in a moment. It's just, well Linux hates me.");
     // get_ip_address();
-    lastTime = dcm_proxy->getTime(0);
-    //testLEDS();
+    //lastTime = dcm_proxy->getTime(0);
 
-    //init_aliases();
-    // testAliases();
-    initialize_everything();
-    connectToDCMLoop(pBroker);
+
+    pBrokerCopy = pBroker;
     log_file << "[connectToDCMLoop] connecting to DCM Loop" << std::endl;
     std::cout << "[connectToDCMLoop] begconnecting to DCM Loop" << std::endl;
     try {
@@ -136,6 +128,23 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
     std::cout << "Everything Initialized!" << std::endl;
 
+
+    //Stuff for NAOQi
+    setModuleDescription("Direct access to DCM/Memory for hardware IO with interprocess communication");
+    functionName("startLoop", getName() , "start");
+    BIND_METHOD(hal_experimental::startLoop);
+
+    functionName("stopLoop", getName() , "stop");
+    BIND_METHOD(hal_experimental::stopLoop);
+
+    functionName("testLEDS", getName(), "test chest LEDS");
+    BIND_METHOD(hal_experimental::testLEDS);
+
+    functionName("set_all_actuator_stiffnesses" , getName(), "change stiffness of all joint");
+    addParam("value", "new stiffness value from 0.0 to 1.0");
+
+    BIND_METHOD(hal_experimental::set_all_actuator_stiffnesses);
+    startLoop();
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
 }
@@ -160,7 +169,7 @@ hal_experimental::~hal_experimental()
     log_file << "My journey is over. **Kills self**\n";
     log_file << "Narator: And that is how the tragic life of the dumb robot ended." << std::endl;
     log_file.close();
-    delete dcm_proxy;
+    //delete dcm_proxy;
     delete nao_memory_proxy;
     delete speak_proxy;
 }
@@ -190,11 +199,57 @@ void hal_experimental::initialize_everything()
   if the NAO's chestboard blinks red. Blocking calls induce some sort of
   priority inversion I believe. 
   **/
+void hal_experimental::startLoop()
+{
+    try
+    {
+        dcm_proxy = getParentBroker()->getDcmProxy();
+        lastTime = dcm_proxy->getTime(0);
+        std::cout << "[startloop]: DCM proxy connection established!" << std::endl;
+        log_file << "[startloop]: DCM proxy connection established!" << std::endl;
+    }
+    catch(const AL::ALError &e)
+    {
+        std::cout << "[startloop][ERROR]: Error getting dcmProxy: " << e.what() << std::endl;
+        log_file << "[startloop][ERROR]: Error getting dcmProxy: " << e.what() << std::endl;
+    }
+
+    signed long isDCMRunning;
+    try
+    {
+        isDCMRunning = getParentBroker()->getProxy("ALLauncher")->call<bool>("isModulePresent", std::string("DCM"));
+        std::cout << "[startloop]: DCM is running!" << std::endl;
+        log_file << "[startloop]: DCM is running!" << std::endl;
+    }
+    catch (AL::ALError& e)
+    {
+        std::cout << "[startLoop][ERROR] Error when connecting to DCM : " << e.what() << std::endl;
+        log_file << "[startLoop][ERROR] Error when connecting to DCM : " << e.what() << std::endl;
+
+    }
+
+    if (!isDCMRunning)
+    {
+        std::cout << "[startLoop][ERROR]: Error no DCM running!" << std::endl;
+        log_file << "[startLoop][ERROR]: Error no DCM running!" << std::endl;
+    }
+
+    initialize_everything();
+    connectToDCMLoop();
+}
+void hal_experimental::stopLoop()
+{
+    set_all_actuator_stiffnesses(0.0f);
+    fDCMPreProcessConnection.disconnect();
+    fDCMPostProcessConnection.disconnect();
+    std::cout << "[stopLoop]: Real time hooks disconnected!" << std::endl;
+    log_file << "[startLoop]: Real time hooks disconnected!" << std::endl;
+}
 /** 
 * The method is called by NaoQi immediately before it communicates with the chest board.
 * It sets all the actuators.
 */
-void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
+void hal_experimental::connectToDCMLoop()
 {
 
     //UNCOMMENT THIS 
@@ -202,8 +257,8 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
     std::cout << "[connectToDCMLoop] beginning fastMemoryAccess stuff" << std::endl;
     try
     {
-        fMemoryFastAccess->ConnectToVariables(pBroker, fSensorKeys, false);
-        std::cout << "Fast Memory Connection Established!" << std::endl;
+        // fMemoryFastAccess->ConnectToVariables(pBrokerCopy, fSensorKeys, false);
+        // std::cout << "Fast Memory Connection Established!" << std::endl;
 
         fMemoryFastAccess->GetValues(sensorValues);
         log_file << "[connectToDCMLoop] Values Got with FastAccess: " << sensorValues.size() << std::endl;
@@ -227,7 +282,8 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
             std::cout << "Error printing sensor values: " << e.what() << std::endl;
         }
         std::cout << "Got sensor values with fast access! " << std::endl;
-        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+       // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        for(int i = 0; i < 25; ++i)
         {
             initialJointSensorValues.push_back(sensorValues[i]);
             log_file << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
@@ -241,8 +297,8 @@ void hal_experimental::connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker)
 
             //Connect our real time functions to the DCM
             fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::actuator_joint_test, this));
-            //dcm_proxy->getGenericProxy()->getModule()->atPreProcess(boost::bind(&hal_experimental::preCallBack, this));
-            fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
+            fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
+            
             log_file << "[connectToDCMLoop] pre/postProcess hook connected!" << std::endl;
             std::cout << "[connectToDCMLoop] pre/postProcess hook connected!" << std::endl;
         }
@@ -334,15 +390,64 @@ void hal_experimental::create_fast_sensor_access()
 {
     std::cout << "[fast_mem_init]: Fast Sensor Access initializing..." << std::endl;
     log_file << "[fast_mem_init]: Fast Sensor Access initializing..." << std::endl;
-    fSensorKeys.clear();
-    fSensorKeys.resize(NumOfSensorIds);
-    for(int i = 0; i < NumOfSensorIds; ++i)
-    {
-        fSensorKeys[i] = sensorNames[i];
-        std::cout << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
-        log_file << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
+    // fSensorKeys.clear();
+    // fSensorKeys.resize(NumOfSensorIds);
+    // for(int i = 0; i < NumOfSensorIds; ++i)
+    // {
+    //     fSensorKeys[i] = sensorNames[i];
+    //     std::cout << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
+    //     log_file << "[fast_mem_init]: fSensorKeys[" << i << "] = " << sensorNames[i] << '\n';
 
-    }
+    // }
+    fSensorKeys.clear();
+    //  Here as an example inertial + joints + FSR are read
+    fSensorKeys.resize(7 + 25 + 6);
+    // Joints Sensor list
+    fSensorKeys[HEAD_PITCH]       = std::string("Device/SubDeviceList/HeadPitch/Position/Sensor/Value");
+    fSensorKeys[HEAD_YAW]         = std::string("Device/SubDeviceList/HeadYaw/Position/Sensor/Value");
+    fSensorKeys[L_ANKLE_PITCH]    = std::string("Device/SubDeviceList/LAnklePitch/Position/Sensor/Value");
+    fSensorKeys[L_ANKLE_ROLL]     = std::string("Device/SubDeviceList/LAnkleRoll/Position/Sensor/Value");
+    fSensorKeys[L_ELBOW_ROLL]     = std::string("Device/SubDeviceList/LElbowRoll/Position/Sensor/Value");
+    fSensorKeys[L_ELBOW_YAW]      = std::string("Device/SubDeviceList/LElbowYaw/Position/Sensor/Value");
+    fSensorKeys[L_HAND]           = std::string("Device/SubDeviceList/LHand/Position/Sensor/Value");
+    fSensorKeys[L_HIP_PITCH]      = std::string("Device/SubDeviceList/LHipPitch/Position/Sensor/Value");
+    fSensorKeys[L_HIP_ROLL]       = std::string("Device/SubDeviceList/LHipRoll/Position/Sensor/Value");
+    fSensorKeys[L_HIP_YAW_PITCH]  = std::string("Device/SubDeviceList/LHipYawPitch/Position/Sensor/Value");
+    fSensorKeys[L_KNEE_PITCH]     = std::string("Device/SubDeviceList/LKneePitch/Position/Sensor/Value");
+    fSensorKeys[L_SHOULDER_PITCH] = std::string("Device/SubDeviceList/LShoulderPitch/Position/Sensor/Value");
+    fSensorKeys[L_SHOULDER_ROLL]  = std::string("Device/SubDeviceList/LShoulderRoll/Position/Sensor/Value");
+    fSensorKeys[L_WRIST_YAW]      = std::string("Device/SubDeviceList/LWristYaw/Position/Sensor/Value");
+    fSensorKeys[R_ANKLE_PITCH]    = std::string("Device/SubDeviceList/RAnklePitch/Position/Sensor/Value");
+    fSensorKeys[R_ANKLE_ROLL]     = std::string("Device/SubDeviceList/RAnkleRoll/Position/Sensor/Value");
+    fSensorKeys[R_ELBOW_ROLL]     = std::string("Device/SubDeviceList/RElbowRoll/Position/Sensor/Value");
+    fSensorKeys[R_ELBOW_YAW]      = std::string("Device/SubDeviceList/RElbowYaw/Position/Sensor/Value");
+    fSensorKeys[R_HAND]           = std::string("Device/SubDeviceList/RHand/Position/Sensor/Value");
+    fSensorKeys[R_HIP_PITCH]      = std::string("Device/SubDeviceList/RHipPitch/Position/Sensor/Value");
+    fSensorKeys[R_HIP_ROLL]       = std::string("Device/SubDeviceList/RHipRoll/Position/Sensor/Value");
+    fSensorKeys[R_KNEE_PITCH]     = std::string("Device/SubDeviceList/RKneePitch/Position/Sensor/Value");
+    fSensorKeys[R_SHOULDER_PITCH] = std::string("Device/SubDeviceList/RShoulderPitch/Position/Sensor/Value");
+    fSensorKeys[R_SHOULDER_ROLL]  = std::string("Device/SubDeviceList/RShoulderRoll/Position/Sensor/Value");
+    fSensorKeys[R_WRIST_YAW]      = std::string("Device/SubDeviceList/RWristYaw/Position/Sensor/Value");
+
+    // Inertial sensors
+    fSensorKeys[ACC_X]   = std::string("Device/SubDeviceList/InertialSensor/AccX/Sensor/Value");
+    fSensorKeys[ACC_Y]   = std::string("Device/SubDeviceList/InertialSensor/AccY/Sensor/Value");
+    fSensorKeys[ACC_Z]   = std::string("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value");
+    fSensorKeys[GYR_X]   = std::string("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value");
+    fSensorKeys[GYR_Y]   = std::string("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value");
+    fSensorKeys[ANGLE_X] = std::string("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value");
+    fSensorKeys[ANGLE_Y] = std::string("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
+
+    // Some FSR sensors
+    fSensorKeys[L_COP_X]        = std::string("Device/SubDeviceList/LFoot/FSR/CenterOfPressure/X/Sensor/Value");
+    fSensorKeys[L_COP_Y]        = std::string("Device/SubDeviceList/LFoot/FSR/CenterOfPressure/Y/Sensor/Value");
+    fSensorKeys[L_TOTAL_WEIGHT] = std::string("Device/SubDeviceList/LFoot/FSR/TotalWeight/Sensor/Value");
+    fSensorKeys[R_COP_X]        = std::string("Device/SubDeviceList/RFoot/FSR/CenterOfPressure/X/Sensor/Value");
+    fSensorKeys[R_COP_Y]        = std::string("Device/SubDeviceList/RFoot/FSR/CenterOfPressure/Y/Sensor/Value");
+    fSensorKeys[R_TOTAL_WEIGHT] = std::string("Device/SubDeviceList/RFoot/FSR/TotalWeight/Sensor/Value");
+
+    // Create the fast memory access
+    fMemoryFastAccess->ConnectToVariables(getParentBroker(), fSensorKeys, false);
 
     std::cout << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
     log_file << "[fast_mem_init]: Fast Sensor Access initialized" << std::endl;
@@ -360,12 +465,40 @@ void hal_experimental::create_actuator_position_aliases()
 
     jointAliases.arraySetSize(2);
     jointAliases[0] = std::string("jointActuators");
-    jointAliases[1].arraySetSize(NumOfPositionActuatorIds);
-    for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-    {
-        jointAliases[1][i] = actuatorNames[i];
-    }
+    // jointAliases[1].arraySetSize(NumOfPositionActuatorIds);
+    // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    // {
+    //     jointAliases[1][i] = actuatorNames[i];
+    // }
+    jointAliases[1].arraySetSize(25);
 
+    // Joints actuator list
+
+    jointAliases[1][HEAD_PITCH]       = std::string("Device/SubDeviceList/HeadPitch/Position/Actuator/Value");
+    jointAliases[1][HEAD_YAW]         = std::string("Device/SubDeviceList/HeadYaw/Position/Actuator/Value");
+    jointAliases[1][L_ANKLE_PITCH]    = std::string("Device/SubDeviceList/LAnklePitch/Position/Actuator/Value");
+    jointAliases[1][L_ANKLE_ROLL]     = std::string("Device/SubDeviceList/LAnkleRoll/Position/Actuator/Value");
+    jointAliases[1][L_ELBOW_ROLL]     = std::string("Device/SubDeviceList/LElbowRoll/Position/Actuator/Value");
+    jointAliases[1][L_ELBOW_YAW]      = std::string("Device/SubDeviceList/LElbowYaw/Position/Actuator/Value");
+    jointAliases[1][L_HAND]           = std::string("Device/SubDeviceList/LHand/Position/Actuator/Value");
+    jointAliases[1][L_HIP_PITCH]      = std::string("Device/SubDeviceList/LHipPitch/Position/Actuator/Value");
+    jointAliases[1][L_HIP_ROLL]       = std::string("Device/SubDeviceList/LHipRoll/Position/Actuator/Value");
+    jointAliases[1][L_HIP_YAW_PITCH]  = std::string("Device/SubDeviceList/LHipYawPitch/Position/Actuator/Value");
+    jointAliases[1][L_KNEE_PITCH]     = std::string("Device/SubDeviceList/LKneePitch/Position/Actuator/Value");
+    jointAliases[1][L_SHOULDER_PITCH] = std::string("Device/SubDeviceList/LShoulderPitch/Position/Actuator/Value");
+    jointAliases[1][L_SHOULDER_ROLL]  = std::string("Device/SubDeviceList/LShoulderRoll/Position/Actuator/Value");
+    jointAliases[1][L_WRIST_YAW]      = std::string("Device/SubDeviceList/LWristYaw/Position/Actuator/Value");
+    jointAliases[1][R_ANKLE_PITCH]    = std::string("Device/SubDeviceList/RAnklePitch/Position/Actuator/Value");
+    jointAliases[1][R_ANKLE_ROLL]     = std::string("Device/SubDeviceList/RAnkleRoll/Position/Actuator/Value");
+    jointAliases[1][R_ELBOW_ROLL]     = std::string("Device/SubDeviceList/RElbowRoll/Position/Actuator/Value");
+    jointAliases[1][R_ELBOW_YAW]      = std::string("Device/SubDeviceList/RElbowYaw/Position/Actuator/Value");
+    jointAliases[1][R_HAND]           = std::string("Device/SubDeviceList/RHand/Position/Actuator/Value");
+    jointAliases[1][R_HIP_PITCH]      = std::string("Device/SubDeviceList/RHipPitch/Position/Actuator/Value");
+    jointAliases[1][R_HIP_ROLL]       = std::string("Device/SubDeviceList/RHipRoll/Position/Actuator/Value");
+    jointAliases[1][R_KNEE_PITCH]     = std::string("Device/SubDeviceList/RKneePitch/Position/Actuator/Value");
+    jointAliases[1][R_SHOULDER_PITCH] = std::string("Device/SubDeviceList/RShoulderPitch/Position/Actuator/Value");
+    jointAliases[1][R_SHOULDER_ROLL]  = std::string("Device/SubDeviceList/RShoulderRoll/Position/Actuator/Value");
+    jointAliases[1][R_WRIST_YAW]      = std::string("Device/SubDeviceList/RWristYaw/Position/Actuator/Value");
     try
     {
         dcm_proxy->createAlias(jointAliases);
@@ -387,45 +520,31 @@ void hal_experimental::create_actuator_position_aliases()
   **/
 void hal_experimental::init_actuator_position_aliases()
 {
+    std::cout << "[init_actuator_pos]: Initializing the Alias for actuator positions..." << std::endl;
+    log_file << "[init_actuator_pos]: Initializing the Alias for actuator positions..." << std::endl;
     commands.arraySetSize(6);
+    LOG("init_actuator_pos", "Array size set to 6");
     commands[0] = std::string("jointActuators");
     commands[1] = std::string("ClearAll");
     commands[2] = std::string("time-separate");
     commands[3] = 0; //Aldabaran never implemented this
 
     commands[4].arraySetSize(1);
-    commands[5].arraySetSize(NumOfPositionActuatorIds);
-
-    for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    
+    // commands[5].arraySetSize(NumOfPositionActuatorIds);
+    // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+    // {
+    //     commands[5][i].arraySetSize(1);
+    // }
+    commands[5].arraySetSize(25);
+    for(int i =0; i < 25; ++i)
     {
         commands[5][i].arraySetSize(1);
     }
+    std::cout << "[init_actuator_pos]: Done!" << std::endl;
+    log_file << "[init_actuator_pos]: Done!" << std::endl;
 
 }
-/**
-  * \brief: Set the stiffness value for every joint on the robot to a single value
-  **/
-void hal_experimental::set_all_actuator_stiffnesses(const float &stiffnessVal)
-{
-    log_file << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
-    std::cout << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
-    AL::ALValue stiffnessComands;
-    int DCMTime;
-
-    try
-    {
-        DCMTime = dcm_proxy->getTime(1000); //Time NAOQi has been running + 1000ms
-    }
-    catch(const AL::ALError &e)
-    {
-        log_file << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
-        std::cout << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
-
-    }
-    log_file << "[set_all_stiffness] Done Setting all stiffness values to: " << stiffnessVal << std::endl;
-    std::cout << "[set_all_stiffness] Done Setting All stiffness values to: " << stiffnessVal << std::endl;
-}
-
 /**
   * \brief: Create the aliases for controlling the joint stiffnesses.
   **/
@@ -442,12 +561,38 @@ void hal_experimental::create_actuator_stiffness_aliases()
         jointAliases.clear();
         jointAliases.arraySetSize(2);
         jointAliases[0] = std::string("jointStiffness");
-        jointAliases[1].arraySetSize(NumOfStiffnessActuatorIds);
 
-        for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
-        {
-            jointAliases[1][i] = actuatorNames[i];
-        }
+        // jointAliases[1].arraySetSize(NumOfStiffnessActuatorIds);
+        // for(int i = 0; i < NumOfStiffnessActuatorIds; ++i)
+        // {
+        //     jointAliases[1][i] = actuatorNames[i];
+        // }
+        jointAliases[1].arraySetSize(25);
+        jointAliases[1][HEAD_PITCH]        = std::string("Device/SubDeviceList/HeadPitch/Hardness/Actuator/Value");
+        jointAliases[1][HEAD_YAW]          = std::string("Device/SubDeviceList/HeadYaw/Hardness/Actuator/Value");
+        jointAliases[1][L_ANKLE_PITCH]     = std::string("Device/SubDeviceList/LAnklePitch/Hardness/Actuator/Value");
+        jointAliases[1][L_ANKLE_ROLL]      = std::string("Device/SubDeviceList/LAnkleRoll/Hardness/Actuator/Value");
+        jointAliases[1][L_ELBOW_ROLL]      = std::string("Device/SubDeviceList/LElbowRoll/Hardness/Actuator/Value");
+        jointAliases[1][L_ELBOW_YAW]       = std::string("Device/SubDeviceList/LElbowYaw/Hardness/Actuator/Value");
+        jointAliases[1][L_HAND]            = std::string("Device/SubDeviceList/LHand/Hardness/Actuator/Value");
+        jointAliases[1][L_HIP_PITCH]       = std::string("Device/SubDeviceList/LHipPitch/Hardness/Actuator/Value");
+        jointAliases[1][L_HIP_ROLL]        = std::string("Device/SubDeviceList/LHipRoll/Hardness/Actuator/Value");
+        jointAliases[1][L_HIP_YAW_PITCH]   = std::string("Device/SubDeviceList/LHipYawPitch/Hardness/Actuator/Value");
+        jointAliases[1][L_KNEE_PITCH]      = std::string("Device/SubDeviceList/LKneePitch/Hardness/Actuator/Value");
+        jointAliases[1][L_SHOULDER_PITCH]  = std::string("Device/SubDeviceList/LShoulderPitch/Hardness/Actuator/Value");
+        jointAliases[1][L_SHOULDER_ROLL]   = std::string("Device/SubDeviceList/LShoulderRoll/Hardness/Actuator/Value");
+        jointAliases[1][L_WRIST_YAW]       = std::string("Device/SubDeviceList/LWristYaw/Hardness/Actuator/Value");
+        jointAliases[1][R_ANKLE_PITCH]     = std::string("Device/SubDeviceList/RAnklePitch/Hardness/Actuator/Value");
+        jointAliases[1][R_ANKLE_ROLL]      = std::string("Device/SubDeviceList/RAnkleRoll/Hardness/Actuator/Value");
+        jointAliases[1][R_ELBOW_ROLL]      = std::string("Device/SubDeviceList/RElbowRoll/Hardness/Actuator/Value");
+        jointAliases[1][R_ELBOW_YAW]       = std::string("Device/SubDeviceList/RElbowYaw/Hardness/Actuator/Value");
+        jointAliases[1][R_HAND]            = std::string("Device/SubDeviceList/RHand/Hardness/Actuator/Value");
+        jointAliases[1][R_HIP_PITCH]       = std::string("Device/SubDeviceList/RHipPitch/Hardness/Actuator/Value");
+        jointAliases[1][R_HIP_ROLL]        = std::string("Device/SubDeviceList/RHipRoll/Hardness/Actuator/Value");
+        jointAliases[1][R_KNEE_PITCH]      = std::string("Device/SubDeviceList/RKneePitch/Hardness/Actuator/Value");
+        jointAliases[1][R_SHOULDER_PITCH]  = std::string("Device/SubDeviceList/RShoulderPitch/Hardness/Actuator/Value");
+        jointAliases[1][R_SHOULDER_ROLL]   = std::string("Device/SubDeviceList/RShoulderRoll/Hardness/Actuator/Value");
+        jointAliases[1][R_WRIST_YAW]       = std::string("Device/SubDeviceList/RWristYaw/Hardness/Actuator/Value");
 
     }
     catch(const AL::ALError &e)
@@ -465,12 +610,55 @@ void hal_experimental::create_actuator_stiffness_aliases()
         log_file << "[create_actuator_stiffness][ERROR]: An error occured while creating stiffness actuator aliases: " << e.toString() << std::endl;
         std::cout << "[create_actuator_stiffness][ERROR]: An error occured while creating stiffness actuator aliases: " << e.toString() << std::endl;
     }
-
-
     std::cout << "[create_actuator_stiffness]: create actuator stiffness initialized" << std::endl;
     log_file << "[create_actuator_stiffness]: create actuator stiffness initialized" << std::endl;
-
 }
+
+/**
+  * \brief: Set the stiffness value for every joint on the robot to a single value
+  **/
+void hal_experimental::set_all_actuator_stiffnesses(const float &stiffnessVal)
+{
+    log_file << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
+    std::cout << "[set_all_stiffness] Setting All stiffness values to: " << stiffnessVal << "\n";
+    AL::ALValue stiffnessCommands;
+    int DCMTime;
+
+    try
+    {
+        DCMTime = dcm_proxy->getTime(1000); //Time NAOQi has been running + 1000ms
+    }
+    catch(const AL::ALError &e)
+    {
+        log_file << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
+        std::cout << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
+    }
+    stiffnessCommands.arraySetSize(3);
+    stiffnessCommands[0] = std::string("jointStiffness");
+    stiffnessCommands[1] = std::string("Merge");
+    stiffnessCommands[2].arraySetSize(1);
+    stiffnessCommands[2][0].arraySetSize(2);
+    stiffnessCommands[2][0][0] = stiffnessVal;
+    stiffnessCommands[2][0][1] = DCMTime;
+
+    log_file << "[set_all_stiffness] Alias set up..trying to set it now." << std::endl;
+    std::cout << "[set_all_stiffness] Alias set up..trying to set it now." << std::endl;
+    try
+    {
+        dcm_proxy->set(stiffnessCommands);
+        log_file << "[set_all_stiffness] Stiffness Values Set!" << std::endl;
+        std::cout << "[set_all_stiffness] Stiffness Values Set!" << std::endl;
+    }
+    catch(const AL::ALError &e)
+    {
+        log_file << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;
+        std::cout << "[set_all_stiffness][ERROR] An error occured while setting stiffness value: " << e.toString() << std::endl;   
+    }
+
+    log_file << "[set_all_stiffness] Done Setting all stiffness values to: " << stiffnessVal << std::endl;
+    std::cout << "[set_all_stiffness] Done Setting All stiffness values to: " << stiffnessVal << std::endl;
+}
+
 
 /////////// End Alias Initialization /////////////
 
@@ -861,8 +1049,8 @@ void hal_experimental::print_actuators()
 void hal_experimental::actuator_joint_test()
 {
     //CRY BECAUSE THIS SEGFAULT EVRY TIEM
-    // std::cout << "[actuator_jt]: Starting Test..." << std::endl;
-    // log_file << "[actuator_jt]: Starting Test..." << std::endl;
+    std::cout << "[actuator_jt]: Starting Test..." << std::endl;
+    log_file << "[actuator_jt]: Starting Test..." << std::endl;
     int current_dcm_time;
     try
     {
@@ -879,10 +1067,10 @@ void hal_experimental::actuator_joint_test()
     //however this ammount of time should happen naturally.
     try
     {
-        // std::cout << "[actuator_jt]: Attempting to set values..." << std::endl;
-        // log_file << "[actuator_jt]: Attempting to set values..." << std::endl;
-        // std::cout << "[actuator_jt]: 1. Setting Time..." << std::endl;
-        // log_file << "[actuator_jt]: 1. Setting Time..." << std::endl;
+        std::cout << "[actuator_jt]: Attempting to set values..." << std::endl;
+        log_file << "[actuator_jt]: Attempting to set values..." << std::endl;
+        std::cout << "[actuator_jt]: 1. Setting Time..." << std::endl;
+        log_file << "[actuator_jt]: 1. Setting Time..." << std::endl;
         commands[4][0] = current_dcm_time; 
 
 
@@ -890,7 +1078,8 @@ void hal_experimental::actuator_joint_test()
         {
             // std::cout << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
             // log_file << "[actuator_jt]: initialJointSensorValues is empty. Assigning those now..." << std::endl;
-            for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+            //for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+            for(int i = 0; i < 25; ++i)
             {
                 initialJointSensorValues.push_back(sensorValues[i]);
                 // log_file << "[connectToDCMLoop] initialSensorValues[" << i << "] = " << sensorValues[i] << '\n';
@@ -898,35 +1087,41 @@ void hal_experimental::actuator_joint_test()
             }
         }
 
-        // std::cout << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size()  << " | " << NumOfPositionActuatorIds << std::endl;
-        // log_file << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size() << " | " << NumOfPositionActuatorIds << std::endl;
+        std::cout << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size()  << " | " << NumOfPositionActuatorIds << std::endl;
+        log_file << "[actuator_jt]: 2. Setting initialJointSensorVals to commands[5][i][0]: " << initialJointSensorValues.size() << " | " << NumOfPositionActuatorIds << std::endl;
 
        
        
-        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+       // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        for(int i = 0; i < 25; ++i)
         {
-            commands[5][i][0] = initialJointSensorValues[i];
+            commands[5][i][0] = 0.2f;//initialJointSensorValues[i];
         }
 
-        // std::cout << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
-        // log_file << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
+        std::cout << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
+        log_file << "[actuator_jt]: 3. Trying to get sensor values with fast access..." << std::endl;
         fMemoryFastAccess->GetValues(sensorValues);
         // std::cout << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
         // log_file << "[actuator_jt]: Got sensor values with fast access! " << sensorValues.size() << std::endl;
         //Test
-        std::cout << "Trying to set commands[5][lShoulderPitchPositionActuator][0] =  " <<  sensorValues[rShoulderPitchPositionSensor] << std::endl;
+        std::cout << "Trying to set:\ncommands[5][lShoulderPitchPositionActuator][0] =  " <<  sensorValues[rShoulderPitchPositionSensor] << std::endl;
         std::cout << "commands[5][lShoulderRollPositionActuator][0]  = " << -sensorValues[rShoulderRollPositionSensor] << std::endl;
         std::cout << "commands[5][lElbowYawPositionActuator][0]      = " << - sensorValues[rElbowRollPositionSensor] << std::endl;
         std::cout << "commands[5][lElbowRollPositionActuator][0]     = " << - sensorValues[rElbowRollPositionSensor] << std::endl;
         
         //!!IMPORTANT!! commands[5][..PositionACTUATOR][0] = sensorValues[..PositionSENSOR];
-        commands[5][lShoulderPitchPositionActuator][0] =  sensorValues[rShoulderPitchPositionSensor];
-        commands[5][lShoulderRollPositionActuator][0]  = -sensorValues[rShoulderRollPositionSensor];
-        commands[5][lElbowYawPositionActuator][0]      = -sensorValues[rElbowRollPositionSensor];
-        commands[5][lElbowRollPositionActuator][0]     = -sensorValues[rElbowRollPositionSensor];
+        // commands[5][lShoulderPitchPositionActuator][0] =  sensorValues[rShoulderPitchPositionSensor];
+        // commands[5][lShoulderRollPositionActuator][0]  = -sensorValues[rShoulderRollPositionSensor];
+        // commands[5][lElbowYawPositionActuator][0]      = -sensorValues[rElbowRollPositionSensor];
+        // commands[5][lElbowRollPositionActuator][0]     = -sensorValues[rElbowRollPositionSensor];
+        commands[5][L_SHOULDER_PITCH][0] =   sensorValues[R_SHOULDER_PITCH];
+        commands[5][L_SHOULDER_ROLL][0]  = - sensorValues[R_SHOULDER_ROLL];
+        commands[5][L_ELBOW_YAW][0]      = - sensorValues[R_ELBOW_YAW];
+        commands[5][L_ELBOW_ROLL][0]     = - sensorValues[R_ELBOW_ROLL];
 
 
-        commands[5][headYawPositionActuator][0] = sensorValues[headYawPositionSensor] + deg2rad(10);
+
+        //commands[5][headYawPositionActuator][0] = sensorValues[headYawPositionSensor] + deg2rad(10);
         //commands[5][headYawPositionActuator][0] = 0.3;
         // std::cout << "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
         // log_file <<  "[actuator_jt]: 4. Values should be set! Assigning to alias..." << std::endl;
@@ -935,7 +1130,6 @@ void hal_experimental::actuator_joint_test()
     {
         std::cout << "[DCM POST LOOP][ERROR] An error occurred in the post DCM callback loop: " << e.toString() << std::endl;
         log_file << "[DCM POST LOOP][ERROR] An error occurred in the post DCM callback loop: " << e.toString() << std::endl;
-
     }
 
     try
@@ -950,7 +1144,7 @@ void hal_experimental::actuator_joint_test()
         std::cout << "[postCallBack RT][ERROR]: Error setting dcm alias: " << e.what() << std::endl;
     }
     // std::cout << "[actuator_jt]: Should be done!" << std::endl;
-    // log_file <<  "[actuator_jt]: Should be done!" << std::endl;
+    // log_file <<  "[actuato   r_jt]: Should be done!" << std::endl;
 }
 
 void hal_experimental::testAliases()
@@ -1063,6 +1257,7 @@ void hal_experimental::testLEDS()
             commandsTest[0] = std::string("ChestLeds");
             commandsTest[1] = std::string("ClearAll");
             commandsTest[2] = std::string("time-mixed");
+            //commandsTest[3].arraySetSize(3);
         }
         catch (const AL::ALError &e) {
             log_file << "Oh damn there was an error with the testLEDS: " << e.what() << "\n";
@@ -1072,7 +1267,7 @@ void hal_experimental::testLEDS()
        
     try
     {
-        std::cout << "Setting chest LEDS" << std::endl;
+        // std::cout << "Setting chest LEDS" << std::endl;
 		commandsTest[3].arraySetSize(3);
 		if (testLEDRot % 3 == 0 && (dcm_proxy->getTime(0) - lastTime > 2000)) {
             //ChestBoard/Led/Red/Actuator/Value
@@ -1087,7 +1282,7 @@ void hal_experimental::testLEDS()
             commandsTest[3][0][1][1] = dcm_proxy->getTime(2000);
 
             lastTime = dcm_proxy->getTime(0);
-            std::cout << "Red value should be set\n";
+            // std::cout << "Red value should be set\n";
         } else if (testLEDRot % 3 == 1 && (dcm_proxy->getTime(0) - lastTime > 2000)) {
             //ChestBoard/Led/Green/Actuator/Value
             commandsTest[3][1].arraySetSize(2);
@@ -1106,7 +1301,7 @@ void hal_experimental::testLEDS()
 
 
             lastTime = dcm_proxy->getTime(0);
-            std::cout << "Green value should be set\n";
+            // std::cout << "Green value should be set\n";
         } else if (testLEDRot % 3 == 2 && (dcm_proxy->getTime(0) - lastTime > 2000)) { 
             //ChestBoard/Led/Blue/Actuator/Value
             commandsTest[3][2].arraySetSize(2);
@@ -1124,16 +1319,23 @@ void hal_experimental::testLEDS()
             // commandsTest[3][2][1][0] = dcm_proxy->getTime(2400);
 
             lastTime = dcm_proxy->getTime(0);
-            std::cout << "Blue value should be set\n";
+            // std::cout << "Blue value should be set\n";
     //     SAY("My chest LEDS should be doing stuff");
         }
         dcm_proxy->setAlias(commandsTest);
         testLEDRot++;
-        std::cout << "Chest LEDS should have been set" << std::endl;
+        // std::cout << "Chest LEDS should have been set" << std::endl;
        } catch(const AL::ALError &e) {
            std::cout << "LED setting error occured: " << e.what() << std::endl;
            log_file << "LED setting error occured: " << e.what() << "\n";
        }
+}
+
+void hal_experimental::LOG(const std::string function, const std::string message)
+{
+    std::cout << "[" << function << "]: " << message << std::endl;
+    std::cout << "[" << function << "]: " << message << std::endl; 
+ 
 }
 //Returns an approximated value
 float hal_experimental::deg2rad(float degrees)

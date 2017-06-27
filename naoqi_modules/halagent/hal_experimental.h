@@ -54,9 +54,11 @@ public:
     void read_sensors();
     void onPreProcess();
     void onPostProcess();
+    void startLoop();
+    void stopLoop();
     
     void initialize_everything();
-    void connectToDCMLoop(boost::shared_ptr<AL::ALBroker> pBroker);
+    void connectToDCMLoop();
 
     
     /// Alias initialization
@@ -88,6 +90,7 @@ public:
     void print_actuators();
     void dummyfunction();
     void get_ip_address();
+    void LOG(const std::string function, const std::string message);
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
 
     /**
@@ -100,9 +103,18 @@ public:
 private:
 
     float deg2rad(float degress);
-    AL::DCMProxy *dcm_proxy;
+
+    boost::shared_ptr<AL::ALBroker> pBrokerCopy;
+    //AL Proxies
+    boost::shared_ptr<AL::DCMProxy> dcm_proxy;
+    //boost::shared_ptr<AL::DCMProxy> dcm_proxy;
     AL::ALMemoryProxy *nao_memory_proxy;
     AL::ALTextToSpeechProxy *speak_proxy;
+    boost::shared_ptr<AL::ALMemoryFastAccess> fMemoryFastAccess;
+
+    //DCM Signal Hooks
+    ProcessSignalConnection fDCMPostProcessConnection, fDCMPreProcessConnection;
+
     //Main aliases
     AL::ALValue position_request_alias, stiffness_request_alias, led_request_alias;
     AL::ALValue commands, commandsAlias;
@@ -110,12 +122,10 @@ private:
     //Sensor names for fast memory access
     std::vector<std::string> fSensorKeys;
     //Pointer for fast memory access
-    boost::shared_ptr<AL::ALMemoryFastAccess> fMemoryFastAccess;
 
     // Test Aliases
     AL::ALValue commandsTestAlias, commandsTest; //Chest LEDS
     AL::ALValue positionTestAlias, testAlias; //Actuator Position
-    ProcessSignalConnection fDCMPostProcessConnection, fDCMPreProcessConnection;
     //Head and Body ID's and Version number. Useful for compatability checking
     std::string body_ID; 
     std::string body_version;
