@@ -776,7 +776,7 @@ void hal_experimental::actuator_joint_test()
         //!!IMPORTANT!! commands[5][..PositionACTUATOR][0] = sensorValues[..PositionSENSOR];
         commands[5][lShoulderPitchPositionActuator][0] =  sensorValues[rShoulderPitchPositionSensor];
         commands[5][lShoulderRollPositionActuator][0]  = -sensorValues[rShoulderRollPositionSensor];
-        commands[5][lElbowYawPositionActuator][0]      = -sensorValues[rElbowRollPositionSensor];
+        commands[5][lElbowYawPositionActuator][0]      = -sensorValues[rElbowYawPositionSensor];
         commands[5][lElbowRollPositionActuator][0]     = -sensorValues[rElbowRollPositionSensor];
     }
     catch(const AL::ALError &e)
