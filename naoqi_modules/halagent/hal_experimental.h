@@ -51,8 +51,6 @@ public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
    ~hal_experimental();
     static const std::string name;
-	void set_actuators();
-    void read_sensors();
     void onPreProcess();
     void onPostProcess();
     void startLoop();
@@ -85,8 +83,6 @@ public:
     //test
     void testLEDS();
     void actuator_joint_test();
-    void print_sensors();
-    void print_actuators();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
 
     std::ofstream log_file;

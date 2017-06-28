@@ -231,6 +231,15 @@ void hal_experimental::stopLoop()
     fDCMPreProcessConnection.disconnect();
     fDCMPostProcessConnection.disconnect();
     LOG("[stopLoop]", "Real time hooks disconnected!");
+    try
+    {
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    } 
+    catch(boost::interprocess::interprocess_exception &e)
+    {
+        std::cout << "[CRITICAL][DESTRUCTOR] Could not clean up shared memory!" << std::endl;
+    }
 }
 /** 
 * The method is called by NaoQi immediately before it communicates with the chest board.
@@ -760,123 +769,11 @@ float* hal_experimental::robot_state_handler(float *actuator_vals)
     return actuator_vals;
 }
 
-/**
-  * set_actuators: Set Actuators main function + helper function calls.
-  * 
-  **/
-void hal_experimental::set_actuators()
-{
-	try
-	{
-        log_file << "[dcm_time:" << dcm_time << "] set_actuators has been called. Stupid dangerous UNSAFE mode is enabled (lol)\n";
-        //pineappleJuice->actuator_semaphore.wait();
-        dcm_time = dcm_proxy->getTime(0);
-        
-        //currently actuator update fails aren't handled
-        pineappleJuice->actuators_current_read = pineappleJuice->actuators_newest_update;
-        /*
-        if (pineappleJuice->actuators_newest_update != last_reading_actuator)
-        {
-            if(actuator_update_fails == 0) 
-                log_file << "NaoQi has failed at updating the actuator value. Bad NaoQi. Bad." << "\n";
-            actuator_update_fails++;
-        }
-        else actuator_update_fails = 0;
-        */
-        last_reading_actuator = pineappleJuice->actuators_newest_update;
-        //read_actuators = pineappleJuice->actuators[pineappleJuice->actuators_current_read];
-        read_actuators = pineappleJuice->actuators_unsafe;
-        
-        //Get actual actuator vals to be assigned. These values won't exactly correspond to
-        //what NAOInterface passed due to the various states the robot may be in.
-        //actuators = robot_state_handler(read_actuators);
-        //pineappleJuice->actuator_semaphore.post();
-        log_file << "I may have gotten through the unsafe part with only minimal irreversible brain damage.\n";
-
-        //Set Actuator values
-        //set_actuators_positions();
-        log_file << "set_actuators_positions was called\n";
-
-
-        log_file << "Hardware values updated" << '\n';
-      //  SAY("My hardware values have been updated");
-        //TODO: Gamecontroller stuff (team info)
-        log_file << "I should have said something dumb about my hardware values being updated" << std::endl;;
-        
-	}
-    catch(AL::ALError &e) //uh...this could yield an Boost.Interprocess exception or a AL::Exception...I wonder if I can throw it as a boost variant?
-    {
-        log_file << "set_actuators exception: " << e.what() << std::endl;
-    }
-}
 /** \brief: init_aliases: This function initializes all the required communication channels for hardware control
   *  tl;dr this method and datastructure is cancer. I really don't want to comment much on it because it sucks. 
   * the relevant documentation can be found here: http://doc.aldebaran.com/2-1/naoqi/sensors/dcm-api.html#DCMProxy
 
   **/
-
-void hal_experimental::read_sensors()
-{
-    try
-    {
-        log_file << "Reading Sensor Values in a stupid UNSAFE way\n";
-        //pineappleJuice->sensor_semaphore.wait();
-        int sensor_data_written = 0;
-        //currently support for dropped reads/writes is disabled
-        if(sensor_data_written == pineappleJuice->sensors_newest_update)
-        {
-            sensor_data_written++;
-        }
-        if(sensor_data_written == pineappleJuice->sensors_newest_read && sensor_data_written == pineappleJuice->sensors_newest_update )
-        {
-            sensor_data_written++;
-        }
-
-        //Safety Test:
-        if(sensor_data_written == pineappleJuice->sensors_newest_read || sensor_data_written == pineappleJuice->sensors_newest_update)
-        {
-            log_file << "Sensor data being overwritten to shared memory!" << "\n"; 
-        }
-        //float *current_sensor = pineappleJuice->sensors[sensor_data_written];
-        float *current_sensor = pineappleJuice->sensors_unsafe;
-        for(int i = 0; i < NumOfSensorIds; ++i)
-        {
-            current_sensor[i] = *sensor_ptrs[i];
-        }
-        //Update sensor values in shared memory
-        pineappleJuice->sensors_newest_update = sensor_data_written;
-        log_file << "[read_sensors()] sensor data read...posting semaphore." << "\n";
-        log_file << "Done with UNSAFE sensor stuff\n";
-        //pineappleJuice->sensor_semaphore.post();
-        SAY("My Sensor Values have been updated");
-        log_file << "[read_sensors()] semaphore posted!" << std::endl;
-        
-    }
-    catch (const std::exception &e)
-    {
-        log_file << "An error occured while trying to read the sensor data: " << e.what() << "\n";   
-    }
-}
-
-
-void hal_experimental::print_sensors()
-{
-    log_file << "================= SENSOR VALUES! =================" << "\n";
-    pineappleJuice->sensor_semaphore.wait();
-    for(int i = 0; i < NumOfSensorIds; ++i)
-        log_file << sensorNames[i] << " = " << pineappleJuice->sensors_unsafe[i] << "\n";
-    //    std::cout << sensorNames[i] << " = " << pineappleJuice->sensors[pineappleJuice->sensors_newest_update][i] << std::endl;
-    pineappleJuice->sensor_semaphore.post(); 
-}
-void hal_experimental::print_actuators()
-{
-    log_file << "================= ACTUATOR VALUES! =================" << "\n";
-    pineappleJuice->actuator_semaphore.wait();
-    for(int i = 0; i < NumOfActuatorIds; ++i)
-            log_file << sensorNames[i] << " = " << pineappleJuice->actuators_unsafe[i] << "\n";
-    //    std::cout << sensorNames[i] << " = " << pineappleJuice->actuators[pineappleJuice->actuators_newest_update][i] << std::endl;
-    pineappleJuice->sensor_semaphore.post(); 
-}
 
 void hal_experimental::actuator_joint_test()
 {

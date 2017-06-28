@@ -104,14 +104,7 @@ public:
 	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	bool set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG);
 	bool set_hardware_value(const unsigned int &hardware_component, const float value);
-	/**
-	  * \brief: A dangerous way to quickly send queued requests to NAOqi
-	  * 
-	  * This method allows for lock/semaphore free passsing of a single value
-	  * to NAOqi. The value sent is simply the top of the priority queue.
-	  * Only use this for super high priority items.
-	  **/
-	bool fast_write();
+
 
 	/**
 	  * \brief Reads a hardware component value.
@@ -183,7 +176,7 @@ private:
 		bool shared_memory_setup;
 	NAOInterface();
     //Intent processing
-    PendingIntents pending_intents;
+  PendingIntents pending_intents;
 	boost::interprocess::managed_shared_memory shm;
 	hal_data *pineappleJuice; // Object stored in interprocess memory
 	bool read_shm, write_shm; // Return Values for interprocess rw operations

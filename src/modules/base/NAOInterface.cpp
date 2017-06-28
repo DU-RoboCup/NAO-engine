@@ -250,31 +250,7 @@ bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, co
 	}
 	return all_success;
 }
-bool NAOInterface::fast_write()
-{
-	/*
-	LOG_DEBUG << "FAST_SET_REF_COUNT: " << pineappleJuice->fast_access_value.use_count();
-	if(pineappleJuice->fast_access_value.use_count() != pineappleJuice->fast_actuator_id.use_count())
-	{
-		LOG_WARNING << "Ref count of fast_actuator_id and fast_access_value are different. It be dangerous to write in this volatility!";
-		return false;
-	}
-	if(pineappleJuice->fast_access_value.use_count() <= 2 && WriteRequests.size() != 0)
-	{
-		if(pineappleJuice->fast_access_value == 0)
-		{
-			LOG_DEBUG << "We can successfully quickly write data to IPC";
-			auto data_request = WriteRequests.pop_top();
-			pineappleJuice->fast_access_value = boost::make_shared<float>(std::get<1>(data_request));
-			pineappleJuice->fast_actuator_id = boost::make_shared<int>(std::get<0>(data_request));
-			return true;
-		}
-		else return false;
-	}
-	LOG_WARNING << "Fast Write Failed.";
-	*/
-	return false;
-}
+
 bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 {
 	if(hardware_get_map.find(hardware_component) == hardware_get_map.end())
@@ -392,7 +368,7 @@ void NAOInterface::hardware_write_test()
 	testValues.resize(4);
 	try
 	{
-		LOG_DEBUG << "Waiting on sensor value semaphore...";
+		//LOG_DEBUG << "Waiting on sensor value semaphore...";
 		//pineappleJuice->sensor_semaphore.wait();
 		testValues[0] = pineappleJuice->sensor_values[rShoulderPitchPositionSensor];
 		LOG_DEBUG << "rShoulderPitchPositionSensor: " << testValues[0];
@@ -403,17 +379,17 @@ void NAOInterface::hardware_write_test()
 		testValues[3] = -pineappleJuice->sensor_values[rElbowRollPositionSensor];
 		LOG_DEBUG << "rElbowRollPositionSensor: " << testValues[3];
 		//pineappleJuice->sensor_semaphore.post();
-		LOG_DEBUG << "Done with sensor value semaphore!";
+		//LOG_DEBUG << "Done with sensor value semaphore!";
 
-		LOG_DEBUG << "Waiting on actuator semaphore...";
+		//LOG_DEBUG << "Waiting on actuator semaphore...";
 		//pineappleJuice->actuator_semaphore.wait();
 		pineappleJuice->actuator_values[lShoulderPitchPositionActuator] = testValues[0];
-		pineappleJuice->actuator_values[lShoulderRollPositionActuator] = testValues[0];
-		pineappleJuice->actuator_values[lElbowYawPositionActuator] = testValues[0];
-		pineappleJuice->actuator_values[lElbowRollPositionActuator] = testValues[0];
+		pineappleJuice->actuator_values[lShoulderRollPositionActuator] = testValues[1];
+		pineappleJuice->actuator_values[lElbowYawPositionActuator] = testValues[2];
+		pineappleJuice->actuator_values[lElbowRollPositionActuator] = testValues[3];
 
 		//pineappleJuice->actuator_semaphore.post();
-		LOG_DEBUG << "Done with Actuator Semaphore! New joint values set!";
+		//LOG_DEBUG << "Done with Actuator Semaphore! New joint values set!";
 	}
 	catch(const interprocess_exception &e)
 	{
