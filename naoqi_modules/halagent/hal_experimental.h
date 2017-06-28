@@ -3,6 +3,7 @@
 
 //Boost Includes
 #define BOOST_SIGNALS_NO_DEPRECATION_WARNING
+
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -76,43 +77,30 @@ public:
 
     void set_LEDS();
     float* robot_state_handler(float *actuator_vals);
-    // Helper functions for setting actuators
-    void set_actuators_positions();
-    bool set_actuators_stiffness();
-    void set_actuators_leds(); //bool &requested_stiffness_set
-    void init_aliases();
     //test
     void testLEDS();
-    void testAliases();
     void actuator_joint_test();
     void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
-    void dummyfunction();
-    void get_ip_address();
-    void LOG(const std::string function, const std::string message);
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
 
-    /**
-      * \brief debug_alvalue: Insanity Check...
-      * @param v: An ALValue alias (which is a weird multidemensional jagged array)
-      * @param name: Alias name
-      **/
-    void debug_alvalue(AL::ALValue &v, std::string name);
     std::ofstream log_file;
 private:
 
     float deg2rad(float degress);
+    void LOG(const std::string function, const std::string message);
+    void get_ip_address();
 
     boost::shared_ptr<AL::ALBroker> pBrokerCopy;
     //AL Proxies
     boost::shared_ptr<AL::DCMProxy> dcm_proxy;
-    //boost::shared_ptr<AL::DCMProxy> dcm_proxy;
-    AL::ALMemoryProxy *nao_memory_proxy;
-    AL::ALTextToSpeechProxy *speak_proxy;
     boost::shared_ptr<AL::ALMemoryFastAccess> fMemoryFastAccess;
 
-    //DCM Signal Hooks
+    AL::ALMemoryProxy *nao_memory_proxy;
+    AL::ALTextToSpeechProxy *speak_proxy;
+
+    //DCM Signal Hooks for Real Time Communication
     ProcessSignalConnection fDCMPostProcessConnection, fDCMPreProcessConnection;
 
     //Main aliases
@@ -131,7 +119,6 @@ private:
     std::string body_version;
     std::string head_ID;
     std::string head_version;
-    std::string my_ip_address;
     boost::interprocess::managed_shared_memory shm;
 
 	uint8_t last_reading_actuator;
@@ -139,7 +126,6 @@ private:
 	//int dcm_time;
     int dcm_time;
     float last_requested_actuators[NumOfActuatorIds];
-    int ledIndex;
     hal_data *pineappleJuice;
     float *read_actuators;
     //float *actuators;
@@ -151,12 +137,8 @@ private:
     static hal_experimental *instance;
     //TESTS
     unsigned long long testLEDRot;
-
     int lastTime;
-    int mult;
-    bool testLEDInitialized, testAliasesInitialized;
+    bool testLEDInitialized;
 
-    FILE *fp;
-    bool cout_debug;
 };
 #endif

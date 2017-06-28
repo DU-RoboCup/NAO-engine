@@ -56,6 +56,8 @@ struct hal_data {
     float sensors_unsafe[NumOfSensorIds];
     float actuators_unsafe[NumOfActuatorIds];
 
+    float sensor_values[NumOfSensorIds];
+    float actuator_values[NumOfActuatorIds];
 
     /* The use of semaphores here may be 1. excessive and 2. unecessary */
     boost::interprocess::interprocess_semaphore actuator_semaphore, sensor_semaphore, speak_semaphore;
