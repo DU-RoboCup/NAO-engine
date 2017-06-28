@@ -2,6 +2,7 @@
 #define _UDP_HANDLER_H_
 
 #include <cstdlib>
+#include "include/common.h"
 #include <iostream>
 #include <boost/asio.hpp>
 

@@ -4,10 +4,8 @@ udp_handler::udp_handler(boost::asio::io_service &io_service, short port)
     :
         _socket(io_service, udp::endpoint(udp::v4(), port))
 {
-    std::cout << "Server spawned" << std::endl;
+    LOG_DEBUG << "Server spawned";
     handle_receive();
-    std::cout << "[post receive]: test1" << std::endl;
-
 }
 
 udp_handler::~udp_handler()
@@ -23,15 +21,16 @@ void udp_handler::handle_receive()
             {
                 if(!ec && bytes_recvd > 0)
                 {    
-                    std::cout << "Buffer: " << data_ << std::endl;
+                    LOG_DEBUG << "Buffer: " << data_;
                     handle_send(bytes_recvd);
                 } else {
-                    std::cout << "test2" << std::endl;
+                    LOG_DEBUG"test2";
                     handle_receive();
                 }
-                std::cout << "test3" << std::endl;
+                LOG_DEBUG << "test3";
                     
             });
+            LOG_DEBUG << "Done handling network receive";
 }
 
 void udp_handler::handle_send(std::size_t length)
@@ -43,6 +42,7 @@ void udp_handler::handle_send(std::size_t length)
             {
                 handle_receive();
             });
+            LOG_DEBUG << "Done handling network send";
 }
 
 /*
