@@ -57,6 +57,11 @@ public:
     void onPostProcess();
     void startLoop();
     void stopLoop();
+
+    //Interprocess syncing
+    void update_actuator_values();
+    void update_sensor_values();
+    void update_text_to_speak();
     
     void initialize_everything();
     void connectToDCMLoop();
@@ -80,7 +85,6 @@ public:
     //test
     void testLEDS();
     void actuator_joint_test();
-    void speak(); // This can be used to annoy people
     void print_sensors();
     void print_actuators();
     std::pair<hal_data *, std::size_t> shared_data_ptr; ///< Because for some reason it segfaults just using pineappleJuice...
@@ -135,6 +139,8 @@ private:
 
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
+
+    char last_spoken_text[35];
     //TESTS
     unsigned long long testLEDRot;
     int lastTime;

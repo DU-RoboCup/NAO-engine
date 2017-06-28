@@ -117,8 +117,17 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
     functionName("set_all_actuator_stiffnesses" , getName(), "change stiffness of all joint");
     addParam("value", "new stiffness value from 0.0 to 1.0");
-
     BIND_METHOD(hal_experimental::set_all_actuator_stiffnesses);
+
+    functionName("update_actuator_values", getName(), "interprocess sync of actuators");
+    BIND_METHOD(hal_experimental::update_actuator_values);
+
+    functionName("update_sensor_value", getName(), "interprocess sync of sensor values");
+    BIND_METHOD(hal_experimental::update_sensor_values);
+
+    functionName("update_text_to_speak", getName(), "interprocess sync of text to speak");
+    BIND_METHOD(hal_experimental::update_text_to_speak);
+
     startLoop();
     std::cout << "hal_experimental Fully Initialized!" << std::endl;
 
@@ -279,7 +288,8 @@ void hal_experimental::connectToDCMLoop()
   **/
 void hal_experimental::onPreProcess()
 {
-
+    update_actuator_values();
+    update_text_to_speak();
 }
 
 /**
@@ -289,32 +299,13 @@ void hal_experimental::onPreProcess()
 
 void hal_experimental::onPostProcess()
 {
-
+    update_sensor_values();
 }
 ////////////////////////////////////////////////////////////
 ///////////////// END REAL TIME HOOKS //////////////////////
 ////////////////////////////////////////////////////////////
 
-/**
-* speak: Make the NAO say things (textToSpeech)
-* This method is currently not really really race condition safe.
-* Not my fault if the NAO starts speaking giberish (well actually 100% my fault but its halarious)
-**/
-void hal_experimental::speak()
-{
-    log_file << "Horrible unsafe speak method called\n";
-    pineappleJuice->speak_semaphore.post();
-    //See if there's anything new to talk about
-    SAY("I've been asked to speak. I am mute.");
-    if(pineappleJuice->text_to_speak_unsafe[0] != ' ' || pineappleJuice->text_to_speak_unsafe[0] != '0')
-    {
-        SAY(pineappleJuice->text_to_speak_unsafe);
-         //Mark as already have talked. Prevents parrots from attacking our pineapples.
-        pineappleJuice->text_to_speak_unsafe[0] = ' ';
-    }
-    log_file << "I have left the terrible unsafe, widely spoken lands" << std::endl;
-   // pineappleJuice->speak_semaphore.post();
-}
+
 /**
 * get_ip_address: Executes a shell command to retrieve the NAO's IP Address
 * NOTE: There is a blocking call that lasts like 10s before the python script is run or anything else
@@ -595,6 +586,131 @@ void hal_experimental::set_all_actuator_stiffnesses(const float &stiffnessVal)
 /////////// End Alias Initialization //////////////
 ///////////////////////////////////////////////////
 
+
+
+
+/////////////////////////////////////////////////////////
+/////////// Interprocess Sync and Hardware IO ///////////
+/////////////////////////////////////////////////////////
+
+/**!!!! NOTE !!!!!
+* If any of the interprocess semaphore wait/post calls take
+* more than 10ms, the DCM will crash and the robot will probably 
+* fall over or have a seizure or something. I honestly dont know but 
+* it'll be funny (not in competition though)...
+**/
+
+/**
+  * \brief: Reads new values from interprocess memory and attempts to set them
+  **/
+void hal_experimental::update_actuator_values()
+{
+    // First get the current time since NAOqi was started from the real time clock
+    int current_dcm_time;
+    try
+    {
+        current_dcm_time = dcm_proxy->getTime(0);
+    }
+    catch(const AL::ALError &e)
+    {
+        LOG("[actuator_joint_test]", "[ERROR]: Error accessing DCM: " + e.toString());
+    }
+    try
+    {
+        // Real time value for setting the actuators immediately.
+        commands[4][0] = current_dcm_time;
+        //Ensure every joint has a value, the obvious choice is its current sensor value.
+        for(int i = 0; i < 25; ++i)
+        {
+            commands[5][i][0] = initialJointSensorValues[i];
+        }
+
+        // Use our semaphore for propery interprocess syncing of shared memory
+        pineappleJuice->actuator_semaphore.wait();
+        //TODO: Switch this to NumOfActuatorIds when thats all implemented
+        for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+        {
+            commands[5][i][0] = pineappleJuice->actuator_values[i];
+        }
+        pineappleJuice->actuator_semaphore.post();
+    }
+    catch(const AL::ALError &e)
+    {
+        LOG("[actuator_joint_test]", "[DCM POST LOOP][ERROR] An error occurred in the post DCM callback loop: " + e.toString());
+    }
+
+    //Tell the DCM the values we want to set the actuators to
+    try
+    {
+        dcm_proxy->setAlias(commands);
+    } 
+    catch(const AL::ALError &e)
+    {
+        LOG("[actuator_joint_test]", "[ERROR]: Error setting dcm alias: " + e.toString());
+    }
+}
+/**
+  * \brief: Checks shared memory for text to speak. If the last text was already spoken, if not it says it.
+  **/
+void hal_experimental::update_text_to_speak()
+{
+    try
+    {
+        pineappleJuice->speak_semaphore.wait();
+        if(std::strcmp(last_spoken_text, pineappleJuice->text_to_speak_unsafe) == 0)
+        {
+            SAY(pineappleJuice->text_to_speak_unsafe);
+            //PLZ DO NOT EXPLOIT ROBOT
+            std::strncpy(last_spoken_text, pineappleJuice->text_to_speak_unsafe, 34);
+        }
+        pineappleJuice->speak_semaphore.post();
+    }
+    catch(const std::exception &e)
+    {
+        log_file << "[update_text_to_speak][ERROR]: An error has occured while updating text to speak! " << e.what() << std::endl;
+    }
+}
+
+/**
+  * \brief: Updates the sensor values in shared memory for NAOInterface
+  **/
+void hal_experimental::update_sensor_values()
+{
+    try
+    {
+        fMemoryFastAccess->GetValues(sensorValues);
+    }
+    catch(const AL::ALError &e)
+    {
+        LOG("update_sensor_vals][ERROR]","Error, could not read sensor values: " + e.toString());
+    }
+
+    try
+    {
+        pineappleJuice->sensor_semaphore.wait();
+        for(int i = 0; i < sensorValues.size(); ++i)
+        {
+            pineappleJuice->sensor_values[i] = sensorValues[i];
+        }
+        pineappleJuice->sensor_semaphore.post();
+    }
+    catch(const boost::interprocess::interprocess_exception &e)
+    {
+        log_file << "[update_sensor_vals][ERROR]: An interprocess error has occured: " << e.what() << std::endl;
+    }
+}
+
+
+/////////////////////////////////////////////////////////
+/////////////////////  End Sync /////////////////////////
+////////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////////////
+/////////////////  Tests   ////////////////////////
+///////////////////////////////////////////////////
 
 void hal_experimental::set_LEDS()
 {
@@ -888,6 +1004,10 @@ void hal_experimental::testLEDS()
            log_file << "LED setting error occured: " << e.what() << "\n";
        }
 }
+
+////////////////////////////////////
+///////// End Tests ////////////////
+////////////////////////////////////
 
 
 /**
