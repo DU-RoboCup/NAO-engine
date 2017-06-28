@@ -44,44 +44,52 @@ void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
 }
 bool NAOInterface::RunFrame()
 {
-    hardware_write_test();
-	if(!pending_intents.empty()) 
+	LOG_DEBUG << "NAOInterface is running...";
+	if(!shared_memory_setup)
 	{
-		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
-		try 
-		{
-			ParsedIntent pi = pending_intents.pop_front().Parse();
-			if(pi[2] == "set_hardware_value"){
-				if(pi.size() < 5)
-					set_hardware_value(pi[3], std::stof(pi[4]));
-
-				//TODO: Write Dispatch Table for ENUM C++
-				// else 
-				// {
-				// 	try{
-				// 		
-				// 		std::string hw_cmp = pi[3];
-				// 		QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
-				// 		set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
-				// 	}
-				// 	catch(const std::exception &e)
-				// 	{
-				// 		std::cout << "An exception has occured: " << e.what() << "\n";
-				// 	}
-				// }
-			}
-			else if(pi[2] == "get_hardware_value")
-				get_hardware_value(pi[3]);
-			else
-			{
-				LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
-				return false; 
-			}
-		} catch(const std::exception &e) {
-			LOG_WARNING << "Intent Parsing Exception: " << e.what() << "";
-		}
-		LOG_DEBUG << "Doing stuff with intents";
+		bool res = access_shared_memory();
+		LOG_WARNING << "Shared mem not setup! Result of setting up shared memory: " <<  res << "";
 	}
+	LOG_DEBUG << "Shared Memory Setup! Doing a hardware test...";
+    hardware_write_test();
+	LOG_DEBUG << "Hardware Test Done!";
+	// if(!pending_intents.empty()) 
+	// {
+	// 	//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
+	// 	try 
+	// 	{
+	// 		ParsedIntent pi = pending_intents.pop_front().Parse();
+	// 		if(pi[2] == "set_hardware_value"){
+	// 			if(pi.size() < 5)
+	// 				set_hardware_value(pi[3], std::stof(pi[4]));
+
+	// 			//TODO: Write Dispatch Table for ENUM C++
+	// 			// else 
+	// 			// {
+	// 			// 	try{
+	// 			// 		
+	// 			// 		std::string hw_cmp = pi[3];
+	// 			// 		QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
+	// 			// 		set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
+	// 			// 	}
+	// 			// 	catch(const std::exception &e)
+	// 			// 	{
+	// 			// 		std::cout << "An exception has occured: " << e.what() << "\n";
+	// 			// 	}
+	// 			// }
+	// 		}
+	// 		else if(pi[2] == "get_hardware_value")
+	// 			get_hardware_value(pi[3]);
+	// 		else
+	// 		{
+	// 			LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
+	// 			return false; 
+	// 		}
+	// 	} catch(const std::exception &e) {
+	// 		LOG_WARNING << "Intent Parsing Exception: " << e.what() << "";
+	// 	}
+	// 	LOG_DEBUG << "Doing stuff with intents";
+	// }
 	return true;
 }
 bool NAOInterface::ProcessIntent(Intent &i)
@@ -106,6 +114,7 @@ using namespace boost::interprocess;
 NAOInterface::NAOInterface()
 {
 	BOOST_LOG_FUNCTION();
+	LOG_WARNING << "Initializing NAOInterface";
 
 	head = std::make_shared<Head>();
 	RightArm = std::make_shared<RArm>();
@@ -113,6 +122,7 @@ NAOInterface::NAOInterface()
 	LeftLeg = std::make_shared<LLeg>();
 	RightLeg = std::make_shared<RLeg>();
 
+	shared_memory_setup = false;
     randomly_set_joints();
 	//Sets up map of get function pointer and set function pointers
 	initialize_function_map();
@@ -125,6 +135,19 @@ NAOInterface::NAOInterface()
 	else
 	{
 		// Pre-allocate our vectors with values. This should help provide better Caching performance.
+		// try
+		// {
+		// 	pineappleJuice->sensor_semaphore.wait();
+		// 	for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+		// 	{
+		// 		sensor_vals[i] = pineappleJuice->sensor_values[i];
+		// 	}
+		// 	pineappleJuice->sensor_semaphore.post();
+		// }
+		// catch(const interprocess_exception &e)
+		// {
+		// 	LOG_FATAL << "Could not access interprocess memory!" << std::endl;
+		// }
 		sensor_vals.assign(NumOfSensorIds, 0);
 		actuator_vals.assign(NumOfActuatorIds, 0);
 	}
@@ -202,7 +225,7 @@ bool NAOInterface::speak(const std::string &text)
 }
 bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, const float value)
 {
-	LOG_DEBUG << "Attempting to do a direct hardware value write.";
+	//LOG_DEBUG << "Attempting to do a direct hardware value write.";
 	bool all_success = false;
 	if(! hardware_component >= NumOfActuatorIds)
 	{
@@ -267,17 +290,24 @@ bool NAOInterface::get_hardware_value(const std::string &hardware_component)
 }
 bool NAOInterface::access_shared_memory()
 {
+	LOG_DEBUG << "Accessing shared memory...";
 	try
 	{
         shm = managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+		LOG_DEBUG << "Found share memory region PineappleJuice!";
 		pineappleJuice = shm.find<hal_data>("juicyData").first;
-		if(!pineappleJuice) LOG_FATAL << "Could not open shared memory object pineappleJuice!";
+		if(!pineappleJuice)
+		 	LOG_FATAL << "Could not open shared memory object pineappleJuice!";
+		else
+			LOG_WARNING << "Shared memory found correctly!"; 
+		LOG_WARNING << "Shared Memory should be setup!";
 	}
 	catch (const interprocess_exception &e)
 	{
 		LOG_WARNING << "NAOInterface could not open required shared memory objects. Error Code: " << e.what() << ".";
 		return false;
 	}
+	shared_memory_setup = true;
 	return true;
 }
 bool NAOInterface::sync_pineapple()
@@ -357,25 +387,39 @@ bool NAOInterface::write_shared_memory()
 }
 void NAOInterface::hardware_write_test()
 {
-	std::vector<std::pair<const unsigned int, const float>> writeTests {
-		{faceLedGreenLeft180DegActuator, 1.0},
-		{faceLedGreenLeft225DegActuator, 1.0},
-		{faceLedBlueLeft90DegActuator, 1.0},
-		{faceLedRedLeft0DegActuator, 1.0},
-		{lShoulderPitchStiffnessActuator, 0.9},
-		{lShoulderRollStiffnessActuator, 0.9}
-
-	};
-
-	for (auto &val : writeTests)
+	BOOST_LOG_FUNCTION();
+	std::vector<float> testValues;
+	testValues.resize(4);
+	try
 	{
-		if(set_hardware_value(val.first, val.second))
-		{
-			LOG_DEBUG << actuatorNames[val.first] << " written successfully!";
-		} else {
-			LOG_WARNING << actuatorNames[val.first] << " failed to write successfully.";
-		}
+		LOG_DEBUG << "Waiting on sensor value semaphore...";
+		//pineappleJuice->sensor_semaphore.wait();
+		testValues[0] = pineappleJuice->sensor_values[rShoulderPitchPositionSensor];
+		LOG_DEBUG << "rShoulderPitchPositionSensor: " << testValues[0];
+		testValues[1] = -pineappleJuice->sensor_values[rShoulderRollPositionSensor];
+		LOG_DEBUG << "rShoulderRollPositionSensor: " << testValues[1];
+		testValues[2] = -pineappleJuice->sensor_values[rElbowYawPositionSensor];
+		LOG_DEBUG << "rElbowYawPositionSensor: " << testValues[2];
+		testValues[3] = -pineappleJuice->sensor_values[rElbowRollPositionSensor];
+		LOG_DEBUG << "rElbowRollPositionSensor: " << testValues[3];
+		//pineappleJuice->sensor_semaphore.post();
+		LOG_DEBUG << "Done with sensor value semaphore!";
+
+		LOG_DEBUG << "Waiting on actuator semaphore...";
+		//pineappleJuice->actuator_semaphore.wait();
+		pineappleJuice->actuator_values[lShoulderPitchPositionActuator] = testValues[0];
+		pineappleJuice->actuator_values[lShoulderRollPositionActuator] = testValues[0];
+		pineappleJuice->actuator_values[lElbowYawPositionActuator] = testValues[0];
+		pineappleJuice->actuator_values[lElbowRollPositionActuator] = testValues[0];
+
+		//pineappleJuice->actuator_semaphore.post();
+		LOG_DEBUG << "Done with Actuator Semaphore! New joint values set!";
 	}
+	catch(const interprocess_exception &e)
+	{
+		LOG_WARNING << "FAILED to set new hardware value!";
+	}
+
 }
 void NAOInterface::randomly_set_joints()
 {

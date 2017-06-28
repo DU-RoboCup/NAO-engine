@@ -51,15 +51,17 @@ Networking::Networking()
     udpserver(io_service, PORT)
 {
     LOG_DEBUG << "com systems online";
+    LOG_WARNING << "Listening for messages on port: " << PORT;
 }
 
 
 void Networking::UDPListen(){
     try
     {
-        LOG_DEBUG << "Listening for message on port: " << PORT;
+        //LOG_DEBUG << "Listening for message on port: " << PORT;
+        //io_service.run_one();
         io_service.run_one();
-        LOG_DEBUG << "End of communication";
+        //LOG_DEBUG << "End of communication";
     }
     catch(const std::exception &e)
     {

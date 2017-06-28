@@ -29,32 +29,39 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     } catch(...) {
         SAY("I could't use the LOG File");
     }
-
+    std::cout << "log file opened\n";
     // Initialize the interprocess shared memory
     try
     {
         log_file << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]\n";
         shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-        if(shm.get_size() != 65536) 
+       std::cout << "Opened pineapple juice" << std::endl;
+        if(shm.get_size() != 65536)
+        {
             log_file << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << "\n";
-        
+            std::cout << "ERROR: Not enough memory was allocated! " << shm.get_size() << std::endl;
+        }
         pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
         shared_data_ptr = shm.find<hal_data>("juicyData");
         if(!shared_data_ptr.first)
         {
             LOG("[Constructor]","[FATAL] juicyData failed to be found!");
             return;
+        } else {
+            log_file << "[Constructor]: Connected to Interprocess Shared Memory!" << std::endl;
         }
         pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
-       
+       std::cout << "Got pointer to shared memory" << std::endl;
        LOG("[Constructor]","pineappleJuice created in shared memory!");
-    } 
+       std::cout << "Interprocess memory setup" << std::endl;
+    }
     catch(const boost::interprocess::interprocess_exception &e) 
     {
         log_file << "[FATAL] An Interprocess error: " << e.what() << ". Cleaning up shared memory..." << std::endl;
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
+    std::cout << "Interprocess memory created" << std::endl;
 
 
     //HardwareMap hm;
@@ -66,6 +73,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
       **/
     try
     {
+        std::cout << "Connecting to speech and normal memory proxies" << std::endl;
         // Establish Communication with NaoQi
         //dcm_proxy = new DCMProxy(pBroker);
         //dcm_proxy = getParentBroker()->getDcmProxy();
@@ -81,7 +89,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 
         instance = this; ///< Remove this to cause fun segfaults...
 
-
+        std::cout << "Almost fully contructed!" << std::endl;
 	} catch(AL::ALError &e) {
         log_file << "[ERROR] Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << "\n";
     }
@@ -213,6 +221,7 @@ void hal_experimental::startLoop()
         LOG("[startLoop]","[ERROR]: Error no DCM running!");
     }
 
+    std::cout << "Starting main loops!" << std::endl;
     initialize_everything();
     connectToDCMLoop();
 }
@@ -229,6 +238,7 @@ void hal_experimental::stopLoop()
 */
 void hal_experimental::connectToDCMLoop()
 {
+    std::cout << "connecting to dcm loop" << std::endl;
     LOG("[connectToDCMLoop]", "beginning fastMemoryAccess stuff");
     try
     {
@@ -253,21 +263,36 @@ void hal_experimental::connectToDCMLoop()
             std::cout << "Error printing sensor values: " << e.what() << std::endl;
         }
         LOG("[connectToDCMLoop]","Got sensor values with fast access! ");
-       // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-        for(int i = 0; i < 25; ++i)
+        try
         {
-            initialJointSensorValues.push_back(sensorValues[i]);
-            log_file << "[connectToDCMLoop]: initialSensorValues[" << i << "] = " << sensorValues[i] << std::endl;
-        }
+       // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
+            LOG("[connectToDCMLoop]", "Assigning inital vals to vector AND sharedMemory");
+            pineappleJuice->actuator_semaphore.wait();
+            for(int i = 0; i < 25; ++i)
+            {
+                initialJointSensorValues.push_back(sensorValues[i]);
+                pineappleJuice->sensor_values[i] = sensorValues[i];
+                log_file << "[connectToDCMLoop]: initialSensorValues[" << i << "] = " << sensorValues[i] << std::endl;
+            }
+            pineappleJuice->actuator_semaphore.post();
+            LOG("[connectToDCMLoop]","Done assigning initial sensor value!");
+        } 
+        catch(const boost::interprocess::interprocess_exception &e)
+        {
+            std::cout << "Error assigning inital values: " << e.what() << std::endl;
+            log_file << "Error assigning inital values: " << e.what() << std::endl;
 
+        }
         try
         {
             LOG("[connectToDCMLoop]","setting up pre/post process hooks...");
 
             //Connect our real time functions to the DCM
-            fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::actuator_joint_test, this));
-            fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
-            
+            //fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::actuator_joint_test, this));
+            //fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
+
+            fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::onPreProcess, this));
+            fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::onPostProcess, this));
             LOG("[connectToDCMLoop]", "pre/postProcess hook connected!");
         }
         catch(const AL::ALError &e)
@@ -280,6 +305,7 @@ void hal_experimental::connectToDCMLoop()
         LOG("[connectToDCMLoop]","[ERROR]: Error while getting initial sensor values: " + e.toString());
     }
     LOG("[connectToDCMLoop]", "Done!");
+    std::cout << "Done Connecting to DCM Loop" << std::endl;
 }
 
 /**
@@ -289,7 +315,8 @@ void hal_experimental::connectToDCMLoop()
 void hal_experimental::onPreProcess()
 {
     update_actuator_values();
-    update_text_to_speak();
+    //actuator_joint_test();
+    //update_text_to_speak();
 }
 
 /**
@@ -300,6 +327,7 @@ void hal_experimental::onPreProcess()
 void hal_experimental::onPostProcess()
 {
     update_sensor_values();
+    testLEDS();
 }
 ////////////////////////////////////////////////////////////
 ///////////////// END REAL TIME HOOKS //////////////////////
@@ -1016,7 +1044,7 @@ void hal_experimental::testLEDS()
 void hal_experimental::LOG(const std::string function, const std::string message)
 {
     std::cout << function << ": " << message << std::endl;
-    std::cout << function << ": " << message << std::endl; 
+    log_file << function << ": " << message << std::endl; 
 }
 
 /**

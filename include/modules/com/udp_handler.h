@@ -5,7 +5,7 @@
 #include "include/common.h"
 #include <iostream>
 #include <boost/asio.hpp>
-
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 //A simple asyncronous UDP server using boost asio
 
@@ -25,6 +25,7 @@ public:
 private:
     udp::socket _socket;
     udp::endpoint _sender_endpoint;
+    //boost::asio::deadline_timer deadline_timer;
     enum { buffer = 1024 };
     char data_[buffer];
 };

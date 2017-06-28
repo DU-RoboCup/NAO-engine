@@ -180,6 +180,7 @@ public:
 
 private:
     static NAOInterface* instance;
+		bool shared_memory_setup;
 	NAOInterface();
     //Intent processing
     PendingIntents pending_intents;
@@ -187,7 +188,7 @@ private:
 	hal_data *pineappleJuice; // Object stored in interprocess memory
 	bool read_shm, write_shm; // Return Values for interprocess rw operations
 	std::vector<float> sensor_vals, actuator_vals;
-	
+
 	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
 	HAL_PQ WriteRequests;
 protected: 
