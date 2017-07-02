@@ -6,11 +6,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
-#include <boost/interprocess/sync/interprocess_condition.hpp>
-#include <boost/interprocess/allocators/allocator.hpp>
-#include <boost/interprocess/sync/named_semaphore.hpp>
+#include <boost/interprocess/permissions.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/unordered_map.hpp>
@@ -50,6 +47,9 @@ class hal_experimental : public AL::ALModule {
 public:
     hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName);
    ~hal_experimental();
+
+    void create_interprocess_memory();
+    
     static const std::string name;
     void onPreProcess();
     void onPostProcess();

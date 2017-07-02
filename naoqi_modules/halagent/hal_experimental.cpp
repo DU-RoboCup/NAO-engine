@@ -30,38 +30,7 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         SAY("I could't use the LOG File");
     }
     std::cout << "log file opened\n";
-    // Initialize the interprocess shared memory
-    try
-    {
-        log_file << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]\n";
-        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-       std::cout << "Opened pineapple juice" << std::endl;
-        if(shm.get_size() != 65536)
-        {
-            log_file << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << "\n";
-            std::cout << "ERROR: Not enough memory was allocated! " << shm.get_size() << std::endl;
-        }
-        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
-        shared_data_ptr = shm.find<hal_data>("juicyData");
-        if(!shared_data_ptr.first)
-        {
-            LOG("[Constructor]","[FATAL] juicyData failed to be found!");
-            return;
-        } else {
-            log_file << "[Constructor]: Connected to Interprocess Shared Memory!" << std::endl;
-        }
-        pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
-       std::cout << "Got pointer to shared memory" << std::endl;
-       LOG("[Constructor]","pineappleJuice created in shared memory!");
-       std::cout << "Interprocess memory setup" << std::endl;
-    }
-    catch(const boost::interprocess::interprocess_exception &e) 
-    {
-        log_file << "[FATAL] An Interprocess error: " << e.what() << ". Cleaning up shared memory..." << std::endl;
-        shm.destroy<hal_data>("juicyData");
-        boost::interprocess::shared_memory_object::remove("PineappleJuice");
-    }
-    std::cout << "Interprocess memory created" << std::endl;
+    create_interprocess_memory();
 
 
     //HardwareMap hm;
@@ -165,7 +134,47 @@ hal_experimental::~hal_experimental()
     delete nao_memory_proxy;
     delete speak_proxy;
 }
-
+/**
+  * create_interprocess_memory: Creates shared memory and anonymous semaphores with unrestricted access.
+  **/
+void hal_experimental::create_interprocess_memory()
+{
+    // Initialize the interprocess shared memory
+    try
+    {
+        permissions shm_permissions;
+        shm_permissions.set_unrestricted();
+        log_file << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]\n";
+        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536, 0, shm_permissions); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+       std::cout << "Opened pineapple juice" << std::endl;
+        if(shm.get_size() != 65536)
+        {
+            log_file << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << "\n";
+            std::cout << "ERROR: Not enough memory was allocated! " << shm.get_size() << std::endl;
+        }
+        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
+        shared_data_ptr = shm.find<hal_data>("juicyData");
+        if(!shared_data_ptr.first)
+        {
+            LOG("[Constructor]","[FATAL] juicyData failed to be found!");
+            return;
+        } else {
+            log_file << "[Constructor]: Connected to Interprocess Shared Memory!" << std::endl;
+        }
+        pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
+       std::cout << "Got pointer to shared memory" << std::endl;
+       LOG("[Constructor]","pineappleJuice created in shared memory!");
+       std::cout << "Interprocess memory setup" << std::endl;
+    }
+    catch(const boost::interprocess::interprocess_exception &e) 
+    {
+        log_file << "[FATAL] An Interprocess error: " << e.what() << ". Cleaning up shared memory..." << std::endl;
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    }
+    std::cout << "Interprocess memory created" << std::endl;
+    
+}
 /**
   * \brief: Sets up all of the aliases for reading sensor values and setting hardware values
   **/
@@ -693,14 +702,14 @@ void hal_experimental::update_text_to_speak()
 {
     try
     {
-        pineappleJuice->speak_semaphore.wait();
-        if(std::strcmp(last_spoken_text, pineappleJuice->text_to_speak_unsafe) == 0)
-        {
-            SAY(pineappleJuice->text_to_speak_unsafe);
-            //PLZ DO NOT EXPLOIT ROBOT
-            std::strncpy(last_spoken_text, pineappleJuice->text_to_speak_unsafe, 34);
-        }
-        pineappleJuice->speak_semaphore.post();
+        // pineappleJuice->speak_semaphore.wait();
+        // if(std::strcmp(last_spoken_text, pineappleJuice->text_to_speak_unsafe) == 0)
+        // {
+        //     SAY(pineappleJuice->text_to_speak_unsafe);
+        //     //PLZ DO NOT EXPLOIT ROBOT
+        //     std::strncpy(last_spoken_text, pineappleJuice->text_to_speak_unsafe, 34);
+        // }
+        // pineappleJuice->speak_semaphore.post();
     }
     catch(const std::exception &e)
     {

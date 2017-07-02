@@ -217,10 +217,10 @@ bool NAOInterface::speak(const std::string &text)
 		LOG_WARNING << "The Text you have asked NAO to say is too long for it to remember.";
 		return false;
 	}
-	pineappleJuice->speak_semaphore.wait();
-	std::strcpy(pineappleJuice->text_to_speak_unsafe, text.c_str());
-	//std::strncpy(pineappleJuice->text_to_speak_unsafe, text, sizeof(pineappleJuice->text_to_speak_unsafe)-1);
-	pineappleJuice->speak_semaphore.post();
+	// pineappleJuice->speak_semaphore.wait();
+	// std::strcpy(pineappleJuice->text_to_speak_unsafe, text.c_str());
+	// //std::strncpy(pineappleJuice->text_to_speak_unsafe, text, sizeof(pineappleJuice->text_to_speak_unsafe)-1);
+	// pineappleJuice->speak_semaphore.post();
 	return true;
 }
 bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, const float value)
@@ -231,15 +231,7 @@ bool NAOInterface::set_hardware_value(const unsigned int &hardware_component, co
 	{
 		try
 		{
-			pineappleJuice->actuator_semaphore.wait();
-			//The write
-			//pineappleJuice->actuators[0][hardware_component] = value;
-			pineappleJuice->actuators_unsafe[hardware_component] = value;
-			pineappleJuice->actuators_newest_update = hardware_component;
-			LOG_DEBUG << actuatorNames[hardware_component] << " set to value " << value;
-
-			pineappleJuice->actuator_semaphore.post();
-			all_success = true;
+		 std::cout << "temp" << std::endl;
 		}
 		catch (const interprocess_exception &e)
 		{
@@ -269,13 +261,21 @@ bool NAOInterface::access_shared_memory()
 	LOG_DEBUG << "Accessing shared memory...";
 	try
 	{
-        shm = managed_shared_memory(open_or_create, "PineappleJuice", 65536); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-		LOG_DEBUG << "Found share memory region PineappleJuice!";
-		pineappleJuice = shm.find<hal_data>("juicyData").first;
-		if(!pineappleJuice)
-		 	LOG_FATAL << "Could not open shared memory object pineappleJuice!";
-		else
-			LOG_WARNING << "Shared memory found correctly!"; 
+        shm = managed_shared_memory(open_only, "PineappleJuice"); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+		if(shm.get_size() < 65536)
+		{
+			LOG_WARNING << "Error, there managed memory regions size is incorrect!";
+		} else {
+			LOG_DEBUG << "Found share memory region PineappleJuice!";
+		}
+		auto shmem_region_ptr = shm.find_no_lock<hal_data>("juicyData");
+		if(!shmem_region_ptr.first)
+		{
+			LOG_FATAL << "Error, could not find shared memory object juicyData!!!";
+		} else {
+			LOG_WARNING << "Found shared memory object juicyData!";
+			pineappleJuice = shmem_region_ptr.first;
+		}
 		LOG_WARNING << "Shared Memory should be setup!";
 	}
 	catch (const interprocess_exception &e)
@@ -292,15 +292,15 @@ bool NAOInterface::sync_pineapple()
 	
 	
 	// Fast Write
-	pineappleJuice->actuator_semaphore.wait();
-	for(int i = 0; i < WriteRequests.size(); ++i)
-	{
-		auto &top_intent = WriteRequests.pop_top();
-		pineappleJuice->actuators_unsafe[std::get<0>(top_intent)] = std::get<1>(top_intent);
-		//pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
+	// pineappleJuice->actuator_semaphore.wait();
+	// for(int i = 0; i < WriteRequests.size(); ++i)
+	// {
+	// 	auto &top_intent = WriteRequests.pop_top();
+	// 	pineappleJuice->actuators_unsafe[std::get<0>(top_intent)] = std::get<1>(top_intent);
+	// 	//pineappleJuice->actuators[pineappleJuice->actuators_newest_update][std::get<0>(top_intent)] = std::get<1>(top_intent);
 	
-	}
-	pineappleJuice->actuator_semaphore.post();
+	// }
+	// pineappleJuice->actuator_semaphore.post();
 	return true;
 }
 bool NAOInterface::read_shared_memory()
@@ -313,22 +313,22 @@ bool NAOInterface::read_shared_memory()
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		pineappleJuice->sensor_semaphore.wait();
-		for(int i = 0; i < NumOfSensorIds;++i)
-		{
-			//vector<float> <------- float[]
-			sensor_vals[i] = pineappleJuice->sensors_unsafe[i];
-			//sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
-		}
-		pineappleJuice->sensor_semaphore.post();
-		pineappleJuice->actuator_semaphore.wait();
-		for(int i = 0; i < NumOfActuatorIds;++i)
-		{
-			//vector<float> <------- float[]
-			actuator_vals[i] = pineappleJuice->actuators_unsafe[i];
-			//actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
-		}
-		pineappleJuice->actuator_semaphore.post();
+		// pineappleJuice->sensor_semaphore.wait();
+		// for(int i = 0; i < NumOfSensorIds;++i)
+		// {
+		// 	//vector<float> <------- float[]
+		// 	sensor_vals[i] = pineappleJuice->sensors_unsafe[i];
+		// 	//sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
+		// }
+		// pineappleJuice->sensor_semaphore.post();
+		// pineappleJuice->actuator_semaphore.wait();
+		// for(int i = 0; i < NumOfActuatorIds;++i)
+		// {
+		// 	//vector<float> <------- float[]
+		// 	actuator_vals[i] = pineappleJuice->actuators_unsafe[i];
+		// 	//actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
+		// }
+		// pineappleJuice->actuator_semaphore.post();
 		
 	}
 	catch (const interprocess_exception &e)
@@ -343,16 +343,16 @@ bool NAOInterface::write_shared_memory()
 	try
 	{
 		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		pineappleJuice->actuator_semaphore.wait();
-		while(!WriteRequests.size() == 0)
-		{
-			auto &request = WriteRequests.pop_top();
-			pineappleJuice->actuators_unsafe[std::get<0>(request)] = std::get<1>(request);
-			//pineappleJuice->actuators[0][std::get<0>(request)] = std::get<1>(request);
-			pineappleJuice->actuators_current_read = std::get<0>(request);
-		}
+		// pineappleJuice->actuator_semaphore.wait();
+		// while(!WriteRequests.size() == 0)
+		// {
+		// 	auto &request = WriteRequests.pop_top();
+		// 	pineappleJuice->actuators_unsafe[std::get<0>(request)] = std::get<1>(request);
+		// 	//pineappleJuice->actuators[0][std::get<0>(request)] = std::get<1>(request);
+		// 	pineappleJuice->actuators_current_read = std::get<0>(request);
+		// }
 		
-		pineappleJuice->actuator_semaphore.post();
+		// pineappleJuice->actuator_semaphore.post();
 	}
 	catch (const interprocess_exception &e)
 	{
@@ -369,7 +369,7 @@ void NAOInterface::hardware_write_test()
 	try
 	{
 		//LOG_DEBUG << "Waiting on sensor value semaphore...";
-		//pineappleJuice->sensor_semaphore.wait();
+		pineappleJuice->sensor_semaphore.wait();
 		testValues[0] = pineappleJuice->sensor_values[rShoulderPitchPositionSensor];
 		LOG_DEBUG << "rShoulderPitchPositionSensor: " << testValues[0];
 		testValues[1] = -pineappleJuice->sensor_values[rShoulderRollPositionSensor];
@@ -378,17 +378,17 @@ void NAOInterface::hardware_write_test()
 		LOG_DEBUG << "rElbowYawPositionSensor: " << testValues[2];
 		testValues[3] = -pineappleJuice->sensor_values[rElbowRollPositionSensor];
 		LOG_DEBUG << "rElbowRollPositionSensor: " << testValues[3];
-		//pineappleJuice->sensor_semaphore.post();
+		pineappleJuice->sensor_semaphore.post();
 		//LOG_DEBUG << "Done with sensor value semaphore!";
 
 		//LOG_DEBUG << "Waiting on actuator semaphore...";
-		//pineappleJuice->actuator_semaphore.wait();
+		pineappleJuice->actuator_semaphore.wait();
 		pineappleJuice->actuator_values[lShoulderPitchPositionActuator] = testValues[0];
 		pineappleJuice->actuator_values[lShoulderRollPositionActuator] = testValues[1];
 		pineappleJuice->actuator_values[lElbowYawPositionActuator] = testValues[2];
 		pineappleJuice->actuator_values[lElbowRollPositionActuator] = testValues[3];
 
-		//pineappleJuice->actuator_semaphore.post();
+		pineappleJuice->actuator_semaphore.post();
 		//LOG_DEBUG << "Done with Actuator Semaphore! New joint values set!";
 	}
 	catch(const interprocess_exception &e)

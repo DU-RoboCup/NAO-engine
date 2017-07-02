@@ -33,37 +33,37 @@ memory for interprocess communication.
 //#include <boost/shared_ptr.hpp>
 
 struct hal_data {
-    unsigned int sensors_newest_update; ///< Index of the sensor with the most recently updated value 
-    unsigned int sensors_newest_read; ///< Index from the list of the current sensor being read
-    unsigned int actuators_newest_update; ///< Index of the actuator with the most recently updated value
-    unsigned int actuators_current_read; ///< Index from the actuator of the current sensor being read
+   // unsigned int sensors_newest_update; ///< Index of the sensor with the most recently updated value 
+   // unsigned int sensors_newest_read; ///< Index from the list of the current sensor being read
+   // unsigned int actuators_newest_update; ///< Index of the actuator with the most recently updated value
+   // unsigned int actuators_current_read; ///< Index from the actuator of the current sensor being read
 
     //joint_data joints[3];
 
-    char text_to_speak[3][35]; //Text to have the NAO say
-    char text_to_speak_unsafe[35]; //Buffer for things to have NAO say with no dropped frame safety
-    bool standing;
+    //char text_to_speak[3][35]; //Text to have the NAO say
+    //char text_to_speak_unsafe[35]; //Buffer for things to have NAO say with no dropped frame safety
+    //bool standing;
     
     //A somewhat dangerous way to pass a single value
   //  volatile boost::shared_ptr<int> fast_actuator_id;
    // volatile boost::shared_ptr<float> fast_access_value; 
 
     //Buffers with frame drop safety.
-	float sensors[3][NumOfSensorIds]; //buffer containing sensor values.
-	float actuators[3][NumOfActuatorIds]; //buffer containing actuator values. 
+	//float sensors[3][NumOfSensorIds]; //buffer containing sensor values.
+	//float actuators[3][NumOfActuatorIds]; //buffer containing actuator values. 
 
     //Buffers without frame drop safety support
-    float sensors_unsafe[NumOfSensorIds];
-    float actuators_unsafe[NumOfActuatorIds];
+    //float sensors_unsafe[NumOfSensorIds];
+    //float actuators_unsafe[NumOfActuatorIds];
 
     float sensor_values[NumOfSensorIds];
     float actuator_values[NumOfActuatorIds];
 
     /* The use of semaphores here may be 1. excessive and 2. unecessary */
-    boost::interprocess::interprocess_semaphore actuator_semaphore, sensor_semaphore, speak_semaphore;
+    boost::interprocess::interprocess_semaphore actuator_semaphore, sensor_semaphore;/*, speak_semaphore;*/
 
     hal_data() 
-    : actuator_semaphore(1), sensor_semaphore(1), speak_semaphore(1)
+    : actuator_semaphore(1), sensor_semaphore(1)/*, speak_semaphore(1)*/
     {}
 };
 
