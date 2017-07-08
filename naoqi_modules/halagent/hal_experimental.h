@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/interprocess/permissions.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
@@ -31,6 +32,7 @@
 #include <fstream>
 #include <limits>
 #include <vector>
+#include <semaphore.h>
 //Project Includes
 #include "../../include/memory/hal_data.h"
 //#include "../../include/util/hardwaremap.h"
@@ -42,6 +44,8 @@ namespace AL {
     class ALMemoryFastAccess;
 }
 
+using namespace boost::interprocess;
+
 class hal_experimental : public AL::ALModule {
 
 public:
@@ -49,6 +53,7 @@ public:
    ~hal_experimental();
 
     void create_interprocess_memory();
+    void open_interprocess_memory();
     
     static const std::string name;
     void onPreProcess();
@@ -120,6 +125,8 @@ private:
     std::string head_ID;
     std::string head_version;
     boost::interprocess::managed_shared_memory shm;
+    //boost::interprocess::named_semaphore actuator_semaphore, sensor_semaphore;
+    
 
 	uint8_t last_reading_actuator;
 	size_t actuator_update_fails;
@@ -135,6 +142,7 @@ private:
 
     float *sensor_ptrs[NumOfSensorIds];
     static hal_experimental *instance;
+    sem_t *semaphore;
 
     char last_spoken_text[35];
     //TESTS

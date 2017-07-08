@@ -3,6 +3,7 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
+#include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/interprocess/permissions.hpp>
 #include <iostream>
 #include <string>
@@ -31,9 +32,9 @@ struct shm_object
 	float test_array_a[ARRAY_1_SIZE];
 	float test_array_b[ARRAY_2_SIZE];
     //char test_speak_array[35];
-	interprocess_semaphore semaphore_a, semaphore_b;
+    //interprocess_semaphore semaphore_a, semaphore_b;
 
-	shm_object() : semaphore_a(1), semaphore_b(1)
+	shm_object() /*: semaphore_a(1), semaphore_b(1)*/
 	{};
 };
 
@@ -42,6 +43,10 @@ class shared_mem_controller
 	
 public:
 	shared_mem_controller()
+        :
+            sem_a(open_or_create, "actuator_semaphore", 1, 0666),
+            sem_b(open_or_create, "sensor_semaphore", 1, 0666)
+
 	{
 		std::cout << "shared_mem_controller constructed!" << std::endl;
 	}
@@ -54,19 +59,22 @@ public:
 	void test_write_a()
 	{
 		LOG("Starting test...");
-		s_mem_object->semaphore_a.wait();
-		for (int i = 0; i < ARRAY_1_SIZE; ++i)
+		//s_mem_object->semaphore_a.wait();
+		sem_a.wait();
+        for (int i = 0; i < ARRAY_1_SIZE; ++i)
 		{
 			s_mem_object->test_array_a[i] = std::rand() % 100;
 		}
-		s_mem_object->semaphore_a.post();
+        sem_a.post();
+		//s_mem_object->semaphore_a.post();
 		LOG("Done writing vals!");
 	}
 	void test_read_a()
 	{
 		LOG("Starting test...");
-		s_mem_object->semaphore_a.wait();
-		for(int i = 0; i < ARRAY_1_SIZE; ++i)
+		//s_mem_object->semaphore_a.wait();
+		sem_a.wait();
+        for(int i = 0; i < ARRAY_1_SIZE; ++i)
 		{
 			auto val = s_mem_object->test_array_a[i];
 			//std::string msg = "READING: test_array_a[" + std::to_string(i) + "]: = " + std::to_string(val);
@@ -75,25 +83,30 @@ public:
             std::cout << "ACTUATOR: " << actuatorNames[i] << " = " << val << '\n';
 		}
         std::cout << std::endl;
-		s_mem_object->semaphore_a.post();
+		sem_a.post();
+        //s_mem_object->semaphore_a.post();
 		LOG("Done reading vals!");
 	}
 	void test_write_b()
 	{
 		LOG("Starting test...");
-		s_mem_object->semaphore_b.wait();
+		//s_mem_object->semaphore_b.wait();
+        sem_b.wait();
 		for (int i = 0; i < ARRAY_2_SIZE; ++i)
 		{
 			s_mem_object->test_array_b[i] = std::rand() % 100;
 		}
-		s_mem_object->semaphore_b.post();
+        sem_b.post();
+		//s_mem_object->semaphore_b.post();
 		LOG("Done writing vals!");
 	}
 	void test_read_b()
 	{
 		LOG("Starting test...");
-		s_mem_object->semaphore_b.wait();
-		for (int i = 0; i < ARRAY_2_SIZE; ++i)
+
+		//s_mem_object->semaphore_b.wait();
+		sem_b.wait();
+        for (int i = 0; i < ARRAY_2_SIZE; ++i)
 		{
 			auto val = s_mem_object->test_array_b[i];
             //std::string msg = "READING: " + std::to_string(*sensorNames[i]) + " = " + std::to_string(val);
@@ -101,7 +114,8 @@ public:
             std::cout << "SENSORS: " << sensorNames[i] << " = " << val << '\n';
 		}
         std::cout << std::endl;
-		s_mem_object->semaphore_b.post();
+		sem_b.post();
+        //s_mem_object->semaphore_b.post();
 		LOG("Done reading vals!");
 	}
 	/*
@@ -239,7 +253,8 @@ private:
     permissions mem_permissions;
 	managed_shared_memory shm;
 	std::pair<shm_object *, std::size_t> shared_data_ptr;
-
+    named_semaphore sem_a, sem_b;
+    //named_semaphore *sem_a;//, sem_b;
 };
 int main(int argc, char **argv)
 {
@@ -304,6 +319,12 @@ int main(int argc, char **argv)
         test_process_1.open_shared_memory();
         test_process_1.test_read_only(1000);
 
+    }
+    else if(std::atoi(argv[1]) == 4)
+    {
+        LOG("Creating shared memory from normal permissios level");
+        test_process_1.initialize_shared_memory();
+        test_process_1.test_read_write(500);
     }
 	else
 	{

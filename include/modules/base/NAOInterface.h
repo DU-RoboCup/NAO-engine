@@ -36,6 +36,7 @@ need to physically work with a NAO robot.
 #include <unordered_map>
 #include <type_traits>
 #include <queue>
+#include <semaphore.h>
 // Add some dynamic programming abilities
 #include <boost/any.hpp>
 #include <boost/variant.hpp>
@@ -68,7 +69,7 @@ need to physically work with a NAO robot.
   * Main class/module class for the NAOInterface. A number of other classes
   * are what are really doing most of the work. 
   **/
-
+using namespace boost::interprocess;
 class NAOInterface : public Module
 {
 public:
@@ -120,6 +121,7 @@ public:
 	  * crashes in some odd way, it could be useful to re-open the shared memory.  
 	  **/
 	bool access_shared_memory();
+	void create_shared_memory();
 	/** \brief - Synchronizes hardware data values with the module running in NAOqi
 	  * \return - boolean which is true if operation was succesful or false if a failure occured.
 	  *
@@ -172,16 +174,19 @@ public:
 	std::shared_ptr<RLeg> RightLeg;
 
 private:
-    static NAOInterface* instance;
-		bool shared_memory_setup;
+	static NAOInterface* instance;
+	bool shared_memory_setup;
 	NAOInterface();
-    //Intent processing
+	//Intent processing
   PendingIntents pending_intents;
+	//Interprocess communication variables
 	boost::interprocess::managed_shared_memory shm;
 	hal_data *pineappleJuice; // Object stored in interprocess memory
+	std::pair<hal_data *, std::size_t> shared_data_ptr;
+	sem_t *semaphore;
+	//named_semaphore actuator_semaphore, sensor_semaphore;
 	bool read_shm, write_shm; // Return Values for interprocess rw operations
 	std::vector<float> sensor_vals, actuator_vals;
-
 	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
 	HAL_PQ WriteRequests;
 protected: 

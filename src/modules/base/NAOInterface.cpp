@@ -22,6 +22,10 @@ is that we can simulate modules communicating with the NAO hardware, so for deve
 need to physically work with a NAO robot.
 */
 #include "include/modules/base/NAOInterface.h"
+//Macro for semaphore name
+#ifndef PINEAPPLE_SEMAPHORE
+    #define PINEAPPLE_SEMAPHORE "pineapple_semaphore"
+#endif
 
 REGISTER_MODULE(NAOInterface);
 //Singleton stuff
@@ -47,15 +51,16 @@ bool NAOInterface::RunFrame()
 	LOG_DEBUG << "NAOInterface is running...";
 	if(!shared_memory_setup)
 	{
-		bool res = access_shared_memory();
-		LOG_WARNING << "Shared mem not setup! Result of setting up shared memory: " <<  res << "";
+		//bool res = access_shared_memory();
+		//create_shared_memory();
+		LOG_WARNING << "Shared mem not setup!" << std::endl;
 	}
 	LOG_DEBUG << "Shared Memory Setup! Doing a hardware test...";
     hardware_write_test();
 	LOG_DEBUG << "Hardware Test Done!";
 	// if(!pending_intents.empty()) 
 	// {
-	// 	//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
+		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
 	// 	try 
 	// 	{
 	// 		ParsedIntent pi = pending_intents.pop_front().Parse();
@@ -63,20 +68,19 @@ bool NAOInterface::RunFrame()
 	// 			if(pi.size() < 5)
 	// 				set_hardware_value(pi[3], std::stof(pi[4]));
 
-	// 			//TODO: Write Dispatch Table for ENUM C++
-	// 			// else 
-	// 			// {
-	// 			// 	try{
-	// 			// 		
-	// 			// 		std::string hw_cmp = pi[3];
-	// 			// 		QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
-	// 			// 		set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
-	// 			// 	}
-	// 			// 	catch(const std::exception &e)
-	// 			// 	{
-	// 			// 		std::cout << "An exception has occured: " << e.what() << "\n";
-	// 			// 	}
-	// 			// }
+	// 			else 
+	// 			{
+	// 				try{
+						
+	// 					std::string hw_cmp = pi[3];
+	// 					QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
+	// 					set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
+	// 				}
+	// 				catch(const std::exception &e)
+	// 				{
+	// 					std::cout << "An exception has occured: " << e.what() << "\n";
+	// 				}
+	// 			}
 	// 		}
 	// 		else if(pi[2] == "get_hardware_value")
 	// 			get_hardware_value(pi[3]);
@@ -111,7 +115,10 @@ bool NAOInterface::Uninstall()
 
 using namespace boost::interprocess;
 
-NAOInterface::NAOInterface()
+NAOInterface::NAOInterface() 
+	/*:
+		actuator_semaphore(open_or_create, "actuator_semaphore", 1),
+        sensor_semaphore(open_or_create, "sensor_semaphore", 1)*/
 {
 	BOOST_LOG_FUNCTION();
 	LOG_WARNING << "Initializing NAOInterface";
@@ -132,7 +139,8 @@ NAOInterface::NAOInterface()
 
 	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
 	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
-	else
+	//create_shared_memory();
+	//else
 	{
 		// Pre-allocate our vectors with values. This should help provide better Caching performance.
 		// try
@@ -283,8 +291,57 @@ bool NAOInterface::access_shared_memory()
 		LOG_WARNING << "NAOInterface could not open required shared memory objects. Error Code: " << e.what() << ".";
 		return false;
 	}
+	semaphore = sem_open(PINEAPPLE_SEMAPHORE, O_RDWR);
+	if(semaphore == SEM_FAILED)
+	{
+		LOG_WARNING << "Named semaphore does not exist, creating now...";
+		semaphore = sem_open(PINEAPPLE_SEMAPHORE, O_CREAT, 0666, 1);
+	} else {
+		LOG_WARNING << "Semaphore already created!";
+	}
 	shared_memory_setup = true;
 	return true;
+}
+
+void NAOInterface::create_shared_memory()
+{
+	try
+    {
+        permissions shm_permissions;
+        LOG_DEBUG << "[create_int_memory]: Current permissions: " << shm_permissions.get_permissions();
+        shm_permissions.set_unrestricted();
+        LOG_DEBUG << "[create_int_memory]: Updated permissions: " << shm_permissions.get_permissions() << std::endl;
+        LOG_DEBUG << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]\n";
+        shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536, 0, 0666/*shm_permissions*/); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+        LOG_DEBUG << "Opened pineapple juice" << std::endl;
+        if(shm.get_size() != 65536)
+        {
+            LOG_DEBUG << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << "\n";
+        } else {
+            LOG_DEBUG << "PineappleJuice created with size of: " << shm.get_size() << std::endl;
+        }
+        pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
+        shared_data_ptr = shm.find<hal_data>("juicyData");
+        if(!shared_data_ptr.first)
+        {
+            LOG_DEBUG << "[FATAL] juicyData failed to be found!";
+            return;
+        } else {
+            LOG_DEBUG << "juicyData Created!";
+            pineappleJuice = shared_data_ptr.first; 
+        }
+		shared_memory_setup = true;
+        ///< Dumb hack to stop boost interprocess from causing segfaults
+       LOG_DEBUG << "pineappleJuice created in shared memory!";
+       std::cout << "Interprocess memory setup" << std::endl;
+    }
+    catch(const boost::interprocess::interprocess_exception &e) 
+    {
+        LOG_DEBUG << "[FATAL] An Interprocess error: " << e.what() << ". Cleaning up shared memory..." << std::endl;
+        shm.destroy<hal_data>("juicyData");
+        boost::interprocess::shared_memory_object::remove("PineappleJuice");
+    }
+    LOG_DEBUG << "Interprocess memory created" << std::endl;
 }
 bool NAOInterface::sync_pineapple()
 {
@@ -369,7 +426,12 @@ void NAOInterface::hardware_write_test()
 	try
 	{
 		//LOG_DEBUG << "Waiting on sensor value semaphore...";
-		pineappleJuice->sensor_semaphore.wait();
+		//pineappleJuice->sensor_semaphore.wait();
+		// sem_wait(semaphore);
+		while(!sem_trywait(semaphore))
+		{
+			LOG_DEBUG << "Still Waiting...";
+		}
 		testValues[0] = pineappleJuice->sensor_values[rShoulderPitchPositionSensor];
 		LOG_DEBUG << "rShoulderPitchPositionSensor: " << testValues[0];
 		testValues[1] = -pineappleJuice->sensor_values[rShoulderRollPositionSensor];
@@ -378,23 +440,24 @@ void NAOInterface::hardware_write_test()
 		LOG_DEBUG << "rElbowYawPositionSensor: " << testValues[2];
 		testValues[3] = -pineappleJuice->sensor_values[rElbowRollPositionSensor];
 		LOG_DEBUG << "rElbowRollPositionSensor: " << testValues[3];
-		pineappleJuice->sensor_semaphore.post();
+		//pineappleJuice->semaphore.post();
+		//pineappleJuice->sensor_semaphore.post();
 		//LOG_DEBUG << "Done with sensor value semaphore!";
 
 		//LOG_DEBUG << "Waiting on actuator semaphore...";
-		pineappleJuice->actuator_semaphore.wait();
+		//pineappleJuice->actuator_semaphore.wait();
 		pineappleJuice->actuator_values[lShoulderPitchPositionActuator] = testValues[0];
 		pineappleJuice->actuator_values[lShoulderRollPositionActuator] = testValues[1];
 		pineappleJuice->actuator_values[lElbowYawPositionActuator] = testValues[2];
 		pineappleJuice->actuator_values[lElbowRollPositionActuator] = testValues[3];
-
-		pineappleJuice->actuator_semaphore.post();
+		//pineappleJuice->actuator_semaphore.post();
 		//LOG_DEBUG << "Done with Actuator Semaphore! New joint values set!";
 	}
 	catch(const interprocess_exception &e)
 	{
 		LOG_WARNING << "FAILED to set new hardware value!";
 	}
+	sem_post(semaphore);
 
 }
 void NAOInterface::randomly_set_joints()

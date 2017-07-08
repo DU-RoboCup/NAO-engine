@@ -6,7 +6,14 @@ using namespace boost::interprocess;
 
 
 // Macro to make the NAO say stuff. Use carefully (if spammed it'll crash the DCM also its really damn annoying)
-#define SAY(text) speak_proxy->post.say(text); 
+#define SAY(text) speak_proxy->post.say(text);
+//Macro for logging
+#define LOG2(msg) std::cout << "[" << __func__ << "]: " << msg << std::endl;
+//Macro for semaphore name
+#ifndef PINEAPPLE_SEMAPHORE
+    #define PINEAPPLE_SEMAPHORE "pineapple_semaphore"
+#endif
+
 //const std::string hal_experimental::name("hal_experimental");
 hal_experimental* hal_experimental::instance = NULL;
 hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, const std::string& pName) 
@@ -14,6 +21,8 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
         fMemoryFastAccess(boost::shared_ptr<AL::ALMemoryFastAccess>(new AL::ALMemoryFastAccess())),
         nao_memory_proxy(NULL),
         speak_proxy(NULL),
+        /*actuator_semaphore(open_or_create, "actuator_semaphore", 1),
+        sensor_semaphore(open_or_create, "sensor_semaphore", 1),*/
         ////DEBUG STUFF
         testLEDInitialized(false),
         testLEDRot(0)
@@ -31,15 +40,9 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
     }
     std::cout << "log file opened\n";
     create_interprocess_memory();
-
+    //open_interprocess_memory();
 
     //HardwareMap hm;
-    /** \Brief: This part is complicated and you really need to shouldn't care about it.
-      * 
-      * Inside this try block we are doing quite a few things. To summarize, we establish communication
-      * proxies with NAOQi, then we begin creating AL::Aliases to (questionably) more effeciently
-      * send values to the DCM.
-      **/
     try
     {
         std::cout << "Connecting to speech and normal memory proxies" << std::endl;
@@ -62,17 +65,9 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 	} catch(AL::ALError &e) {
         log_file << "[ERROR] Fatal Error: Could Not Initialize Interface with NaoQi due to: "<< e.what() << "\n";
     }
-    //Boost Interprocess Shared Memory Initialization:
-        // log_file << "Testing actuator semaphore wait...\n";
-        // pineappleJuice->actuator_semaphore.wait();
-        // //dcm_time = dcm_proxy->getTime(0); ///< Get's current time on NAO
-        // log_file << "NO SEGFAULT: DCM Time = " << dcm_time << "\n";
-        // log_file << "woohoo I'm in a semaphore" << '\n';
-        // pineappleJuice->actuator_semaphore.post();
         
-
-        for(int i = 0; i < NumOfActuatorIds; ++i)
-            actuators[i] = 0.f;
+    for(int i = 0; i < NumOfActuatorIds; ++i)
+        actuators[i] = 0.f;
 
     // SAY("I will say my IP Address in a moment. It's just, well Linux hates me.");
     // get_ip_address();
@@ -111,7 +106,6 @@ hal_experimental::hal_experimental(boost::shared_ptr<AL::ALBroker> pBroker, cons
 }
 hal_experimental::~hal_experimental()
 {
-    SAY("Time to die.");
     std::cout << "Destructing hal_experimental" << std::endl;
     /**
       * Note: If naoqi crashes, by default all data stored in shared memory will (probably)
@@ -122,6 +116,9 @@ hal_experimental::~hal_experimental()
     {
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
+        sem_close(semaphore);
+        // named_semaphore::remove("actuator_semaphore");
+        // named_semaphore::remove("sensor_semaphore");
     } 
     catch(boost::interprocess::interprocess_exception &e)
     {
@@ -135,7 +132,7 @@ hal_experimental::~hal_experimental()
     delete speak_proxy;
 }
 /**
-  * create_interprocess_memory: Creates shared memory and anonymous semaphores with unrestricted access.
+  * create_interprocess_memory: Creates shared memory with unrestricted access using boost interprocess.
   **/
 void hal_experimental::create_interprocess_memory()
 {
@@ -146,11 +143,13 @@ void hal_experimental::create_interprocess_memory()
         shm_permissions.set_unrestricted();
         log_file << "Initializing Shared Memory with Boost.Interprocess. [PineappleJuice]\n";
         shm = boost::interprocess::managed_shared_memory(open_or_create, "PineappleJuice", 65536, 0, shm_permissions); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
-       std::cout << "Opened pineapple juice" << std::endl;
+        std::cout << "Opened pineapple juice" << std::endl;
         if(shm.get_size() != 65536)
         {
             log_file << "ERROR: Did not allocate enough memory. SHM size: " << shm.get_size() << "\n";
             std::cout << "ERROR: Not enough memory was allocated! " << shm.get_size() << std::endl;
+        } else {
+            std::cout << "PineappleJuice created with size of: " << shm.get_size() << std::endl;
         }
         pineappleJuice = shm.find_or_construct<hal_data>("juicyData")(/*Constructor, assuming use of default constructor*/);
         shared_data_ptr = shm.find<hal_data>("juicyData");
@@ -159,10 +158,11 @@ void hal_experimental::create_interprocess_memory()
             LOG("[Constructor]","[FATAL] juicyData failed to be found!");
             return;
         } else {
+            LOG2("juicyData created!");
+            pineappleJuice = shared_data_ptr.first; 
             log_file << "[Constructor]: Connected to Interprocess Shared Memory!" << std::endl;
         }
-        pineappleJuice = shared_data_ptr.first; ///< Dumb hack to stop boost interprocess from causing segfaults
-       std::cout << "Got pointer to shared memory" << std::endl;
+        ///< Dumb hack to stop boost interprocess from causing segfaults
        LOG("[Constructor]","pineappleJuice created in shared memory!");
        std::cout << "Interprocess memory setup" << std::endl;
     }
@@ -173,7 +173,48 @@ void hal_experimental::create_interprocess_memory()
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
     }
     std::cout << "Interprocess memory created" << std::endl;
+    /* Create our named semaphore for syncing data between NAOQi and the NAO-Engine
+       We switched this from a boost::interprocess semaphore to a POSIX one due to
+       some blocking issues. If you'd like to use boost, create the named semaphore
+       and use the try_wait() call
+    */
+    semaphore = sem_open(PINEAPPLE_SEMAPHORE, O_RDWR);
+    if(semaphore == SEM_FAILED)
+	{
+		LOG2("Named semaphore does not exist, creating now...");
+        //Create the semaphore with [!DIRECTORY, READ, WRITE, EXECUTE] permissions and an initial count of 1
+		semaphore = sem_open(PINEAPPLE_SEMAPHORE, O_CREAT, 0666, 1);
+	} 
+    else
+		LOG2("Named semaphore has already been created and was found in /dev/shm!!!");
     
+}
+void hal_experimental::open_interprocess_memory()
+{
+    LOG2("Accessing shared memory...");
+	try
+	{
+        shm = managed_shared_memory(open_only, "PineappleJuice"); /** Allocate a 64KiB region in shared memory, with segment name "PineappleJuice", subsections of this region of memory need to be allocated to store data **/
+		if(shm.get_size() < 65536)
+		{
+			LOG2("Error, there managed memory regions size is incorrect!");
+		} else {
+			LOG2("Found share memory region PineappleJuice!");
+		}
+		std::pair<hal_data *, std::size_t> shmem_region_ptr = shm.find_no_lock<hal_data>("juicyData");
+		if(!shmem_region_ptr.first)
+		{
+			LOG2("Error, could not find shared memory object juicyData!!!");
+		} else {
+			LOG2("Found shared memory object juicyData!");
+			pineappleJuice = shmem_region_ptr.first;
+		}
+		LOG2("Shared Memory should be setup!");
+	}
+	catch (const interprocess_exception &e)
+	{
+		std::cout << "NAOInterface could not open required shared memory objects. Error Code: " << e.what() << ".";
+	}
 }
 /**
   * \brief: Sets up all of the aliases for reading sensor values and setting hardware values
@@ -244,6 +285,8 @@ void hal_experimental::stopLoop()
     {
         shm.destroy<hal_data>("juicyData");
         boost::interprocess::shared_memory_object::remove("PineappleJuice");
+        // named_semaphore::remove("actuator_semaphore");
+        // named_semaphore::remove("sensor_semaphore");
     } 
     catch(boost::interprocess::interprocess_exception &e)
     {
@@ -285,14 +328,15 @@ void hal_experimental::connectToDCMLoop()
         {
        // for(int i = 0; i < NumOfPositionActuatorIds; ++i)
             LOG("[connectToDCMLoop]", "Assigning inital vals to vector AND sharedMemory");
-            pineappleJuice->actuator_semaphore.wait();
+            //pineappleJuice->actuator_semaphore.wait();
+            sem_wait(semaphore);
             for(int i = 0; i < 25; ++i)
             {
                 initialJointSensorValues.push_back(sensorValues[i]);
                 pineappleJuice->sensor_values[i] = sensorValues[i];
                 log_file << "[connectToDCMLoop]: initialSensorValues[" << i << "] = " << sensorValues[i] << std::endl;
             }
-            pineappleJuice->actuator_semaphore.post();
+            //pineappleJuice->actuator_semaphore.post();
             LOG("[connectToDCMLoop]","Done assigning initial sensor value!");
         } 
         catch(const boost::interprocess::interprocess_exception &e)
@@ -301,14 +345,13 @@ void hal_experimental::connectToDCMLoop()
             log_file << "Error assigning inital values: " << e.what() << std::endl;
 
         }
+        sem_post(semaphore);
+
         try
         {
             LOG("[connectToDCMLoop]","setting up pre/post process hooks...");
 
             //Connect our real time functions to the DCM
-            //fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::actuator_joint_test, this));
-            //fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::testLEDS, this));
-
             fDCMPostProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPostProcess(boost::bind(&hal_experimental::onPreProcess, this));
             fDCMPreProcessConnection = getParentBroker()->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&hal_experimental::onPostProcess, this));
             LOG("[connectToDCMLoop]", "pre/postProcess hook connected!");
@@ -672,18 +715,21 @@ void hal_experimental::update_actuator_values()
         }
 
         // Use our semaphore for propery interprocess syncing of shared memory
-        pineappleJuice->actuator_semaphore.wait();
+        // while(!pineappleJuice->actuator_semaphore.try_wait());
         //TODO: Switch this to NumOfActuatorIds when thats all implemented
+        sem_wait(semaphore);
         for(int i = 0; i < NumOfPositionActuatorIds; ++i)
         {
             commands[5][i][0] = pineappleJuice->actuator_values[i];
         }
-        pineappleJuice->actuator_semaphore.post();
+        //pineappleJuice->actuator_semaphore.post();
     }
     catch(const AL::ALError &e)
     {
         LOG("[actuator_joint_test]", "[DCM POST LOOP][ERROR] An error occurred in the post DCM callback loop: " + e.toString());
     }
+    sem_post(semaphore);
+
 
     //Tell the DCM the values we want to set the actuators to
     try
@@ -695,6 +741,7 @@ void hal_experimental::update_actuator_values()
         LOG("[actuator_joint_test]", "[ERROR]: Error setting dcm alias: " + e.toString());
     }
 }
+
 /**
   * \brief: Checks shared memory for text to speak. If the last text was already spoken, if not it says it.
   **/
@@ -733,17 +780,21 @@ void hal_experimental::update_sensor_values()
 
     try
     {
-        pineappleJuice->sensor_semaphore.wait();
+        //pineappleJuice->sensor_semaphore.wait();
+        //sensor_semaphore.wait();
+        sem_wait(semaphore);
         for(int i = 0; i < sensorValues.size(); ++i)
         {
             pineappleJuice->sensor_values[i] = sensorValues[i];
         }
-        pineappleJuice->sensor_semaphore.post();
+        //sensor_semaphore.post();
+        //pineappleJuice->sensor_semaphore.post();
     }
     catch(const boost::interprocess::interprocess_exception &e)
     {
         log_file << "[update_sensor_vals][ERROR]: An interprocess error has occured: " << e.what() << std::endl;
     }
+    sem_post(semaphore);
 }
 
 
@@ -778,11 +829,9 @@ float* hal_experimental::robot_state_handler(float *actuator_vals)
     return actuator_vals;
 }
 
-/** \brief: init_aliases: This function initializes all the required communication channels for hardware control
-  *  tl;dr this method and datastructure is cancer. I really don't want to comment much on it because it sucks. 
-  * the relevant documentation can be found here: http://doc.aldebaran.com/2-1/naoqi/sensors/dcm-api.html#DCMProxy
-
-  **/
+/** \brief: actuator_joint_test: An example of directly reading sensor values and writing actuator values
+  *  In this example, any movement on the left arm is mimicked by the right arm
+  */
 
 void hal_experimental::actuator_joint_test()
 {
