@@ -58,42 +58,24 @@ bool NAOInterface::RunFrame()
 	LOG_DEBUG << "Shared Memory Setup! Doing a hardware test...";
     hardware_write_test();
 	LOG_DEBUG << "Hardware Test Done!";
-	// if(!pending_intents.empty()) 
-	// {
-		//Do intent stuff: NOTE - This should be replaced with a ProcessIntent feature in the Intent object
-	// 	try 
-	// 	{
-	// 		ParsedIntent pi = pending_intents.pop_front().Parse();
-	// 		if(pi[2] == "set_hardware_value"){
-	// 			if(pi.size() < 5)
-	// 				set_hardware_value(pi[3], std::stof(pi[4]));
-
-	// 			else 
-	// 			{
-	// 				try{
-						
-	// 					std::string hw_cmp = pi[3];
-	// 					QPRIORITY_FLAG c_flag = static_cast<QPRIORITY_FLAG>(std::stoi(pi[5]));
-	// 					set_hardware_value(hw_cmp, std::stof(pi[4]), c_flag);
-	// 				}
-	// 				catch(const std::exception &e)
-	// 				{
-	// 					std::cout << "An exception has occured: " << e.what() << "\n";
-	// 				}
-	// 			}
-	// 		}
-	// 		else if(pi[2] == "get_hardware_value")
-	// 			get_hardware_value(pi[3]);
-	// 		else
-	// 		{
-	// 			LOG_WARNING << "No accessable function named " << pi[3] << " in NAOInterface";
-	// 			return false; 
-	// 		}
-	// 	} catch(const std::exception &e) {
-	// 		LOG_WARNING << "Intent Parsing Exception: " << e.what() << "";
-	// 	}
-	// 	LOG_DEBUG << "Doing stuff with intents";
-	// }
+	if(!pending_intents.empty())
+	{
+		LOG_DEBUG << "Popping intent...";
+		const ParsedIntent new_val = pending_intents.pop_front().Parse();
+		auto map_val = hardware_map[new_val[2]]; //K,V pair. 
+		if(LIKELY(map_val.second != "NULL"))
+		{
+			//Do intent stuff here
+			LOG_DEBUG << "New Hardware Value [" << map_val.first << "]: " << map_val.second;
+		
+		}
+		else
+			LOG_WARNING << "The Hardware Component " << new_val[2] << "Does not exist!" << std::endl;
+	}
+	else
+	{
+		LOG_WARNING << "No new intents for NAOInterface!";
+	}
 	return true;
 }
 bool NAOInterface::ProcessIntent(Intent &i)

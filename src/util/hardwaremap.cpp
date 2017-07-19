@@ -41,7 +41,7 @@ const _value& HardwareMap::operator[](const std::string key)
     } 
     catch(const std::exception &e)
     {
-        std::cout << "HardwareMap Lookup Error (probably non-existant value): " << e.what() << std::endl;
+        std::cerr << "HardwareMap Lookup Error (probably non-existant value): " << e.what() << std::endl;
     }
 
     return null_val;

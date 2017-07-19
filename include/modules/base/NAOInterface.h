@@ -61,7 +61,7 @@ need to physically work with a NAO robot.
 #include "include/common.h"
 #include "include/debug/debugging.h"
 #include "include/memory/hal_data.h"
-
+#include "include/util/hardwaremap.h"
 
 
 /**
@@ -189,6 +189,8 @@ private:
 	std::vector<float> sensor_vals, actuator_vals;
 	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
 	HAL_PQ WriteRequests;
+
+	HardwareMap hardware_map;
 protected: 
 	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
 	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers

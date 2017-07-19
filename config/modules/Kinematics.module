@@ -1,0 +1,8 @@
+module = {
+    name = "libKinematics Module",
+    liblocation = "../lib/libKinematics.so",
+    rfps = 40,
+    mprio = 2,
+    mthr = 1
+}
+return module

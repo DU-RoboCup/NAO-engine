@@ -68,7 +68,7 @@ struct Intent {
 // PendingIntents is basically a wrapper around the std::deque structure.
 // The primary modification is that the pop_front() and pop_back() methods
 // now return the Intent in each respective situation.
-typedef struct {
+struct PendingIntents{
 	std::deque<Intent> pending;
 	Intent pop_front() 
 	{
@@ -92,7 +92,7 @@ typedef struct {
 	void push_front(Intent &i) { pending.push_front(i); }
 	void push_back(Intent &i) { pending.push_back(i); }
 	bool empty() { return pending.empty(); }
-} PendingIntents;
+};
 
 
 #endif /*_INTENT_H_*/
