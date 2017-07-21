@@ -53,9 +53,23 @@ public:
     void process_and_parse_intents();
     //Function for performing local tests
     void perform_tests();
+    //Get values from Bazaar in a usable form
+    bool get_hardware_data();
+    //Update modified values in the Bazaar in boost::any form
+    bool set_hardware_data();
+
 private:
     Kinematics();
     static Kinematics *instance;
+
+    uint32_t sensor_data_subscription_id, actuator_data_subscription_id;
+    //These are both of the boost any dynamic type. That means all original type info
+    //is lost in conversion, thus they must be cast back.
+    std::shared_ptr<boost::any> sensor_values_dt, actuator_values_dt;
+    const float *sensor_values;
+    float *actuator_values;
+    //std::shared_ptr<float *>> sensor_values;
+    //std::shared_ptr<float *>> actuator_values;
 
     PendingIntents pending_intents;
 };

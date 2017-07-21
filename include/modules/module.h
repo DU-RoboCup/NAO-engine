@@ -45,9 +45,9 @@ class Module {
 	        this->ModuleID = id;
 	        LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
 	        this->ModuleName = mconfig["name"].get<std::string>();
-	        this->ModuleFPS = (int)mconfig["rfps"].get<double>();
-	        this->ModulePriority = (int)mconfig["mprio"].get<double>();
-	        this->ModuleThread = (int)mconfig["mthr"].get<double>();
+	        this->ModuleFPS = static_cast<int>(mconfig["rfps"].get<double>());
+	        this->ModulePriority = static_cast<int>(mconfig["mprio"].get<double>());
+	        this->ModuleThread = static_cast<int>(mconfig["mthr"].get<double>());
         }
 
         /**
