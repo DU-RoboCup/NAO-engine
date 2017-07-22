@@ -38,17 +38,10 @@ NAOInterface* NAOInterface::Instance()
 	}
 	return NAOInterface::instance;
 }
-void NAOInterface::Reconfigure(std::string config_file, uint16_t id) {
-	this->ModuleID = id;
-	LuaTable mconfig = LuaTable::fromFile(config_file.c_str());
-	this->ModuleName = mconfig["name"].get<std::string>();
-	this->ModuleFPS = static_cast<int>(mconfig["rfps"].get<float>());
-	this->ModulePriority = static_cast<int>(mconfig["mprio"].get<float>());
-	this->ModuleThread = static_cast<int>(mconfig["mthr"].get<float>());
-}
+
 bool NAOInterface::RunFrame()
 {
-	LOG_DEBUG << "NAOInterface is running...";
+	BOOST_LOG_FUNCTION(); //Gets function traces
 	if(!shared_memory_setup)
 	{
 		//bool res = access_shared_memory();
@@ -102,7 +95,6 @@ NAOInterface::NAOInterface()
 		actuator_semaphore(open_or_create, "actuator_semaphore", 1),
         sensor_semaphore(open_or_create, "sensor_semaphore", 1)*/
 {
-	BOOST_LOG_FUNCTION();
 	LOG_WARNING << "Initializing NAOInterface";
 
 	shared_memory_setup = false;
@@ -110,28 +102,58 @@ NAOInterface::NAOInterface()
 	LOG_DEBUG << "NAOInterface Initialized";
 
 	LOG_DEBUG << "NAOInterface is attempting to open shared memory object";
-	if(!access_shared_memory()) LOG_FATAL << "NAOInterface could not access shared memory";
-	//create_shared_memory();
-	//else
+	bool shared_mem_access_ret_code = access_shared_memory();
+	if(!shared_mem_access_ret_code) LOG_FATAL << "NAOInterface could not access shared memory";
+
+	LOG_DEBUG << "Calling bazaar init";
+	bool bazaar_ret_code = initialize_bazaar_data();
+
+}
+
+
+bool NAOInterface::initialize_bazaar_data()
+{
+	LOG_WARNING << "Initializing the Bazaar data";
+	std::vector<float> t_sensor_values(NumOfSensorIds);
+	std::vector<float> t_actuator_values(NumOfActuatorIds);
+
+	try
 	{
-		// Pre-allocate our vectors with values. This should help provide better Caching performance.
-		// try
-		// {
-		// 	pineappleJuice->sensor_semaphore.wait();
-		// 	for(int i = 0; i < NumOfPositionActuatorIds; ++i)
-		// 	{
-		// 		sensor_vals[i] = pineappleJuice->sensor_values[i];
-		// 	}
-		// 	pineappleJuice->sensor_semaphore.post();
-		// }
-		// catch(const interprocess_exception &e)
-		// {
-		// 	LOG_FATAL << "Could not access interprocess memory!" << std::endl;
-		// }
-		sensor_vals.assign(NumOfSensorIds, 0);
-		actuator_vals.assign(NumOfActuatorIds, 0);
+		LOG_DEBUG << "NAOInterface is accessing the semaphore";
+		while(!sem_trywait(semaphore))
+			LOG_DEBUG << "Waiting for semaphore access...";
+
+		//Create a NAO-Engine local copy of the data stored in shared memory
+		std::copy(&pineappleJuice->sensor_values[0], &pineappleJuice->sensor_values[NumOfSensorIds], t_sensor_values.begin());
+		LOG_DEBUG << "sensor values copied";
+		std::copy(&pineappleJuice->actuator_values[0], &pineappleJuice->actuator_values[NumOfActuatorIds], t_actuator_values.begin());
+		LOG_DEBUG << "actuator values copied";
+		sem_post(semaphore);
+		LOG_DEBUG << "Semaphore posted";
+	}
+	catch (const interprocess_exception &e)
+	{
+		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
+		return false;
+	}
+	LOG_DEBUG << "Adding data to Bazaar...";
+	Bazaar::Vend("sensor_data", std::make_shared<boost::any>(t_sensor_values));
+	Bazaar::Vend("actuator_data", std::make_shared<boost::any>(t_actuator_values));
+	sensor_values_dt = Bazaar::Get("sensor_data");
+	actuator_values_dt = Bazaar::Get("actuator_data");
+
+	try
+	{
+		sensor_vals = boost::any_cast<std::vector<float>>(&*sensor_values_dt);
+		actuator_vals = boost::any_cast<std::vector<float>>(&*actuator_values_dt);
+	}
+	catch(const boost::bad_any_cast &e)
+	{
+		LOG_WARNING << "Failed to cast boost any values: " << e.what();
 	}
 
+	LOG_DEBUG << "Done adding data to the Bazaar...";
+	return true;
 }
 
 void NAOInterface::print_commands_list()
@@ -227,6 +249,8 @@ bool NAOInterface::access_shared_memory()
 		LOG_WARNING << "Semaphore already created!";
 	}
 	shared_memory_setup = true;
+
+	// read_shared_memory();	
 	return true;
 }
 
@@ -293,33 +317,28 @@ bool NAOInterface::read_shared_memory()
 		the list of sensors and actuators and update their values. It is much faster to use the 
 		other provided method for reading a single value from the sensors and actuators.
 	**/
-	
+	LOG_DEBUG << "Reading shared memory";
 	try
 	{
-		LOG_DEBUG << "NAOInterface is accessing the semaphore";
-		// pineappleJuice->sensor_semaphore.wait();
-		// for(int i = 0; i < NumOfSensorIds;++i)
+		// LOG_DEBUG << "NAOInterface is accessing the semaphore";
+		// while(!sem_trywait(semaphore))
 		// {
-		// 	//vector<float> <------- float[]
-		// 	sensor_vals[i] = pineappleJuice->sensors_unsafe[i];
-		// 	//sensor_vals[i] = pineappleJuice->sensors[pineappleJuice->sensors_newest_read][i];
+		// 	LOG_DEBUG << "Waiting for semaphore access...";
 		// }
-		// pineappleJuice->sensor_semaphore.post();
-		// pineappleJuice->actuator_semaphore.wait();
-		// for(int i = 0; i < NumOfActuatorIds;++i)
-		// {
-		// 	//vector<float> <------- float[]
-		// 	actuator_vals[i] = pineappleJuice->actuators_unsafe[i];
-		// 	//actuator_vals[i] = pineappleJuice->actuators[pineappleJuice->sensors_newest_read][i];
-		// }
-		// pineappleJuice->actuator_semaphore.post();
-		
+		// //Create a NAO-Engine local copy of the data stored in shared memory
+		// std::copy(pineappleJuice->sensor_values, pineappleJuice->sensor_values + NumOfSensorIds, sensor_vals->begin());
+		// LOG_DEBUG << "sensor values copied";
+		// std::copy(pineappleJuice->actuator_values, pineappleJuice->actuator_values + NumOfActuatorIds, actuator_vals->begin());
+		// LOG_DEBUG << "actuator values copied";
+		// sem_post(semaphore);
+		// LOG_DEBUG << "Semaphore posted";
 	}
 	catch (const interprocess_exception &e)
 	{
 		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
 		return false;
 	}
+	LOG_DEBUG << "Done reading shared memory";
 	return true;
 }
 bool NAOInterface::write_shared_memory()

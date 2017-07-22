@@ -53,6 +53,8 @@ public:
     void process_and_parse_intents();
     //Function for performing local tests
     void perform_tests();
+    //Access the Bazaar
+    void initialize_bazaar_access();
     //Get values from Bazaar in a usable form
     bool get_hardware_data();
     //Update Bazaar and notify subscribers
@@ -69,6 +71,9 @@ private:
     std::shared_ptr<boost::any> sensor_values_dt, actuator_values_dt;
     const float *sensor_values;
     float *actuator_values;
+
+    const std::vector<float> *sensor_vals;
+    std::vector<float> *actuator_vals;
     //std::shared_ptr<float *>> sensor_values;
     //std::shared_ptr<float *>> actuator_values;
 

@@ -30,6 +30,7 @@ need to physically work with a NAO robot.
 
 #include <iostream>
 #include <vector>
+#include <array>
 #include <string>
 #include <cassert>
 #include <memory>
@@ -90,7 +91,10 @@ public:
 	bool set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG);
 	bool set_hardware_value(const unsigned int &hardware_component, const float value);
 
-
+	/**
+		* \brief - Initializes hardware data in the Bazaar
+		**/
+		bool initialize_bazaar_data();
 
 
 	/**
@@ -134,7 +138,6 @@ public:
 	
 	//required module functions
 	static NAOInterface* Instance();
-	void Reconfigure(std::string config_file, uint16_t id);
 	bool RunFrame();
 	bool ProcessIntent(Intent &i);
 	bool Install();
@@ -153,7 +156,10 @@ private:
 	sem_t *semaphore;
 	//named_semaphore actuator_semaphore, sensor_semaphore;
 	bool read_shm, write_shm; // Return Values for interprocess rw operations
-	std::vector<float> sensor_vals, actuator_vals;
+	std::vector<float> *sensor_vals, *actuator_vals;
+	std::shared_ptr<boost::any> sensor_values_dt, actuator_values_dt;
+	
+	//const uint32_t subscription_id;
 	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
 	HAL_PQ WriteRequests;
 

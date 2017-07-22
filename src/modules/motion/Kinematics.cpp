@@ -44,8 +44,13 @@ Kinematics *Kinematics::Instance()
 
 bool Kinematics::RunFrame()
 {
+    BOOST_LOG_FUNCTION();
     // Call calculation and intent processing functions here
     process_and_parse_intents();
+
+    //if Bazaar access failed, we need to try again.
+    if(!subscribe_return_code)
+        initialize_bazaar_access();
     // Update hardware values from the Bazaar
     if(get_hardware_data())
     {
@@ -87,9 +92,17 @@ bool Kinematics::Uninstall()
 Kinematics::Kinematics()
 {
     LOG_DEBUG << "Kinematics Constructor Called!";
+    initialize_bazaar_access();
+}
+/**
+  * \brief initialize_bazaar_access: Attempts to access hardware data from the bazaar.
+  *                                  Updates the variable subscribe_return_code depending on whether access succeeded.
+  **/
+void Kinematics::initialize_bazaar_access()
+{
     //Access Sensor and Actuator values of NAOInterface through the Bazaar
-    sensor_data_subscription_id = Bazaar::Subscribe("sensor_data", this->instance, "LOCAL/Kinematics/Subscribe/Sensor_Data");
-    actuator_data_subscription_id = Bazaar::Subscribe("actuator_data", this->instance, "LOCAL/Kinematics/Subscribe/Actuator_Data");
+    sensor_data_subscription_id = Bazaar::Subscribe("sensor_data", this->instance, "Kinematics/Subscribe/Sensor_Data");
+    actuator_data_subscription_id = Bazaar::Subscribe("actuator_data", this->instance, "Kinematics/Subscribe/Actuator_Data");
     //Verify that we have subscribed
     if(sensor_data_subscription_id && actuator_data_subscription_id)
     {
@@ -97,15 +110,15 @@ Kinematics::Kinematics()
         sensor_values_dt = Bazaar::Get("sensor_data");
         actuator_values_dt = Bazaar::Get("actuator_data");
         subscribe_return_code = true;
-        LOG_DEBUG << "Bazaar connections for sensor values established";
+        LOG_WARNING << "Bazaar connections for sensor values established";
     }
     else
     {
         LOG_WARNING << "One of the subscription return codes was False";
         subscribe_return_code = false;
     }
-}
 
+}
 /**
   * \brief get_hardware_data: Provides direct pointer access to sensor and actuator values.
   *                           You only want to update the actuator values with the calculated kinematics data.
@@ -119,12 +132,17 @@ bool Kinematics::get_hardware_data()
         //Ensure arrays have been created
         if(subscribe_return_code)
         {
-            sensor_values = boost::any_cast<float *>(*sensor_values_dt); //immutable
-            actuator_values = boost::any_cast<float *>(*actuator_values_dt); //mutable
+
+            sensor_vals = (boost::any_cast<std::vector<float>>(&*sensor_values_dt)); //immutable
+            actuator_vals = (boost::any_cast<std::vector<float>>(&*actuator_values_dt)); //mutable
+#ifndef TARGET_IS_CROSS
+    LOG_WARNING << "Bazaar Access Test: " << (*actuator_vals)[4];
+    (*actuator_vals)[4] = 3.14f;
+#endif
         }
         else
         {
-            LOG_WARNING << "One or both of the values from the Bazaar is a nullptr";
+            LOG_WARNING << "One or both of the values from the Bazaar is a nullptr.";
             return false;
         }
         return true;
@@ -159,7 +177,6 @@ void Kinematics::process_and_parse_intents()
     {
         ParsedIntent new_intent = pending_intents.pop_front().Parse(); //this is a vector<string>
         const std::string module_received_from = new_intent[0];
-        //Do stuff below
     }
 }
 
@@ -168,6 +185,8 @@ void Kinematics::perform_tests()
 {
 //Guards to ensure tests aren't run when crosscompiled
 #ifndef TARGET_IS_CROSS
+    //Do stuff below. Ex:
+    (*actuator_vals)[3] = 0.5f;
     LOG_DEBUG << "Performing 'Kinematics' Module tests";
     //Do tests here
 #endif
