@@ -53,6 +53,10 @@ bool Kinematics::RunFrame()
         // You now have access to the latest sensor data and current actuator values
         // Call kinematics calculation functions with the array of floats in sensor_values
         // assign results of kinematics calculations to actuator_values.
+
+
+        //Finally notify subscribers of update.
+        set_hardware_data();
     }
 
     return true;
@@ -86,10 +90,20 @@ Kinematics::Kinematics()
     //Access Sensor and Actuator values of NAOInterface through the Bazaar
     sensor_data_subscription_id = Bazaar::Subscribe("sensor_data", this->instance, "LOCAL/Kinematics/Subscribe/Sensor_Data");
     actuator_data_subscription_id = Bazaar::Subscribe("actuator_data", this->instance, "LOCAL/Kinematics/Subscribe/Actuator_Data");
-    //Get pointers of boost::any dynamic type to objects in the Bazaar
-    sensor_values_dt = Bazaar::Get("sensor_data");
-    actuator_values_dt = Bazaar::Get("actuator_data");
-    LOG_DEBUG << "Bazaar connections for sensor values established";
+    //Verify that we have subscribed
+    if(sensor_data_subscription_id && actuator_data_subscription_id)
+    {
+        //Get pointers of boost::any dynamic type to objects in the Bazaar
+        sensor_values_dt = Bazaar::Get("sensor_data");
+        actuator_values_dt = Bazaar::Get("actuator_data");
+        subscribe_return_code = true;
+        LOG_DEBUG << "Bazaar connections for sensor values established";
+    }
+    else
+    {
+        LOG_WARNING << "One of the subscription return codes was False";
+        subscribe_return_code = false;
+    }
 }
 
 /**
@@ -99,11 +113,20 @@ Kinematics::Kinematics()
   **/
 bool Kinematics::get_hardware_data()
 {
-
+    BOOST_LOG_FUNCTION(); //Traces this function call in the logger
     try
     {
-        sensor_values = boost::any_cast<float *>(*sensor_values_dt); //immutable
-        actuator_values = boost::any_cast<float *>(*actuator_values_dt); //mutable
+        //Ensure arrays have been created
+        if(subscribe_return_code)
+        {
+            sensor_values = boost::any_cast<float *>(*sensor_values_dt); //immutable
+            actuator_values = boost::any_cast<float *>(*actuator_values_dt); //mutable
+        }
+        else
+        {
+            LOG_WARNING << "One or both of the values from the Bazaar is a nullptr";
+            return false;
+        }
         return true;
     } 
     catch(const boost::bad_any_cast &e) 
@@ -111,6 +134,18 @@ bool Kinematics::get_hardware_data()
         LOG_WARNING << "A Boost Bad any_cast has occured: " << e.what();
     }
     return false;
+}
+
+/**
+  * \brief set_hardware_data: Ensures the data is updated in the Bazaar
+  **/
+bool Kinematics::set_hardware_data()
+{
+    //Touch will notify all subscribers that the data has changed with the intent
+    //used to subscribe to the data (i.e. NAOInterface)
+    Bazaar::Touch("sensor_data");
+    Bazaar::Touch("actuator_data");
+    return true;
 }
 
 /**

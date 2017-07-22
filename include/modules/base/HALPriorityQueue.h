@@ -41,7 +41,7 @@ public:
 
     void push(const queued_intent &q); //Add an intent to the queue
     const queued_intent &top() const; //Get the top queued item
-    const queued_intent &pop_top(); //Get top item and remove it from the list
+    const queued_intent pop_top(); //Get top item and remove it from the list
     void pop(); //Remove the top element from the queue
     std::size_t size() const; //Returns the number of items in the queue
     void print_and_clear(); //Prints out the queue using a stream and clears it

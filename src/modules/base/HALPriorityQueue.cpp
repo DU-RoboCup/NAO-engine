@@ -54,8 +54,8 @@ void HAL_PQ::pop()
 {
     intent_priority_queue.pop();
 }
-const queued_intent &HAL_PQ::pop_top() { 
-    auto item = intent_priority_queue.top(); 
+const queued_intent HAL_PQ::pop_top() { 
+    queued_intent item = intent_priority_queue.top(); 
     intent_priority_queue.pop();
     return item; 
 }

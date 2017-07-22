@@ -55,7 +55,7 @@ public:
     void perform_tests();
     //Get values from Bazaar in a usable form
     bool get_hardware_data();
-    //Update modified values in the Bazaar in boost::any form
+    //Update Bazaar and notify subscribers
     bool set_hardware_data();
 
 private:
@@ -63,6 +63,7 @@ private:
     static Kinematics *instance;
 
     uint32_t sensor_data_subscription_id, actuator_data_subscription_id;
+    bool subscribe_return_code;
     //These are both of the boost any dynamic type. That means all original type info
     //is lost in conversion, thus they must be cast back.
     std::shared_ptr<boost::any> sensor_values_dt, actuator_values_dt;

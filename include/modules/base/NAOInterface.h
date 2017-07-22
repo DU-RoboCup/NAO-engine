@@ -52,11 +52,7 @@ need to physically work with a NAO robot.
 #include <boost/interprocess/sync/named_semaphore.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "Head.h"
-#include "RArm.h"
-#include "LArm.h"
-#include "LLeg.h"
-#include "RLeg.h"
+
 #include "HALPriorityQueue.h"
 #include "include/common.h"
 #include "include/debug/debugging.h"
@@ -75,21 +71,10 @@ class NAOInterface : public Module
 public:
 	
 
-	/*
-	* hardware_datatypes - boost::variant datatype that can be set to a variety of different datatypes.
-	**/
-	typedef boost::variant < std::pair<float, float>, float, std::string, std::unordered_map<std::string, Head::EyeLED> > hardware_datatypes;
-	void initialize_hardware_map(); ///< Initially sets all of the values of our absurd hashmap.
-	void initialize_function_map(); ///< Initializes a map for calling functions.
 	
 	//Debug Functions
 	void print_commands_list(); ///< Lists all available function calls
-	void randomly_set_joints(); ///< This function randomly sets all of the joint values of the NAO's hardware.
-	void print_hardware_map(); ///< Will probably be deprecated
 
-
-	float generate_random_bound_val(float min, float max); ///< Generates a random number between a lower and upper limit
-	float generate_random_bound_val(std::pair<float, float> bounds); ///< Generates a random value given a actuators bounds (in radians, don't use degrees).
 	std::vector<std::string> command_list; ///< Stores the commands. 
 	/**
 	  * \brief Writes a new value to a hardware component.
@@ -102,17 +87,11 @@ public:
 	  * After all values have been written to the local map of values, we send that data
 	  * to the Shared Memory Map using the synch_pineapple() method.
 	  */
-	bool set_hardware_value(const std::string &hardware_component, float  value); 
 	bool set_hardware_value(const int &hardware_component, float value, QPRIORITY_FLAG FLAG);
 	bool set_hardware_value(const unsigned int &hardware_component, const float value);
 
 
-	/**
-	  * \brief Reads a hardware component value.
-	  * \param hardware_component - The hardware component's name to be read from.
-	  * 
-	  */
-	bool get_hardware_value(const std::string &hardware_component);
+
 
 	/**
 	  * \brief - Helper method for initializing access to shared memory. 
@@ -152,26 +131,14 @@ public:
 
 	// Hardware Write Tests
 	void hardware_write_test();
-
-	typedef std::function<hardware_datatypes(hardware_datatypes)> generic_function;
-	/*typedef std::map<std::string, generic_function> function_map;*/
 	
-
+	//required module functions
 	static NAOInterface* Instance();
-    void Reconfigure(std::string config_file, uint16_t id);
-    bool RunFrame();
-    bool ProcessIntent(Intent &i);
-    bool Install();
-    bool Uninstall();
-	/**
-	  * shared_ptr's for Ligaments: Due to these being shared pointers, be careful with Ref Counts and how destruction is handled (it's not automatic).
-	  * Need to be shared_ptrs for function pointers and binding.
-	  **/
-	std::shared_ptr<Head> head;
-	std::shared_ptr<RArm> RightArm;
-	std::shared_ptr<LArm> LeftArm;
-	std::shared_ptr<LLeg> LeftLeg;
-	std::shared_ptr<RLeg> RightLeg;
+	void Reconfigure(std::string config_file, uint16_t id);
+	bool RunFrame();
+	bool ProcessIntent(Intent &i);
+	bool Install();
+	bool Uninstall();
 
 private:
 	static NAOInterface* instance;
@@ -190,10 +157,9 @@ private:
 	/* Items to be written stored as tuples: <ActuatorIDnumber, Value, FLAG> */
 	HAL_PQ WriteRequests;
 
+	//Contains a hashmap with all actuator and sensor values
 	HardwareMap hardware_map;
-protected: 
-	std::unordered_map<std::string, std::function<void(float)>> hardware_set_functions; ///< unordered_map of API calls and value set function pointers
-	std::unordered_map<std::string, std::function<float(void)>> hardware_get_map;///< unordered_map of API calls and value get function pointers
+
 };
 
 #endif //NAOInterface_H
