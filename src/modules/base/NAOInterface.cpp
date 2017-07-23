@@ -49,6 +49,7 @@ bool NAOInterface::RunFrame()
 		LOG_WARNING << "Shared mem not setup!" << std::endl;
 	}
 	LOG_DEBUG << "Shared Memory Setup! Doing a hardware test...";
+	read_shared_memory();
     hardware_write_test();
 	LOG_DEBUG << "Hardware Test Done!";
 	if(!pending_intents.empty())
@@ -320,6 +321,21 @@ bool NAOInterface::read_shared_memory()
 	LOG_DEBUG << "Reading shared memory";
 	try
 	{
+		LOG_DEBUG << "NAOInterface is accessing the semaphore";
+		while(!sem_trywait(semaphore))
+			LOG_DEBUG << "Waiting for semaphore access...";
+
+		//Create a NAO-Engine local copy of the data stored in shared memory
+		std::copy(&pineappleJuice->sensor_values[0], &pineappleJuice->sensor_values[NumOfSensorIds], (*sensor_vals).begin());
+		std::copy(&pineappleJuice->actuator_values[0], &pineappleJuice->actuator_values[NumOfActuatorIds], (*actuator_vals).begin());
+		sem_post(semaphore);
+		LOG_DEBUG << "Semaphore posted";
+	}
+	catch (const interprocess_exception &e)
+	{
+		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
+		return false;
+	}
 		// LOG_DEBUG << "NAOInterface is accessing the semaphore";
 		// while(!sem_trywait(semaphore))
 		// {
@@ -332,13 +348,6 @@ bool NAOInterface::read_shared_memory()
 		// LOG_DEBUG << "actuator values copied";
 		// sem_post(semaphore);
 		// LOG_DEBUG << "Semaphore posted";
-	}
-	catch (const interprocess_exception &e)
-	{
-		LOG_WARNING << "Could not access robo_semaphore due to: " << e.what() << ". NaoQI Probably crashed.";
-		return false;
-	}
-	LOG_DEBUG << "Done reading shared memory";
 	return true;
 }
 bool NAOInterface::write_shared_memory()
